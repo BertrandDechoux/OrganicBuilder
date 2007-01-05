@@ -3,6 +3,7 @@ package uk.org.squirm3;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javax.swing.JApplet;
 import javax.swing.SwingUtilities;
 
 import uk.org.squirm3.engine.IApplicationEngine;
@@ -10,7 +11,7 @@ import uk.org.squirm3.engine.LocalEngine;
 import uk.org.squirm3.ui.GUI;
 import uk.org.squirm3.ui.Resource;
 
-public final class Application
+public final class Application 
 {
 	static private final String translationsDirectory = "translations";
 	static private final String levelsTranslationFilePath = translationsDirectory+"/levels";
@@ -19,13 +20,18 @@ public final class Application
 	static private ResourceBundle levelsRB;
 	static private ResourceBundle interfaceRB;
 	
-	private Application() {
+	public Application(final JApplet applet) {
+		initTranslator();
 		final IApplicationEngine iApplicationEngine = new LocalEngine();
 	    SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
-	        	GUI.createGUI(iApplicationEngine);
+	        	GUI.createGUI(iApplicationEngine, applet);
 	        }
 	    });
+	}
+	
+	public Application() {
+		this(null);
 	}
 	
 	static private void initTranslator() {
@@ -52,7 +58,6 @@ public final class Application
 	// if you want to run the organic builder as an application
 	public static void main(String argv[]) {
 		if(argv==null || argv.length==0) {
-			initTranslator();
 			new Application();
 			return;
 		} else {

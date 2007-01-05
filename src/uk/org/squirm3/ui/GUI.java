@@ -2,8 +2,8 @@ package uk.org.squirm3.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
@@ -11,6 +11,9 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -20,53 +23,43 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.JToolBar;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.engine.EngineDispatcher;
 import uk.org.squirm3.engine.IApplicationEngine;
-import uk.org.squirm3.engine.IEngineListener;
 
 public class GUI {
-	private final JFrame frame;
 	
-	private final EngineDispatcher engineDispatcher;
-	private final IApplicationEngine iApplicationEngine;
-	
-	public GUI(final IApplicationEngine iApplicationEngine, Container contentPane) {
-		frame = new JFrame(Application.localize(new String[] {"interface","application","title"}));
-			// applictionEngine
-		engineDispatcher = new EngineDispatcher();
-		this.iApplicationEngine = iApplicationEngine;
-		iApplicationEngine.addListener(engineDispatcher);	
-			//show frame
-		frame.setContentPane(contentPane);
+	public static void createGUI(final IApplicationEngine iApplicationEngine, final JApplet applet) {
+		Resource.loadPictures();
+		final EngineDispatcher engineDispatcher = new EngineDispatcher();
+		iApplicationEngine.addListener(engineDispatcher);
+		
+			//frame
+		JFrame frame = new JFrame(Application.localize(new String[] {"interface","application","title"}));
 		Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 		frame.setSize((int)screenSize.getWidth(),(int)(0.9*screenSize.getHeight()));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addWindowListener(
-				new WindowAdapter() {
-					public void windowClosing(WindowEvent e) {
-						iApplicationEngine.removeListener(engineDispatcher);
-					}
-					public void windowDeiconified(WindowEvent e) {}
-					public void windowIconified(WindowEvent e) {}
-				});
-		frame.setVisible(true);
-	}
-	
-	public void addListener(IEngineListener l) {
-		engineDispatcher.addListener(l);
-	}
-	
-	public static GUI createGUI(IApplicationEngine iApplicationEngine) {
-		Resource.loadPictures();
+			new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					iApplicationEngine.removeListener(engineDispatcher);
+				}
+				public void windowDeiconified(WindowEvent e) {}
+				public void windowIconified(WindowEvent e) {}
+			});
+
 			//listeners
 		AtomsListener atomsListener = new AtomsListener(iApplicationEngine);
 		CurrentLevelListener currentLevelListener = new CurrentLevelListener(iApplicationEngine);
 		ReactionsListener reactionsListener = new ReactionsListener(iApplicationEngine);
 		final SimulationListener simulationListener = new SimulationListener(iApplicationEngine);
 		LevelNavigator levelNavigator = new LevelNavigator(iApplicationEngine);
+				//ajout
+		engineDispatcher.addListener(atomsListener);
+		engineDispatcher.addListener(currentLevelListener);
+		engineDispatcher.addListener(reactionsListener);
+		engineDispatcher.addListener(simulationListener);
 		
 			//main panels
 		JPanel collisionsPanel 		= atomsListener.getCollisionsPanel();
@@ -74,29 +67,40 @@ public class GUI {
 		JPanel reactionsPanel		= reactionsListener.getReactionsPanel();
 		
 			//toolbar
-		JToolBar toolBar = new JToolBar();
-		toolBar.setFloatable(false);
+		JPanel toolBar = new JPanel();
+		toolBar.setLayout(new BoxLayout(toolBar,BoxLayout.X_AXIS));
 		Color bg = new Color(255,255,225);
 		toolBar.setBackground(bg);
-				// simulation controls
-		toolBar.add(createIconButton(simulationListener.getStopAction(),bg));
-		toolBar.add(createIconButton(simulationListener.getRunAction(),bg));
-		toolBar.add(createIconButton(simulationListener.getResetAction(),bg));
-		toolBar.addSeparator();
-					//parameters
-		toolBar.add(createIconButton(createParametersAction(simulationListener.getParametersPanel()),bg));
-		toolBar.addSeparator(new Dimension(50,10));
+			// simulation controls
+			JPanel simControlsPanel = new JPanel();
+			simControlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT,1,2));
+			simControlsPanel.setBackground(bg);
+			simControlsPanel.add(createIconButton(simulationListener.getStopAction(),bg));
+			simControlsPanel.add(createIconButton(simulationListener.getRunAction(),bg));
+			simControlsPanel.add(createIconButton(simulationListener.getResetAction(),bg));
+			simControlsPanel.add(createIconButton(createParametersAction(simulationListener.getParametersPanel()),bg));
+		toolBar.add(simControlsPanel);
+		toolBar.add(Box.createHorizontalGlue());
 			// navigation controls
-		toolBar.add(createIconButton(levelNavigator.getIntroAction(),bg));
-		toolBar.add(createIconButton(levelNavigator.getPreviousAction(),bg));
-		JComboBox cb = levelNavigator.getLevelComboBox();
-		cb.setMaximumSize(new Dimension(150,80));
-		toolBar.add(cb);
-		toolBar.add(createIconButton(levelNavigator.getNextAction(),bg));
-		toolBar.add(createIconButton(levelNavigator.getLastAction(),bg));
-		toolBar.addSeparator();
-			//about control
-		toolBar.add(createIconButton(createAboutAction(),bg));
+			JPanel navControlsPanel = new JPanel();
+			navControlsPanel.setLayout(new FlowLayout(FlowLayout.CENTER,1,2));
+			navControlsPanel.setBackground(bg);
+			navControlsPanel.add(createIconButton(levelNavigator.getIntroAction(),bg));
+			navControlsPanel.add(createIconButton(levelNavigator.getPreviousAction(),bg));
+			JComboBox cb = levelNavigator.getLevelComboBox();
+			cb.setMaximumSize(new Dimension(150,80));
+			navControlsPanel.add(cb);
+			navControlsPanel.add(createIconButton(levelNavigator.getNextAction(),bg));
+			navControlsPanel.add(createIconButton(levelNavigator.getLastAction(),bg));
+		toolBar.add(navControlsPanel);
+		toolBar.add(Box.createHorizontalGlue());
+			//misc controls
+			JPanel miscControlsPanel = new JPanel();
+			miscControlsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT,1,2));
+			miscControlsPanel.setBackground(bg);
+			miscControlsPanel.add(createIconButton(createAboutAction(),bg));
+			if(applet!=null) miscControlsPanel.add(createIconButton(createAppletAction(frame,applet),bg));
+		toolBar.add(miscControlsPanel);
 		
 		// rootComponent
 		JSplitPane leftComponent = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, currentLevelPanel, reactionsPanel);
@@ -109,16 +113,14 @@ public class GUI {
 		contentPane.add(toolBar, BorderLayout.NORTH);
 		contentPane.add(rootComponent, BorderLayout.CENTER);
 		
-			//gui
-		final GUI gui = new GUI(iApplicationEngine, contentPane);
-		gui.addListener(atomsListener);
-		gui.addListener(currentLevelListener);
-		gui.addListener(reactionsListener);
-		gui.addListener(simulationListener);
-		
 		levelNavigator.init();
+		if(applet==null) {
+			frame.setContentPane(contentPane);
+			frame.setVisible(true);
+		} else {
+			applet.setContentPane(contentPane);
+		}
 		
-		return gui;
 	}
 	
 	private static JButton createIconButton(Action action, Color bg) {
@@ -142,7 +144,7 @@ public class GUI {
 	    return action;
 	}
 	
-	private static Action createAboutAction() {	//TODO
+	private static Action createAboutAction() {	//TODO mise en page des textes
 		final JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.addTab(Application.localize(new String[] {"interface","application","about"}),
 				null, createScrolledTA("about.txt"), null);
@@ -161,6 +163,29 @@ public class GUI {
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
 	    action.putValue(Action.SMALL_ICON, Resource.getIcon("about"));
+	    return action;
+	}
+	
+	private static Action createAppletAction(final JFrame frame, final JApplet applet) { //TODO externalize strings
+		Action action = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				if(frame.isVisible()) {
+					frame.setVisible(false);
+					putValue(Action.NAME,"Undock");
+					putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
+					applet.setContentPane(frame.getContentPane());
+					applet.repaint();
+				} else {
+					putValue(Action.NAME,"Dock");
+					putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
+					frame.setContentPane(applet.getContentPane());
+					frame.setVisible(true);
+					applet.repaint();
+				}
+			}
+	    };
+	    action.putValue(Action.NAME,"Undock");
+	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
 	    return action;
 	}
 	
