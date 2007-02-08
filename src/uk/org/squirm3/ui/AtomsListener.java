@@ -1,3 +1,4 @@
+
 package uk.org.squirm3.ui;
 
 import java.awt.BasicStroke;
@@ -148,7 +149,6 @@ public class AtomsListener extends EngineListenerAdapter {
 				if(imagePanel!=null) {
 					Dimension d = scrollPane.getSize();
 					int pseudoScale = (int) (Math.min((double)((double)d.height*0.99/(double)simulationHeight),(double)((double)d.width*0.99/(double)simulationWidth))*100);
-					System.out.println(pseudoScale);
 					scale = (pseudoScale>=100)? 100 : (byte)pseudoScale;
 				} 
 			} else {

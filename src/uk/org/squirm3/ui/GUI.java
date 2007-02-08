@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.engine.EngineDispatcher;
@@ -39,15 +40,11 @@ public class GUI {
 		JFrame frame = new JFrame(Application.localize(new String[] {"interface","application","title"}));
 		Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 		frame.setSize((int)screenSize.getWidth(),(int)(0.9*screenSize.getHeight()));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.addWindowListener(
-			new WindowAdapter() {
-				public void windowClosing(WindowEvent e) {
-					iApplicationEngine.removeListener(engineDispatcher);
-				}
-				public void windowDeiconified(WindowEvent e) {}
-				public void windowIconified(WindowEvent e) {}
-			});
+		if(applet==null) {
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		} else {
+			frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		}
 
 			//listeners
 		AtomsListener atomsListener = new AtomsListener(iApplicationEngine);
@@ -116,10 +113,25 @@ public class GUI {
 		levelNavigator.init();
 		if(applet==null) {
 			frame.setContentPane(contentPane);
+			SwingUtilities.updateComponentTreeUI(frame);
 			frame.setVisible(true);
 		} else {
 			applet.setContentPane(contentPane);
+			SwingUtilities.updateComponentTreeUI(applet);
 		}
+		
+		frame.addWindowListener(
+				new WindowAdapter() {
+					public void windowClosing(WindowEvent e) {
+						if(applet==null) iApplicationEngine.removeListener(engineDispatcher);
+						else {
+							applet.setContentPane(contentPane);
+							SwingUtilities.updateComponentTreeUI(applet);
+						}
+					}
+					public void windowDeiconified(WindowEvent e) {}
+					public void windowIconified(WindowEvent e) {}
+				});
 		
 	}
 	
@@ -174,13 +186,13 @@ public class GUI {
 					putValue(Action.NAME,"Undock");
 					putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
 					applet.setContentPane(frame.getContentPane());
-					applet.repaint();
+					SwingUtilities.updateComponentTreeUI(applet);
 				} else {
 					putValue(Action.NAME,"Dock");
 					putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
 					frame.setContentPane(applet.getContentPane());
 					frame.setVisible(true);
-					applet.repaint();
+					SwingUtilities.updateComponentTreeUI(frame);
 				}
 			}
 	    };
