@@ -1,6 +1,9 @@
 package uk.org.squirm3;
 
+import java.io.FileInputStream;
 import java.util.Locale;
+import java.util.Properties;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 import javax.swing.JApplet;
@@ -17,8 +20,8 @@ public final class Application
 	static private final String levelsTranslationFilePath = translationsDirectory+"/levels";
 	static private final String interfaceTranslationFilePath = translationsDirectory+"/interface";
 	
-	static private ResourceBundle levelsRB;
-	static private ResourceBundle interfaceRB;
+	static final private Properties levelsProps = new Properties();
+	static final private Properties interfaceProps = new Properties();;
 	
 	public Application(final JApplet applet) {
 		initTranslator();
@@ -38,8 +41,17 @@ public final class Application
 		// if we have several possibilities, we might ask the user and then use
 		// Locale.setDefault(newLocale);
 		Locale currentLocale =  Locale.getDefault();
-        levelsRB = ResourceBundle.getBundle(levelsTranslationFilePath, currentLocale);
-        interfaceRB = ResourceBundle.getBundle(interfaceTranslationFilePath, currentLocale);
+		// use files in the locale's language
+		try{
+			levelsProps.load(new FileInputStream(levelsTranslationFilePath+"_"+currentLocale.getLanguage()+".properties"));
+		    interfaceProps.load(new FileInputStream(interfaceTranslationFilePath+"_"+currentLocale.getLanguage()+".properties"));
+			
+		} catch(Exception e) {// use default files
+			try {
+				levelsProps.load(new FileInputStream(levelsTranslationFilePath+".properties"));
+				interfaceProps.load(new FileInputStream(interfaceTranslationFilePath+".properties"));
+			} catch(Exception ex) {;}
+		}
 	}
 	
 	static public String localize(String[] code) {
@@ -49,9 +61,9 @@ public final class Application
 			key += "."+code[i];
 		}
 		if(bundle.equals("levels")) {
-			return levelsRB.getString(key);
+			return levelsProps.getProperty(key,"ERROR : STRING NOT FOUND!");
 		} else if(bundle.equals("interface")) {
-			return interfaceRB.getString(key);
+			return interfaceProps.getProperty(key,"ERROR : STRING NOT FOUND!");
 		} else return bundle+"/"+key;
 	}
 	
