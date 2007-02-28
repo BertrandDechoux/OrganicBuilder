@@ -9,10 +9,10 @@ import java.util.Iterator;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
@@ -22,7 +22,7 @@ import uk.org.squirm3.engine.IApplicationEngine;
 
 public class CurrentLevelListener extends EngineListenerAdapter {
 	private IApplicationEngine iApplicationEngine;
-	private JTextArea description;
+	private JEditorPane description;
 	private JButton hintButton, evaluateButton;
 	private Level currentLevel;
 	
@@ -36,10 +36,8 @@ public class CurrentLevelListener extends EngineListenerAdapter {
 	private JPanel createCurrentLevelPanel() {
 		final JPanel jPanel = new JPanel();
 		jPanel.setLayout(new BorderLayout());
-		description = new JTextArea();
-		description.setRows(10);
-		description.setLineWrap(true);
-		description.setWrapStyleWord(true);
+		description = new JEditorPane();
+		description.setContentType("text/html");
 		description.setEditable(false);
 		jPanel.add(new JScrollPane(description), BorderLayout.CENTER);
 		jPanel.add(createButtonsPanel(),BorderLayout.SOUTH);
@@ -101,7 +99,7 @@ public class CurrentLevelListener extends EngineListenerAdapter {
 			hintButton.setEnabled(false);
 			evaluateButton.setEnabled(false);
 		} else {
-			description.setText(currentLevel.getChallenge());
+			description.setText("<b>"+currentLevel.getTitle()+"</b>"+currentLevel.getChallenge());
 			if(currentLevel.getHint()==null || currentLevel.getHint().equals("")) {
 				hintButton.setEnabled(false);
 			} else {

@@ -60,7 +60,7 @@ public class Resource
 		
 	// used to load an image from the jar into an Image structure
 	private static Image loadImage(String name, Component c) {
-		boolean old_version = false;
+		boolean old_version = true;
 		if(old_version) { //TODO make a benchmark or something
 			// in order to chose the most efficent method
 			URL url = Resource.class.getResource("/pictures/"+name);

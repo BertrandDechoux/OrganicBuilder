@@ -3,8 +3,6 @@ package uk.org.squirm3;
 import java.io.FileInputStream;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
 
 import javax.swing.JApplet;
 import javax.swing.SwingUtilities;

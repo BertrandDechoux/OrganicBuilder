@@ -2,7 +2,6 @@
 package uk.org.squirm3.ui;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -24,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -56,8 +56,9 @@ public class AtomsListener extends EngineListenerAdapter {
 	private JSlider scaleSlider;
 	
 	private JPanel imagePanel;
+	private JPanel controlsPanel;
 	
-	private final JPanel collisionsPanel;
+	private final JComponent collisionsPanel;
 	private JScrollPane scrollPane;
 	
 
@@ -68,13 +69,14 @@ public class AtomsListener extends EngineListenerAdapter {
 		setApplicationEngine(iApplicationEngine);
 	}
 	
-	public JPanel getCollisionsPanel() {
+	public JComponent getCollisionsPanel() {
 		return collisionsPanel;
 	}
 	
-	private JPanel createCollisionsPanel() {
-		JPanel mainPanel = new JPanel();
-		mainPanel.addComponentListener(new ComponentListener() {
+	private JComponent createCollisionsPanel() {
+		imagePanel = new ImagePanel();
+		scrollPane = new JScrollPane(imagePanel);
+		scrollPane.addComponentListener(new ComponentListener() {
 			public void componentResized(ComponentEvent arg0) {
 				imageSizeHasChanged();
 			}
@@ -82,12 +84,9 @@ public class AtomsListener extends EngineListenerAdapter {
 			public void componentMoved(ComponentEvent arg0) {}
 			public void componentShown(ComponentEvent arg0) {}
 		});
-		mainPanel.setLayout(new BorderLayout());	
-		imagePanel = new ImagePanel();
-		scrollPane = new JScrollPane(imagePanel);
-		mainPanel.add(scrollPane,BorderLayout.CENTER);
-		JPanel jPanel = new JPanel();
-		jPanel.add(new JLabel(Application.localize(new String[] {"interface","scale"})));
+		
+		controlsPanel = new JPanel();
+		controlsPanel.add(new JLabel(Application.localize(new String[] {"interface","scale"})));
 		auto = new JCheckBox(Application.localize(new String[] {"interface","scale","auto"}));
 		auto.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -96,7 +95,7 @@ public class AtomsListener extends EngineListenerAdapter {
 			}
 		});
 		auto.setSelected(true);
-		jPanel.add(auto);
+		controlsPanel.add(auto);
 		scaleSlider = new JSlider(30, 100, scale);
 		scaleSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -108,9 +107,13 @@ public class AtomsListener extends EngineListenerAdapter {
 		});
 		scaleSlider.setToolTipText(Application.localize(new String[] {"interface","scale","manual"}));
 		scaleSlider.setEnabled(false);
-		jPanel.add(scaleSlider);
-		mainPanel.add(jPanel,BorderLayout.SOUTH);
-		return mainPanel;
+		controlsPanel.add(scaleSlider);
+
+		return scrollPane;
+	}
+	
+	public JPanel getControlsPanel() {
+		return controlsPanel;
 	}
 
 	public void setApplicationEngine(IApplicationEngine iApplicationEngine) {

@@ -16,13 +16,14 @@ import javax.swing.BoxLayout;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import uk.org.squirm3.Application;
@@ -38,8 +39,7 @@ public class GUI {
 		
 			//frame
 		JFrame frame = new JFrame(Application.localize(new String[] {"interface","application","title"}));
-		Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-		frame.setSize((int)screenSize.getWidth(),(int)(0.9*screenSize.getHeight()));
+		frame.setSize(950,600);
 		if(applet==null) {
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		} else {
@@ -59,7 +59,7 @@ public class GUI {
 		engineDispatcher.addListener(simulationListener);
 		
 			//main panels
-		JPanel collisionsPanel 		= atomsListener.getCollisionsPanel();
+		JComponent collisionsPanel 	= atomsListener.getCollisionsPanel();
 		JPanel currentLevelPanel	= currentLevelListener.getCurrentLevelPanel();
 		JPanel reactionsPanel		= reactionsListener.getReactionsPanel();
 		
@@ -75,7 +75,7 @@ public class GUI {
 			simControlsPanel.add(createIconButton(simulationListener.getStopAction(),bg));
 			simControlsPanel.add(createIconButton(simulationListener.getRunAction(),bg));
 			simControlsPanel.add(createIconButton(simulationListener.getResetAction(),bg));
-			simControlsPanel.add(createIconButton(createParametersAction(simulationListener.getParametersPanel()),bg));
+			simControlsPanel.add(createIconButton(createParametersAction(simulationListener.getParametersPanel(),atomsListener.getControlsPanel()),bg));
 		toolBar.add(simControlsPanel);
 		toolBar.add(Box.createHorizontalGlue());
 			// navigation controls
@@ -143,10 +143,14 @@ public class GUI {
 		return button;
 	}
 	
-	private static Action createParametersAction(final JPanel p) {
+	private static Action createParametersAction(final JPanel p1, final JPanel p2) {
+		final JPanel message = new JPanel();
+		message.setLayout(new BoxLayout(message, BoxLayout.PAGE_AXIS));
+		message.add(p1);
+		message.add(p2);
 		Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, p,
+				JOptionPane.showMessageDialog(null, message,
 						Application.localize(new String[] {"interface","application","parameters"}),
 						JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -159,12 +163,9 @@ public class GUI {
 	private static Action createAboutAction() {	//TODO mise en page des textes
 		final JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.addTab(Application.localize(new String[] {"interface","application","about"}),
-				null, createScrolledTA("about.txt"), null);
+				null, createTextPane("about.html"), null);
 		tabbedPane.addTab(Application.localize(new String[] {"interface","application","license"}),
-				null, createScrolledTA("license.txt"), null);
-		tabbedPane.addTab(Application.localize(new String[] {"interface","application","explanation"}),
-				null, createScrolledTA("explanation.txt"), null);
-		//tabbedPane.setMnemonicAt(0, KeyEvent.VK_1); TODO
+				null, createTextPane("license.html"), null);
 
 		Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
@@ -200,13 +201,13 @@ public class GUI {
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
 	    return action;
 	}
-	
-	private static JScrollPane createScrolledTA(String fileName) {
-		JTextArea message  = new JTextArea(Resource.getFileContent(fileName));
-		message.setLineWrap(true);
-		message.setWrapStyleWord(true);
-		message.setEditable(false);
-		JScrollPane sp = new JScrollPane(message);
+
+	private static JScrollPane createTextPane(String fileName) {
+		JEditorPane textPane = new JEditorPane();
+		textPane.setContentType("text/html");
+		textPane.setText(Resource.getFileContent(fileName));
+		textPane.setEditable(false);
+		JScrollPane sp = new JScrollPane(textPane);
 		sp.setPreferredSize(new Dimension(600,400));
 		return sp;
 	}
