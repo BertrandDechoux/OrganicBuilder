@@ -222,13 +222,13 @@ public class ReactionsListener extends EngineListenerAdapter {
 				String reactionString = "";
 				reactionString += aType.getSelectedItem();
 				reactionString += aState.getSelectedItem();
-				if(bondedBefore.isSelected()) reactionString +=" + ";
+				if(!bondedBefore.isSelected()) reactionString +=" + ";
 				reactionString += bType.getSelectedItem();
 				reactionString += bState.getSelectedItem();
 				reactionString += " => ";
 				reactionString += futureAType.getText();
 				reactionString += futureAState.getSelectedItem();
-				if(bondedAfter.isSelected()) reactionString +=" + ";
+				if(!bondedAfter.isSelected()) reactionString +=" + ";
 				reactionString += futureBType.getText();
 				reactionString += futureBState.getSelectedItem();
 				addReaction.setText(reactionString);
