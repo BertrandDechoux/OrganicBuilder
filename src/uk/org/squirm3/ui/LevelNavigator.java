@@ -124,7 +124,7 @@ public class LevelNavigator {
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","first"}));
-	    action.putValue(Action.SMALL_ICON, Resource.getIcon("beginning"));
+	    action.putValue(Action.SMALL_ICON, Resource.getIcon("first"));
 		return 	action;
 	}
 	
@@ -157,7 +157,7 @@ public class LevelNavigator {
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","last"}));
-	    action.putValue(Action.SMALL_ICON, Resource.getIcon("end"));
+	    action.putValue(Action.SMALL_ICON, Resource.getIcon("last"));
 		return 	action;
 	}
 

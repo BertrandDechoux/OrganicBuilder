@@ -90,7 +90,7 @@ public class Resource
 	}
 	
 	public static Icon getIcon(String name) {
-		URL url = Resource.class.getResource("/icons/"+name+".gif");
+		URL url = Resource.class.getResource("/icons/"+name+".png");
 		return new ImageIcon( Toolkit.getDefaultToolkit().getImage(url));
 	}
 	
