@@ -64,7 +64,7 @@ public class Resource
 		if(old_version) { //TODO make a benchmark or something
 			// in order to chose the most efficent method
 			URL url = Resource.class.getResource("/pictures/"+name);
-			Image img = c.getToolkit().getImage(url);
+			Image img = c.getToolkit().createImage(url);
 			try {
 				MediaTracker tracker = new MediaTracker(c);
 				tracker.addImage(img, 0);
@@ -91,7 +91,7 @@ public class Resource
 	
 	public static Icon getIcon(String name) {
 		URL url = Resource.class.getResource("/icons/"+name+".png");
-		return new ImageIcon( Toolkit.getDefaultToolkit().getImage(url));
+		return new ImageIcon( Toolkit.getDefaultToolkit().createImage(url));
 	}
 	
 	// return the content of the file
@@ -122,7 +122,7 @@ public class Resource
 			  connection.setDoOutput(true);
 			  
 			  PrintWriter out = new PrintWriter(connection.getOutputStream());
-			  out.println("Organic Builder CVS version (current state : refactoring)");
+			  out.println("Organic Builder");
 			  out.println("challenge "+String.valueOf(levelNumber+" solved"));
 			  Iterator it = reactions.iterator();
 			  while(it.hasNext()) out.println(((Reaction)it.next()).getString());

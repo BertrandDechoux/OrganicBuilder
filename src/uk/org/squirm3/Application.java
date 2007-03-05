@@ -1,6 +1,5 @@
 package uk.org.squirm3;
 
-import java.io.FileInputStream;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -14,7 +13,7 @@ import uk.org.squirm3.ui.Resource;
 
 public final class Application 
 {
-	static private final String translationsDirectory = "translations";
+	static private final String translationsDirectory = "/translations";
 	static private final String levelsTranslationFilePath = translationsDirectory+"/levels";
 	static private final String interfaceTranslationFilePath = translationsDirectory+"/interface";
 	
@@ -41,13 +40,13 @@ public final class Application
 		Locale currentLocale =  Locale.getDefault();
 		// use files in the locale's language
 		try{
-			levelsProps.load(new FileInputStream(levelsTranslationFilePath+"_"+currentLocale.getLanguage()+".properties"));
-		    interfaceProps.load(new FileInputStream(interfaceTranslationFilePath+"_"+currentLocale.getLanguage()+".properties"));
+			levelsProps.load(Resource.class.getResourceAsStream(levelsTranslationFilePath+"_"+currentLocale.getLanguage()+".properties"));
+		    interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+"_"+currentLocale.getLanguage()+".properties"));
 			
 		} catch(Exception e) {// use default files
 			try {
-				levelsProps.load(new FileInputStream(levelsTranslationFilePath+".properties"));
-				interfaceProps.load(new FileInputStream(interfaceTranslationFilePath+".properties"));
+				levelsProps.load(Resource.class.getResourceAsStream(levelsTranslationFilePath+".properties"));
+				interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+".properties"));
 			} catch(Exception ex) {;}
 		}
 	}
