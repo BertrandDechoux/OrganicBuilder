@@ -1,6 +1,5 @@
 package uk.org.squirm3.ui;
 
-import java.awt.Dimension;
 import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -94,6 +93,11 @@ public class LevelNavigator {
 		levelList.add(new Membrane_transport());
 		levelList.add(new Membrane_division());
 		levelList.add(new Cell_division());
+		Iterator it = levelList.iterator();
+		byte id = 0;
+		while(it.hasNext()) {
+			((Level)it.next()).setId(id++);
+		}
 	}
 	
 	private JComboBox createLevelComboBox() {

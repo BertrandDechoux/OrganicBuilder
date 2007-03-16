@@ -17,8 +17,8 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
@@ -113,7 +113,7 @@ public class Resource
 		return "ERROR : "+fileName;
 	}
 		
-	public static void logSolution(int levelNumber, Vector reactions){
+	public static void logSolution(int levelNumber, Collection reactions){
 	  if(levelNumber>0) // do you want to log the solution or not?
 	  {
 		 try {

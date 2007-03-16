@@ -194,6 +194,7 @@ public class GUI {
 					frame.setContentPane(applet.getContentPane());
 					frame.setVisible(true);
 					SwingUtilities.updateComponentTreeUI(frame);
+					SwingUtilities.updateComponentTreeUI(applet);
 				}
 			}
 	    };

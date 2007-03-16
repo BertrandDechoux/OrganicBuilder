@@ -1,7 +1,7 @@
 package uk.org.squirm3.data;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.Iterator;
 
 
 public class Reaction

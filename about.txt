@@ -1,0 +1,23 @@
+ORGANIC BUILDER
+
+Copyright (C) 2005 Tim J. Hutton - tim.hutton@gmail.com - http://www.sq3.org.uk
+
+Contributions from: Ralph Hartley, Bertrand Dechoux
+
+Project hosted by sourceforge http://sourceforge.net/projects/organicbuilder : http://organicbuilder.sourceforge.net/
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Full text of GPL license using the -license parameter.
+
+Pictures are from the "Open Clip Art Library" http://openclipart.org/ : http://creativecommons.org/licenses/publicdomain/
+
+    * reset simulation (reload) : Jose Hevia
+    * about (information) : mo
+    * add reaction (svg buttons) : Lumen Design Studio
+    * atom's pictures
+    * ...

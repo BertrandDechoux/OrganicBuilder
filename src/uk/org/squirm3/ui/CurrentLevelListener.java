@@ -80,6 +80,7 @@ public class CurrentLevelListener extends EngineListenerAdapter {
 						success = false;
 				}
 				if(success) {
+					Resource.logSolution(currentLevel.getId(),iApplicationEngine.getReactions());
 					JOptionPane.showMessageDialog(currentLevelPanel, result,
 							Application.localize(new String[] {"interface","level","success","title"}), JOptionPane.INFORMATION_MESSAGE);
 				} else {

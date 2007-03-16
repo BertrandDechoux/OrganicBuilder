@@ -1,6 +1,5 @@
 package uk.org.squirm3;
 
-import java.util.Locale;
 import java.util.Properties;
 
 import javax.swing.JApplet;
@@ -20,8 +19,8 @@ public final class Application
 	static final private Properties levelsProps = new Properties();
 	static final private Properties interfaceProps = new Properties();;
 	
-	public Application(final JApplet applet) {
-		initTranslator();
+	public Application(final JApplet applet, String language) {
+		initTranslator(language);
 		final IApplicationEngine iApplicationEngine = new LocalEngine();
 	    SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
@@ -30,18 +29,17 @@ public final class Application
 	    });
 	}
 	
-	public Application() {
-		this(null);
+	public Application(String language) {
+		this(null,language);
 	}
 	
-	static private void initTranslator() {
-		// if we have several possibilities, we might ask the user and then use
-		// Locale.setDefault(newLocale);
-		Locale currentLocale =  Locale.getDefault();
-		// use files in the locale's language
+	static private void initTranslator(String language) {
+		// use files in the specified language
+		// for more information
+		// http://www.loc.gov/standards/iso639-2/englangn.html
 		try{
-			levelsProps.load(Resource.class.getResourceAsStream(levelsTranslationFilePath+"_"+currentLocale.getLanguage()+".properties"));
-		    interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+"_"+currentLocale.getLanguage()+".properties"));
+			levelsProps.load(Resource.class.getResourceAsStream(levelsTranslationFilePath+"_"+language+".properties"));
+		    interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+"_"+language+".properties"));
 			
 		} catch(Exception e) {// use default files
 			try {
@@ -66,46 +64,30 @@ public final class Application
 	
 	// if you want to run the organic builder as an application
 	public static void main(String argv[]) {
-		if(argv==null || argv.length==0) {
-			new Application();
-			return;
+		String horizontalBar = "*********************************************";
+		System.out.println();
+		System.out.println(horizontalBar);
+		if(argv==null || argv.length==0 || (argv[0].length()==2 && argv[0].charAt(0)!='-')) {
+			System.out.println("Starting the Organic Builder...");
+			new Application((argv==null || argv.length==0)?null:argv[0]);
+			System.out.println("Organic Builder is running.");
 		} else {
 			String parameter = argv[0].toLowerCase();
-			String horizontalBar = "*********************************************";
 			if(parameter.equals("-help") || parameter.equals("-h")) {
-				System.out.println();
-				System.out.println(horizontalBar);
-				System.out.println("To run this application type : java -jar OrganicBuilder.jar -help");
-				System.out.println("To display this help use : java -jar OrganicBuilder.jar -help");
-				System.out.println("To display information about this application : java -jar OrganicBuilder.jar -about");
-				System.out.println("To display the full license of this application : java -jar OrganicBuilder.jar -license");
-				System.out.println("You can't choose yet by parameters the user interface or the engine used.");
-				System.out.println(horizontalBar);
-				System.out.println();
-				return;
-			}
-			if(parameter.equals("-about")) {
-				System.out.println();
-				System.out.println(horizontalBar);
+				printOutFile("help.txt");
+			}else if(parameter.equals("-about")) {
 				printOutFile("about.txt");
-				System.out.println();
-				System.out.println("Full text of GPL license using the -license parameter.");
-				System.out.println(horizontalBar);
-				System.out.println();
-				return;
+			}else if(parameter.equals("-license")) {
+				printOutFile("gpl.txt");
+			}else {
+				System.err.println("Wrong parameters!");
+				System.out.println("To display the help use : java -jar OrganicBuilder.jar -help");
 			}
-			if(parameter.equals("-license")) {
-				System.out.println();
-				System.out.println(horizontalBar);
-				printOutFile("license.txt");
-				System.out.println(horizontalBar);
-				System.out.println();
-				return;
-			}			
 		}
-		System.err.println("Wrong parameters!");
-		return;
+		System.out.println(horizontalBar);
+		System.out.println();
 	}
+	
 	
 	private static void printOutFile(String name) {
 		System.out.print(Resource.getFileContent(name));
