@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar OrganicBuilder.jar
+java -jar OrganicBuilder.jar fr
