@@ -1,6 +1,7 @@
 package uk.org.squirm3.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
@@ -39,7 +40,9 @@ public class CurrentLevelListener extends EngineListenerAdapter {
 		description = new JEditorPane();
 		description.setContentType("text/html");
 		description.setEditable(false);
-		jPanel.add(new JScrollPane(description), BorderLayout.CENTER);
+		JScrollPane p = new JScrollPane(description);
+		p.setMinimumSize(new Dimension(50, 100));
+		jPanel.add(p, BorderLayout.CENTER);
 		jPanel.add(createButtonsPanel(),BorderLayout.SOUTH);
 		return jPanel;
 	}

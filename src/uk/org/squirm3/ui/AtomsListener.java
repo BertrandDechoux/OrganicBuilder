@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
