@@ -293,19 +293,16 @@ public class Collider
 				}
 			}
 			// bonds act like springs
-			for(int j=0;j<a.bonds.size();j++)
-			{
-				Atom other = (Atom)(a.bonds.elementAt(j));
-				if(a.pos.distanceSq(other.pos)>diam2)
-				{
-					float sep = (float)a.pos.distance(other.pos);
-					float force = getForce(sep-diam)/4.0f; // this determines the bond spring stiffness
-					// pull towards the other atom
-					float dx = force * (other.pos.x - a.pos.x)/sep;
-					float dy = force * (other.pos.y - a.pos.y)/sep;
-					a.velocity.x += dx;
-					a.velocity.y += dy;
-				}
+			Iterator it = a.bonds.iterator();
+			while(it.hasNext()) {
+				Atom other =(Atom)it.next();
+				float sep = (float)a.pos.distance(other.pos);
+				float force = getForce(sep-diam)/4.0f; // this determines the bond spring stiffness
+				// pull towards the other atom
+				float dx = force * (other.pos.x - a.pos.x)/sep;
+				float dy = force * (other.pos.y - a.pos.y)/sep;
+				a.velocity.x += dx;
+				a.velocity.y += dy;
 			}
 			// the user can pull atoms about using the mouse
 			if(is_dragging && which_being_dragged==i)

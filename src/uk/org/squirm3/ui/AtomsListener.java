@@ -22,7 +22,6 @@ import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -39,6 +38,8 @@ import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.DraggingPointData;
 import uk.org.squirm3.engine.EngineListenerAdapter;
 import uk.org.squirm3.engine.IApplicationEngine;
+
+import com.oreilly.java.awt.RoundGradientPaint;
 
 
 /**  
@@ -83,12 +84,43 @@ public class AtomsListener extends EngineListenerAdapter {
 	private final JComponent collisionsPanel;
 	private JScrollPane scrollPane;
 	
+	// yellow, grey, blue, purple, red, green
+	private static final Color atomsColors[] = {new Color(0xbdcf00), new Color(0x5f5f5f), new Color(0x0773db),  new Color(0xee10ac), new Color(0xef160f), new Color(0x00df06)};
+	private static final BufferedImage[] atomsImages = new BufferedImage[atomsColors.length];
+	
 
 	public AtomsListener(IApplicationEngine iApplicationEngine) {
+		createAtomsImages();
 		needRepaint = true;
 		scale = 100;
 		collisionsPanel = createCollisionsPanel();
 		setApplicationEngine(iApplicationEngine);
+	}
+	
+	private static void createAtomsImages() {
+		//size
+		final float R = Atom.getAtomSize();
+		final int w = (int)(2*R);
+		final int h = (int)(2*R);
+		for(int i = 0; i<atomsColors.length; i++) {
+			// creation of the image
+			atomsImages[i] = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
+			// creation of the graphic
+			Graphics2D g2 = atomsImages[i].createGraphics();
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
+			// creation of the colors
+			Color baseColor = atomsColors[i];
+			final int colorOffset = 180;
+			int red = (baseColor.getRed()<255-colorOffset)?baseColor.getRed()+colorOffset:255;
+			int green = (baseColor.getGreen()<255-colorOffset)?baseColor.getGreen()+colorOffset:255;
+			int blue = (baseColor.getBlue()<255-colorOffset)?baseColor.getBlue()+colorOffset:255;
+			Color lightColor = new Color(red, green, blue);
+			// drawing the image
+			RoundGradientPaint gradient = new RoundGradientPaint(w/3, h/3, lightColor, new Point2D.Double(w/2, h/2), baseColor);
+			g2.setPaint(gradient);
+			g2.fillOval(0, 0, w, h);
+		}
 	}
 	
 	public JComponent getCollisionsPanel() {
@@ -207,25 +239,55 @@ public class AtomsListener extends EngineListenerAdapter {
 		if (bimg == null || bimg.getWidth() != w || bimg.getHeight() != h)
 			bimg = (BufferedImage) collisionsPanel.createImage(w,h);
 		if(bimg==null) return;// collisionsPanel is not displayable
+		
 		// create graphics	
 		Graphics2D g2 = bimg.createGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		g2.setBackground(Color.WHITE);
 		g2.clearRect(0, 0, w, h);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-			RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-			RenderingHints.VALUE_RENDER_QUALITY);
 			
 		// draw the atoms themselves
 		g2.setStroke(new BasicStroke(4));
 		g2.setFont(new Font("Arial", Font.BOLD, R));
 		g2.setPaint(Color.black);
-		Atom.draw(atoms, g2, R, collisionsPanel);
+		if(atoms!=null) {
+			int offset_x= R;
+			int offset_y= R;
+			int text_offset_y= (int)(R*8.0/22.0);
+			for (int i = 0; i < atoms.length; i++){
+				if(!atoms[i].killer) {
+					// draw the normal colour atom image and label it
+					g2.drawImage(atomsImages[atoms[i].type], (int)atoms[i].pos.x-offset_x, (int)atoms[i].pos.y-offset_y, R*2, R*2, collisionsPanel);
+					String label = atoms[i].toString();
+					int width = g2.getFontMetrics().stringWidth(label);
+					g2.drawString(label, (int)atoms[i].pos.x-width/2, (int)atoms[i].pos.y+text_offset_y); 
+				} else {
+					// draw a special spiky image and no label
+					g2.drawImage(Resource.getSpikyImage(),(int)atoms[i].pos.x-offset_x, 
+							(int)atoms[i].pos.y-offset_y, R*2, R*2, collisionsPanel);
+				}
+			}
+		}
 		
 		// draw the bonds 
 		g2.setPaint(new Color(0,0,0,50));
-		Atom.drawBonds(atoms, g2, R, collisionsPanel);
+		if(atoms!=null) {
+			for (int i = 0; i < atoms.length; i++){
+				Iterator it = atoms[i].bonds.iterator();
+				while(it.hasNext()) {
+					Atom other = (Atom)it.next();
+					float x1 = atoms[i].pos.x;
+					float y1 = atoms[i].pos.y;
+					float dx = other.pos.x - x1;
+					float dy = other.pos.y - y1;
+					float d = (float)Math.sqrt(dx*dx+dy*dy);
+					float x_cut = dx*R*0.8f/d;
+					float y_cut = dy*R*0.8f/d;
+					g2.drawLine((int)(x1+x_cut),(int)(y1+y_cut),(int)(x1+dx-x_cut),(int)(y1+dy-y_cut));
+				}
+			}
+		}
 		
 		// draw the dragging line if currently dragging
 		if(draggingPointData!=null) {

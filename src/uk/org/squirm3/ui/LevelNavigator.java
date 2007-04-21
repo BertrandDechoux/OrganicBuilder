@@ -5,9 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -249,7 +249,7 @@ class Join_As extends Level //1
 			if(atoms[i].type!=0 && atoms[i].bonds.size()>0)
 				return Application.localize(new String[] {"levels","joinas","error","1" });
 		// is every 'a' atom bonded together in a big clump?
-		Vector a_atoms = new Vector();
+		LinkedList a_atoms = new LinkedList();
 		for(int i=0;i<atoms.length;i++) {
 			if(atoms[i].type==0) {
 				// this will do as our starting point
@@ -322,7 +322,7 @@ class Line_Cs extends Level //3
 	public String evaluate(Atom[] atoms) {
 				int single_bonded_atoms_found=0,double_bonded_atoms_found=0;
 			// get the set of atoms joined to atom[0]
-			Vector joined = new Vector();
+			LinkedList joined = new LinkedList();
 			atoms[0].getAllConnectedAtoms(joined);
 			// fail on bonds<1 or >2, or not in 'joined' list
 			for(int i=0;i<atoms.length;i++) {
@@ -365,7 +365,7 @@ class Join_all extends Level //4
 	
 	public String evaluate(Atom[] atoms) {
 				// all joined?
-			Vector joined = new Vector();
+			LinkedList joined = new LinkedList();
 			atoms[0].getAllConnectedAtoms(joined);
 			if(joined.size()!=atoms.length)
 				return Application.localize(new String[] {"levels","joinall","error","1" });
@@ -400,7 +400,7 @@ class Connect_corners extends Level //5
 	
 	public String evaluate(Atom[] atoms) { 
 				// 0 joined to 1?
-			Vector joined = new Vector();
+			LinkedList joined = new LinkedList();
 			atoms[0].getAllConnectedAtoms(joined);
 			if(!joined.contains(atoms[1]))
 				return Application.localize(new String[] {"levels","connectcorners","error","1" });
@@ -430,12 +430,13 @@ class Abcdef_chains extends Level //6
 				Atom a = atoms[i];
 				if(a.type==0 && a.bonds.size()==1) {
 					// looks promising - let's check
-					Vector joined = new Vector();
+					LinkedList joined = new LinkedList();
 					a.getAllConnectedAtoms(joined);
 					if(joined.size()!=6) continue;
-					if(((Atom)joined.elementAt(0)).type==0 && ((Atom)joined.elementAt(1)).type==1
-						&& ((Atom)joined.elementAt(2)).type==2 && ((Atom)joined.elementAt(3)).type==3
-						&& ((Atom)joined.elementAt(4)).type==4 && ((Atom)joined.elementAt(5)).type==5)
+					Iterator it = joined.iterator();
+					if(((Atom)it.next()).type==0 && ((Atom)it.next()).type==1
+						&& ((Atom)it.next()).type==2 && ((Atom)it.next()).type==3
+						&& ((Atom)it.next()).type==4 && ((Atom)it.next()).type==5)
 						num_abcdef_chains_found++;
 					// (this isn't a perfect test but hopefully close enough)
 				}
@@ -466,12 +467,13 @@ class Join_same extends Level //7
 	public String evaluate(Atom[] atoms) {
 				for(int i=0;i<atoms.length;i++) {	
 				// get everything that's joined to this atom
-				Vector joined = new Vector();
+				LinkedList joined = new LinkedList();
 				Atom atom = atoms[i];
 				atom.getAllConnectedAtoms(joined);
 				// is there any atom in this list of a different type?
-				for(int j=0;j<joined.size();j++) {
-					Atom other = (Atom)joined.elementAt(j);
+				Iterator it = joined.iterator();
+				while(it.hasNext()) {
+					Atom other = (Atom)it.next();
 					if(other.type != atom.type)
 						return Application.localize(new String[] {"levels","joinsame","error","1" });
 				}
@@ -522,7 +524,7 @@ class Match_template extends Level //8
 				// does each atom 0-5 have another single type-matching atom attached?
 			for(int i=0;i<6;i++) {
 				Atom a = atoms[i];
-				Atom b = (Atom)a.bonds.lastElement();
+				Atom b = (Atom)a.bonds.getLast();
 				if(b.type!=a.type || b.bonds.size()!=1)
 					return Application.localize(new String[] {"levels","matchtemplate","error","1" });
 				// (not a complete test, but hopefully ok)
@@ -631,7 +633,7 @@ class Bond_prisoner extends Level //10
 				// if atom 8 bonded with an f?
 			if(atoms[8].bonds.size()==0)
 				return Application.localize(new String[] {"levels","bondprisonner","error","1" });
-			if(((Atom)atoms[8].bonds.elementAt(0)).type!=5)
+			if(((Atom)atoms[8].bonds.getFirst()).type!=5)
 				return Application.localize(new String[] {"levels","bondprisonner","error","2" });
 	return null; }
 }
@@ -768,18 +770,21 @@ class Insert_atom extends Level //13
 	}
 	
 	public String evaluate(Atom[] atoms) {
-				Vector joined = new Vector();
+				LinkedList joined = new LinkedList();
 			atoms[0].getAllConnectedAtoms(joined);
 			if(joined.size()!=11)
 				return Application.localize(new String[] {"levels","insertatom","error","1" });
 			int n_bonds[]={1,2,2,2,2,2,2,2,2,2,1};
 			int types[]={4,4,4,4,4,1,4,4,4,4,4};
-			for(int i=0;i<joined.size();i++) {
-				Atom a = (Atom)joined.elementAt(i);
+			int i = 0;
+			Iterator it = joined.iterator();
+			while(it.hasNext()) {
+				Atom a = (Atom)it.next();
 				if(a.bonds.size()!=n_bonds[i])
 					return Application.localize(new String[] {"levels","insertatom","error","2" });
 				if( a.type!=types[i])
 					return Application.localize(new String[] {"levels","insertatom","error","3" });
+				i++;
 			}
 	return null; }
 }
@@ -824,7 +829,7 @@ class Make_ladder extends Level //14
 	}
 	
 	public String evaluate(Atom[] atoms) {
-				Vector joined = new Vector();
+				LinkedList joined = new LinkedList();
 			atoms[0].getAllConnectedAtoms(joined);
 			if(joined.size()>12)
 				return Application.localize(new String[] {"levels","makeladder","error","1" });
@@ -833,12 +838,14 @@ class Make_ladder extends Level //14
 			// are the types matching?
 			int original_type_count[] = {0,0,0,0,0,0},new_type_count[]={0,0,0,0,0,0};
 			for(int i=0;i<6;i++) original_type_count[atoms[i].type]++;
-			for(int i=0;i<joined.size();i++) new_type_count[((Atom)joined.elementAt(i)).type]++;
+			Iterator it = joined.iterator();
+			while(it.hasNext()) new_type_count[((Atom)it.next()).type]++;
 			for(int i=0;i<6;i++)
 				if(new_type_count[i] != original_type_count[i]*2) 
 					return Application.localize(new String[] {"levels","makeladder","error","3" });
-			for(int i=0;i<joined.size();i++) { 
-				Atom a = (Atom)joined.elementAt(i);
+			it = joined.iterator();
+			while(it.hasNext()) { 
+				Atom a = (Atom)it.next();
 				if(a.type==4 || a.type==5) // 'e' and 'f' 
 					if(a.bonds.size()!=2) 
 						return Application.localize(new String[] {"levels","makeladder","error","4" });
@@ -892,7 +899,7 @@ class Selfrep extends Level //15
 	}
 	
 	public String evaluate(Atom[] atoms) { // improved code from Ralph Hartley
-	Vector joined = new Vector();
+	LinkedList joined = new LinkedList();
 			// there should be at least two bonded 'e' atoms in the world, each at the head of a copy
 			int n_found = 0;
 			int bound_atoms = 0;
@@ -908,12 +915,12 @@ class Selfrep extends Level //15
 						if(joined.size()!=6)
 							return Application.localize(new String[] {"levels","selfrep","error","1" });
 						
-						Atom last = (Atom)joined.elementAt(joined.size()-1);
+						Atom last = (Atom)joined.getLast();
 						if (first.bonds.size()!=1 || last.bonds.size()!=1 || last.type!=5)
 							return Application.localize(new String[] {"levels","selfrep","error","2" });
 						
 						for(int j=1;j<joined.size()-1;j++) {
-							Atom a = (Atom)joined.elementAt(j);
+							Atom a = (Atom)joined.get(j);
 							if (a.bonds.size()!=2)
 								return Application.localize(new String[] {"levels","selfrep","error","3" });				
 							if(a.type != atoms[j].type)
@@ -988,16 +995,19 @@ class Grow_membrane extends Level //16
 	
 	public String evaluate(Atom[] atoms) {
 	// starting from atom 0 there should be a neat closed loop of a atoms
-			Vector joined = new Vector();
+			LinkedList joined = new LinkedList();
 			atoms[0].getAllConnectedAtoms(joined);
 			// (each atom in the connected group should of type 'a' and have exactly two bonds (hence a neat loop))
 			int x_points[] = new int[joined.size()],y_points[]=new int[joined.size()];
-			for(int i=0;i<joined.size();i++) {
-				Atom a = (Atom)joined.elementAt(i);
+			Iterator it = joined.iterator();
+			int i = 0;
+			while(it.hasNext()) {
+				Atom a = (Atom)it.next();
 				if(a.type!=0 || a.bonds.size()!=2)
 					return Application.localize(new String[] {"levels","growmembrane","error","1" });
 				x_points[i] = (int)a.pos.x; // (need these for polygon check, below)
 				y_points[i] = (int)a.pos.y;
+				i++;
 			}
 			// inside the polygon formed by the a atoms there should be exactly one atom - the original f1 (although its state may have changed)
 			Atom f1 = atoms[8]; // see the setup code for this level
@@ -1005,7 +1015,7 @@ class Grow_membrane extends Level //16
 			if(!poly.contains(f1.pos))
 				return Application.localize(new String[] {"levels","growmembrane","error","2" });
 			// and no other 'a' atoms around
-			for(int i=0;i<atoms.length;i++) {
+			for(i=0;i<atoms.length;i++) {
 				Atom a = atoms[i];
 				if(!joined.contains(a) && a.type==0)
 					return Application.localize(new String[] {"levels","growmembrane","error","3" });
@@ -1070,16 +1080,19 @@ class Membrane_transport extends Level //17
 	
 	public String evaluate(Atom[] atoms) {
 				// starting from atom 0 there should be a neat closed loop of a atoms
-			Vector joined = new Vector();
+			LinkedList joined = new LinkedList();
 			atoms[0].getAllConnectedAtoms(joined);
 			// (each atom in the connected group should of type 'a' and have exactly two bonds (hence a neat loop))
 			int x_points[] = new int[joined.size()],y_points[]=new int[joined.size()];
-			for(int i=0;i<joined.size();i++) {
-				Atom a = (Atom)joined.elementAt(i);
+			Iterator it = joined.iterator();
+			int i = 0;
+			while(it.hasNext()) {
+				Atom a = (Atom)it.next();
 				if(a.type!=0 || a.bonds.size()!=2)
 					return Application.localize(new String[] {"levels","membranetransport","error","1" });
 				x_points[i] = (int)a.pos.x; // (need these for polygon check, below)
 				y_points[i] = (int)a.pos.y;
+				i++;
 			}
 			// inside should be the original 'b' atom, and all the 'f' atoms, and nothing else
 			Atom b1 = atoms[12]; // see the setup code for this level
@@ -1087,7 +1100,7 @@ class Membrane_transport extends Level //17
 			if(!poly.contains(b1.pos))
 				return Application.localize(new String[] {"levels","membranetransport","error","2" });
 			// check the other atoms (want: f's inside, other's outside)
-			for(int i=joined.size()+1;i<atoms.length;i++) {
+			for(i=joined.size()+1;i<atoms.length;i++) {
 				Atom a = atoms[i];
 				if(a.type==5 && !poly.contains(a.pos))
 					return Application.localize(new String[] {"levels","membranetransport","error","3" });
@@ -1141,7 +1154,7 @@ class Membrane_division extends Level //18
 	
 				final int N=12; // original loop size (see setup code, above)
 			// starting from atom 0 there should be a neat closed loop of a atoms
-			Vector loop[] = {new Vector(),new Vector()};
+			LinkedList loop[] = {new LinkedList(),new LinkedList()};
 			atoms[0].getAllConnectedAtoms(loop[0]);
 			if(loop[0].size()>=N)
 				return Application.localize(new String[] {"levels","membranedivision","error","1" });
@@ -1155,7 +1168,7 @@ class Membrane_division extends Level //18
 			// each atom in each group should of type 'a' and have exactly two bonds (hence a neat loop)
 			for(int iLoop=0;iLoop<2;iLoop++) {
 				for(int i=0;i<loop[iLoop].size();i++) {
-					Atom a = (Atom)loop[iLoop].elementAt(i);
+					Atom a = (Atom)loop[iLoop].get(i);
 					if(a.type!=0 || a.bonds.size()!=2)
 						return Application.localize(new String[] {"levels","membranedivision","error","3" });
 				}
@@ -1242,20 +1255,20 @@ class Cell_division extends Level //19
 			
 			// pseudocode: non-embedded connected components, identification of the copies, check for template copy
 
-			Vector components = new Vector(); // stores a list of Vector's, the components
+			LinkedList components = new LinkedList(); // stores a list of LinkedList's, the components
 			for(int i=0;i<atoms.length;i++) {
 				Atom a = atoms[i];
 				// is this atom already in a connected component?
 				boolean already_seen=false;
 				for(int iComponent=0;iComponent<components.size();iComponent++) {
-					if(((Vector)components.elementAt(iComponent)).contains(a)) {
+					if(((LinkedList)components.get(iComponent)).contains(a)) {
 						already_seen=true;
 						break;
 					}
 				}
 				if(already_seen) continue;
 				// create a new connected component starting from this atom
-				Vector component = new Vector();
+				LinkedList component = new LinkedList();
 				a.getAllConnectedAtoms(component);
 				if(component.size()>6) // only interested in larger groups
 					components.add(component);
@@ -1268,12 +1281,12 @@ class Cell_division extends Level //19
 				Polygon poly[] = new Polygon[2];
 				// assemble the two polygons (doesn't matter if they're a bit messy at places)
 				for(int iComp=0;iComp<2;iComp++){
-					final int NP = ((Vector)components.elementAt(iComp)).size();
+					final int NP = ((LinkedList)components.get(iComp)).size();
 					int px[] = new int[NP],
 						py[] = new int[NP];
 					for(int i=0;i<NP;i++)
 					{
-						Atom a = ((Atom)((Vector)components.elementAt(iComp)).elementAt(i));
+						Atom a = ((Atom)((LinkedList)components.get(iComp)).get(i));
 						px[i]=(int)a.pos.x;
 						py[i]=(int)a.pos.y;
 					}
@@ -1282,10 +1295,10 @@ class Cell_division extends Level //19
 				// check for either polygon having a point inside the other
 				// (given that bond-crossing is forbidden, we expect this to be a complete test of separatedness)
 				for(int iComp=0;iComp<2;iComp++) {
-					Vector c = (Vector)components.elementAt(iComp);
+					LinkedList c = (LinkedList)components.get(iComp);
 					int NP = c.size();
 					for(int i=0;i<NP;i++) {
-						Atom a = (Atom)c.elementAt(i);
+						Atom a = (Atom)c.get(i);
 						// is this point inside the other polygon?
 						if(poly[1-iComp].contains(a.pos))
 							return Application.localize(new String[] {"levels","celldivision","error","2" });
@@ -1304,20 +1317,20 @@ class Cell_division extends Level //19
 			if(n_found<2)
 				return Application.localize(new String[] {"levels","celldivision","error","3" });
 			// each head should be in a separate component
-			Vector c1 = (Vector)components.elementAt(0),c2=(Vector)components.elementAt(1);
+			LinkedList c1 = (LinkedList)components.get(0),c2=(LinkedList)components.get(1);
 			if( (c1.contains(heads[0]) && !c2.contains(heads[1])) || (c2.contains(heads[0]) && !c1.contains(heads[1])) )
 				return Application.localize(new String[] {"levels","celldivision","error","4" });
 			// work down each template, adding the type of each 2-connected atom to sequence[i]
 			String sequence[] = {new String(),new String()};
 			for(int iCell=0;iCell<2;iCell++) {
-				Vector seen = new Vector();
+				LinkedList seen = new LinkedList();
 				Atom current = heads[iCell];
 				seen.add(current);
 				sequence[iCell]="e"; // let's get things started
-				if(((Atom)current.bonds.firstElement()).bonds.size()==2)
-					current = (Atom)current.bonds.firstElement();
+				if(((Atom)current.bonds.getFirst()).bonds.size()==2)
+					current = (Atom)current.bonds.getFirst();
 				else
-					current = (Atom)current.bonds.lastElement();
+					current = (Atom)current.bonds.getLast();
 				while(sequence[iCell].length()<10) {
 					// if the current atom has other than 2 bonds then we are done
 					if(current.bonds.size()!=2) break;
@@ -1326,10 +1339,10 @@ class Cell_division extends Level //19
 					// add the current atom to the list so that we will know we have seen it before
 					seen.add(current);
 					// move onto the next bond (we know this atom has exactly two) 
-					if(seen.contains((Atom)current.bonds.elementAt(0)))
-						current = (Atom)current.bonds.elementAt(1);
+					if(seen.contains((Atom)current.bonds.getFirst()))
+						current = (Atom)current.bonds.get(1);
 					else
-						current = (Atom)current.bonds.elementAt(0);
+						current = (Atom)current.bonds.getFirst();
 				}
 				//System.out.println(sequence[iCell]);
 				if(sequence[iCell].length()!=6 || sequence[iCell].charAt(0)!='e' ||
