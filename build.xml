@@ -1,0 +1,54 @@
+<project name="Organic Builder" default="dist" basedir=".">
+    <description>
+        build file to compile and package the application
+    </description>
+  <property name="src" location="src"/>
+  <property name="release" location="release"/>
+  <property name="build" location="${release}/build"/>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${release}"/>
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <javac srcdir="${src}" destdir="${build}"/>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+
+    <jar jarfile="${release}/OrganicBuilder.jar">
+        <fileset dir="." includes="about.html"/>
+        <fileset dir="." includes="about.txt"/>
+        <fileset dir="." includes="gpl.txt"/>
+        <fileset dir="." includes="help.txt"/>
+        <fileset dir="." includes="license.html"/>
+	<zipfileset dir="icons" prefix="icons"/>
+	<zipfileset dir="pictures" prefix="pictures"/>
+	<zipfileset dir="translations" prefix="translations"/>
+	<fileset dir="${build}"/>
+        <manifest>
+            <attribute name="Sealed" value="true"/>
+            <attribute name="Main-Class" value="uk.org.squirm3.Application"/>
+        </manifest>
+    </jar>
+
+    <zip destfile="${release}/OrganicBuilder-${DSTAMP}.zip">
+	<fileset dir="." includes="README.txt"/>
+        <fileset dir="${release}" includes="OrganicBuilder.jar"/>
+        <fileset dir="." includes="OrganicBuilder_linux.sh"/>
+        <fileset dir="." includes="OrganicBuilder_linux_fr.sh"/>
+	<fileset dir="." includes="OrganicBuilder_windows.bat"/>
+	<fileset dir="." includes="OrganicBuilder_windows_fr.bat"/>
+	<zipfileset dir="src" prefix="src"/>
+    </zip>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <delete dir="${release}"/>
+  </target>
+</project>
