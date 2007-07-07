@@ -35,7 +35,6 @@ import javax.swing.event.ChangeListener;
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.DraggingPoint;
-import uk.org.squirm3.engine.EngineDispatcher;
 import uk.org.squirm3.engine.IApplicationEngine;
 import uk.org.squirm3.engine.IAtomListener;
 import uk.org.squirm3.engine.IPropertyListener;
@@ -63,7 +62,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class AtomsListener implements IView, IAtomListener, IPropertyListener {
+public class AtomsView implements IView, IAtomListener, IPropertyListener {
 	private IApplicationEngine iApplicationEngine;
 	
 	private DraggingPoint draggingPoint;
@@ -90,7 +89,7 @@ public class AtomsListener implements IView, IAtomListener, IPropertyListener {
 	private static final BufferedImage[] atomsImages = new BufferedImage[atomsColors.length];
 	
 
-	public AtomsListener(IApplicationEngine iApplicationEngine) {
+	public AtomsView(IApplicationEngine iApplicationEngine) {
 		createAtomsImages();
 		needRepaint = true;
 		scale = 100;

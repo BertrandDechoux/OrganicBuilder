@@ -55,7 +55,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class ReactionsListener implements IView, IReactionListener {
+public class ReactionsView implements IView, IReactionListener {
 	private IApplicationEngine iApplicationEngine;
 	private JCheckBox bondedBefore, bondedAfter;
 	private JComboBox aType, aState, bType, bState, futureAState, futureBState;
@@ -68,7 +68,7 @@ public class ReactionsListener implements IView, IReactionListener {
 	
 	private final JPanel reactionsPanel;
 
-	public ReactionsListener(IApplicationEngine iApplicationEngine) {
+	public ReactionsView(IApplicationEngine iApplicationEngine) {
 		this.iApplicationEngine = iApplicationEngine;
 		reactionsPanel = new JPanel();
 		reactionsPanel.setLayout(new BorderLayout());

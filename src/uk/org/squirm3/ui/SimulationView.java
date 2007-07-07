@@ -45,7 +45,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class SimulationListener implements IView, IStateListener, IPropertyListener {
+public class SimulationView implements IView, IStateListener, IPropertyListener {
 	
 	// Actions controlling the simulation
 	private final Action stop, run, reset;
@@ -56,7 +56,7 @@ public class SimulationListener implements IView, IStateListener, IPropertyListe
 	// use to communicate
 	private IApplicationEngine iApplicationEngine;
 
-	public SimulationListener(IApplicationEngine iApplicationEngine) {
+	public SimulationView(IApplicationEngine iApplicationEngine) {
 		this.iApplicationEngine = iApplicationEngine;
 		stop = createStopAction();
 		run = createRunAction();

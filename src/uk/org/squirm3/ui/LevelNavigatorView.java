@@ -39,7 +39,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class LevelNavigator implements IView {
+public class LevelNavigatorView implements IView {
 	private IApplicationEngine iApplicationEngine;
 	
 	private final List levelList;
@@ -50,7 +50,7 @@ public class LevelNavigator implements IView {
 	private final JComboBox levelComboBox;
 	
 	
-	public LevelNavigator(IApplicationEngine iApplicationEngine) {
+	public LevelNavigatorView(IApplicationEngine iApplicationEngine) {
 		this.iApplicationEngine = iApplicationEngine;
 		levelList = new ArrayList();
 		addLevels();

@@ -8,10 +8,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -30,7 +26,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import uk.org.squirm3.Application;
-import uk.org.squirm3.engine.EngineDispatcher;
 import uk.org.squirm3.engine.IApplicationEngine;
 
 /**  
@@ -68,16 +63,16 @@ public class GUI {
 		}
 
 			//listeners
-		AtomsListener atomsListener = new AtomsListener(iApplicationEngine);
-		CurrentLevelListener currentLevelListener = new CurrentLevelListener(iApplicationEngine);
-		ReactionsListener reactionsListener = new ReactionsListener(iApplicationEngine);
-		final SimulationListener simulationListener = new SimulationListener(iApplicationEngine);
-		LevelNavigator levelNavigator = new LevelNavigator(iApplicationEngine);
+		AtomsView atomsView = new AtomsView(iApplicationEngine);
+		CurrentLevelView currentLevelView = new CurrentLevelView(iApplicationEngine);
+		ReactionsView reactionsView = new ReactionsView(iApplicationEngine);
+		SimulationView simulationView = new SimulationView(iApplicationEngine);
+		LevelNavigatorView levelNavigatorView = new LevelNavigatorView(iApplicationEngine);
 		
 			//main panels
-		JComponent collisionsPanel 	= atomsListener.getCollisionsPanel();
-		JPanel currentLevelPanel	= currentLevelListener.getCurrentLevelPanel();
-		JPanel reactionsPanel		= reactionsListener.getReactionsPanel();
+		JComponent collisionsPanel 	= atomsView.getCollisionsPanel();
+		JPanel currentLevelPanel	= currentLevelView.getCurrentLevelPanel();
+		JPanel reactionsPanel		= reactionsView.getReactionsPanel();
 		
 			//toolbar
 		JPanel toolBar = new JPanel();
@@ -88,23 +83,23 @@ public class GUI {
 			JPanel simControlsPanel = new JPanel();
 			simControlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT,1,2));
 			simControlsPanel.setBackground(bg);
-			simControlsPanel.add(createIconButton(simulationListener.getStopAction(),bg));
-			simControlsPanel.add(createIconButton(simulationListener.getRunAction(),bg));
-			simControlsPanel.add(createIconButton(simulationListener.getResetAction(),bg));
-			simControlsPanel.add(createIconButton(createParametersAction(simulationListener.getParametersPanel(),atomsListener.getControlsPanel()),bg));
+			simControlsPanel.add(createIconButton(simulationView.getStopAction(),bg));
+			simControlsPanel.add(createIconButton(simulationView.getRunAction(),bg));
+			simControlsPanel.add(createIconButton(simulationView.getResetAction(),bg));
+			simControlsPanel.add(createIconButton(createParametersAction(simulationView.getParametersPanel(),atomsView.getControlsPanel()),bg));
 		toolBar.add(simControlsPanel);
 		toolBar.add(Box.createHorizontalGlue());
 			// navigation controls
 			JPanel navControlsPanel = new JPanel();
 			navControlsPanel.setLayout(new FlowLayout(FlowLayout.CENTER,1,2));
 			navControlsPanel.setBackground(bg);
-			navControlsPanel.add(createIconButton(levelNavigator.getIntroAction(),bg));
-			navControlsPanel.add(createIconButton(levelNavigator.getPreviousAction(),bg));
-			JComboBox cb = levelNavigator.getLevelComboBox();
+			navControlsPanel.add(createIconButton(levelNavigatorView.getIntroAction(),bg));
+			navControlsPanel.add(createIconButton(levelNavigatorView.getPreviousAction(),bg));
+			JComboBox cb = levelNavigatorView.getLevelComboBox();
 			cb.setMaximumSize(new Dimension(150,80));
 			navControlsPanel.add(cb);
-			navControlsPanel.add(createIconButton(levelNavigator.getNextAction(),bg));
-			navControlsPanel.add(createIconButton(levelNavigator.getLastAction(),bg));
+			navControlsPanel.add(createIconButton(levelNavigatorView.getNextAction(),bg));
+			navControlsPanel.add(createIconButton(levelNavigatorView.getLastAction(),bg));
 		toolBar.add(navControlsPanel);
 		toolBar.add(Box.createHorizontalGlue());
 			//misc controls
@@ -126,7 +121,7 @@ public class GUI {
 		contentPane.add(toolBar, BorderLayout.NORTH);
 		contentPane.add(rootComponent, BorderLayout.CENTER);
 		
-		levelNavigator.init();
+		levelNavigatorView.init();
 		if(applet==null) {
 			frame.setContentPane(contentPane);
 			SwingUtilities.updateComponentTreeUI(frame);

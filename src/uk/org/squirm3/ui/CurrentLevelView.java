@@ -42,7 +42,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class CurrentLevelListener implements IView, ILevelListener {
+public class CurrentLevelView implements IView, ILevelListener {
 	private IApplicationEngine iApplicationEngine;
 	private JEditorPane description;
 	private JButton hintButton, evaluateButton;
@@ -50,7 +50,7 @@ public class CurrentLevelListener implements IView, ILevelListener {
 	
 	private final JPanel currentLevelPanel;
 
-	public CurrentLevelListener(IApplicationEngine iApplicationEngine) {
+	public CurrentLevelView(IApplicationEngine iApplicationEngine) {
 		currentLevelPanel = createCurrentLevelPanel();
 		this.iApplicationEngine = iApplicationEngine;
 		levelHasChanged();
