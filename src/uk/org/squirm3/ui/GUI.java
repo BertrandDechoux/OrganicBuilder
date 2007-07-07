@@ -66,8 +66,9 @@ public class GUI {
 		AtomsView atomsView = new AtomsView(iApplicationEngine);
 		CurrentLevelView currentLevelView = new CurrentLevelView(iApplicationEngine);
 		ReactionsView reactionsView = new ReactionsView(iApplicationEngine);
-		SimulationView simulationView = new SimulationView(iApplicationEngine);
+		StateView stateView = new StateView(iApplicationEngine);
 		LevelNavigatorView levelNavigatorView = new LevelNavigatorView(iApplicationEngine);
+		PropertyView propertyView = new PropertyView(iApplicationEngine);
 		
 			//main panels
 		JComponent collisionsPanel 	= atomsView.getCollisionsPanel();
@@ -83,10 +84,10 @@ public class GUI {
 			JPanel simControlsPanel = new JPanel();
 			simControlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT,1,2));
 			simControlsPanel.setBackground(bg);
-			simControlsPanel.add(createIconButton(simulationView.getStopAction(),bg));
-			simControlsPanel.add(createIconButton(simulationView.getRunAction(),bg));
-			simControlsPanel.add(createIconButton(simulationView.getResetAction(),bg));
-			simControlsPanel.add(createIconButton(createParametersAction(simulationView.getParametersPanel(),atomsView.getControlsPanel()),bg));
+			simControlsPanel.add(createIconButton(stateView.getStopAction(),bg));
+			simControlsPanel.add(createIconButton(stateView.getRunAction(),bg));
+			simControlsPanel.add(createIconButton(stateView.getResetAction(),bg));
+			simControlsPanel.add(createIconButton(createParametersAction(propertyView.getParametersPanel(),atomsView.getControlsPanel()),bg));
 		toolBar.add(simControlsPanel);
 		toolBar.add(Box.createHorizontalGlue());
 			// navigation controls

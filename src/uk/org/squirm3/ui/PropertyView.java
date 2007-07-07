@@ -2,13 +2,10 @@ package uk.org.squirm3.ui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -22,7 +19,6 @@ import javax.swing.text.NumberFormatter;
 import uk.org.squirm3.Application;
 import uk.org.squirm3.engine.IApplicationEngine;
 import uk.org.squirm3.engine.IPropertyListener;
-import uk.org.squirm3.engine.IStateListener;
 
 
 /**  
@@ -45,10 +41,8 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class SimulationView implements IView, IStateListener, IPropertyListener {
-	
-	// Actions controlling the simulation
-	private final Action stop, run, reset;
+public class PropertyView implements IView, IPropertyListener {
+
 	// components reflecting simulation's parameters
 	private /*final*/ JSlider speedSelector, atomNumberSelector, heightSelector, widthSelector;
 	private /*final*/ JFormattedTextField speedTF, atomNumberTF, heightTF, widthTF;
@@ -56,68 +50,16 @@ public class SimulationView implements IView, IStateListener, IPropertyListener 
 	// use to communicate
 	private IApplicationEngine iApplicationEngine;
 
-	public SimulationView(IApplicationEngine iApplicationEngine) {
+	public PropertyView(IApplicationEngine iApplicationEngine) {
 		this.iApplicationEngine = iApplicationEngine;
-		stop = createStopAction();
-		run = createRunAction();
-		reset = createResetAction();
-		simulationStateHasChanged();
 		parametersPanel = createParametersPanel();
-		iApplicationEngine.addStateListener(this);
 		iApplicationEngine.addPropertyListener(this);
-	}
-	
-	public Action getRunAction() {
-		return run;
-	}
-	
-	public Action getStopAction() {
-		return stop;
-	}
-	
-	public Action getResetAction() {
-		return reset;
 	}
 	
 	public JPanel getParametersPanel() {
 		return parametersPanel;
 	}
-	
-	private Action createRunAction() {
-		final Action action = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.runSimulation();
-			}
-	    };
-	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","run"}));
-	    //action.putValue(Action.LONG_DESCRIPTION, "Context-Sensitive Help Text"); TODO and for the others actions too
-	    action.putValue(Action.SMALL_ICON, Resource.getIcon("play"));
-	    //action.putValue(Action.MNEMONIC_KEY, new Integer(java.awt.event.KeyEvent.VK_A)); TODO
-		return 	action;
-	}
-	
-	private Action createStopAction() {
-		final Action action = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.pauseSimulation();
-			}
-	    };
-	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","stop"}));
-	    action.putValue(Action.SMALL_ICON, Resource.getIcon("pause"));
-		return 	action;
-	}
-	
-	private Action createResetAction() {
-		final Action action = new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.restartLevel();;
-			}
-	    };
-	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","reset"}));
-	    action.putValue(Action.SMALL_ICON, Resource.getIcon("reset"));
-		return 	action;
-	}
-	
+
 	public JPanel createParametersPanel() {
 		// parameters panel
 		JPanel parametersPanel = new JPanel();
@@ -260,13 +202,6 @@ public class SimulationView implements IView, IStateListener, IPropertyListener 
 		int speed = iApplicationEngine.getSimulationSpeed();
 		speedTF.setValue(new Integer(speed));
 		speedSelector.setValue(speed);
-	}
-
-	public void simulationStateHasChanged() {
-		boolean isRunning = iApplicationEngine.simulationIsRunning();
-		boolean resetNeeded = iApplicationEngine.simulationNeedReset();
-		stop.setEnabled(!resetNeeded && isRunning);
-		run.setEnabled(!resetNeeded && !isRunning);
 	}
 	
 	private JFormattedTextField createCustomTF(int min, int max, int now) {
