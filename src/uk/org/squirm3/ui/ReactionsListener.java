@@ -31,8 +31,8 @@ import javax.swing.event.ListSelectionListener;
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Reaction;
-import uk.org.squirm3.engine.EngineListenerAdapter;
 import uk.org.squirm3.engine.IApplicationEngine;
+import uk.org.squirm3.engine.IReactionListener;
 
 
 /**  
@@ -55,7 +55,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class ReactionsListener extends EngineListenerAdapter {
+public class ReactionsListener implements IView, IReactionListener {
 	private IApplicationEngine iApplicationEngine;
 	private JCheckBox bondedBefore, bondedAfter;
 	private JComboBox aType, aState, bType, bState, futureAState, futureBState;
@@ -69,12 +69,13 @@ public class ReactionsListener extends EngineListenerAdapter {
 	private final JPanel reactionsPanel;
 
 	public ReactionsListener(IApplicationEngine iApplicationEngine) {
-		setApplicationEngine(iApplicationEngine);
+		this.iApplicationEngine = iApplicationEngine;
 		reactionsPanel = new JPanel();
 		reactionsPanel.setLayout(new BorderLayout());
 		reactionsPanel.add(createEditorPanel(),BorderLayout.NORTH);
 		reactionsPanel.add(createListPanel(),BorderLayout.CENTER);
 		textArea = new JTextArea();
+		iApplicationEngine.addReactionListener(this);
 	}
 	
 	public JPanel getReactionsPanel() {
@@ -280,7 +281,7 @@ public class ReactionsListener extends EngineListenerAdapter {
 		reactionsPanel.repaint();
 	}
 
-	public void setApplicationEngine(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
+	public void isVisible(boolean b) {
+		// TODO Auto-generated method stub
 	}
 }

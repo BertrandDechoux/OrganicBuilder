@@ -8,6 +8,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -54,8 +57,6 @@ public class GUI {
 	
 	public static void createGUI(final IApplicationEngine iApplicationEngine, final JApplet applet) {
 		Resource.loadPictures();
-		final EngineDispatcher engineDispatcher = new EngineDispatcher();
-		iApplicationEngine.addListener(engineDispatcher);
 		
 			//frame
 		JFrame frame = new JFrame(Application.localize(new String[] {"interface","application","title"}));
@@ -72,11 +73,6 @@ public class GUI {
 		ReactionsListener reactionsListener = new ReactionsListener(iApplicationEngine);
 		final SimulationListener simulationListener = new SimulationListener(iApplicationEngine);
 		LevelNavigator levelNavigator = new LevelNavigator(iApplicationEngine);
-				//ajout
-		engineDispatcher.addListener(atomsListener);
-		engineDispatcher.addListener(currentLevelListener);
-		engineDispatcher.addListener(reactionsListener);
-		engineDispatcher.addListener(simulationListener);
 		
 			//main panels
 		JComponent collisionsPanel 	= atomsListener.getCollisionsPanel();
@@ -143,8 +139,8 @@ public class GUI {
 		frame.addWindowListener(
 				new WindowAdapter() {
 					public void windowClosing(WindowEvent e) {
-						if(applet==null) iApplicationEngine.removeListener(engineDispatcher);
-						else {
+						if(applet!=null) {
+							//TODO dock/undock text change
 							applet.setContentPane(contentPane);
 							SwingUtilities.updateComponentTreeUI(applet);
 						}

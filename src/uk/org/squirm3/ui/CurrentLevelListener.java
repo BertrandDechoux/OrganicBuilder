@@ -18,8 +18,8 @@ import javax.swing.JScrollPane;
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Level;
-import uk.org.squirm3.engine.EngineListenerAdapter;
 import uk.org.squirm3.engine.IApplicationEngine;
+import uk.org.squirm3.engine.ILevelListener;
 
 
 /**  
@@ -42,7 +42,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class CurrentLevelListener extends EngineListenerAdapter {
+public class CurrentLevelListener implements IView, ILevelListener {
 	private IApplicationEngine iApplicationEngine;
 	private JEditorPane description;
 	private JButton hintButton, evaluateButton;
@@ -52,9 +52,11 @@ public class CurrentLevelListener extends EngineListenerAdapter {
 
 	public CurrentLevelListener(IApplicationEngine iApplicationEngine) {
 		currentLevelPanel = createCurrentLevelPanel();
-		setApplicationEngine(iApplicationEngine);
+		this.iApplicationEngine = iApplicationEngine;
+		levelHasChanged();
+		iApplicationEngine.addLevelListener(this);	
 	}
-	
+
 	private JPanel createCurrentLevelPanel() {
 		final JPanel jPanel = new JPanel();
 		jPanel.setLayout(new BorderLayout());
@@ -134,8 +136,7 @@ public class CurrentLevelListener extends EngineListenerAdapter {
 		}	
 	}
 
-	public void setApplicationEngine(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
-		levelHasChanged();
+	public void isVisible(boolean b) {
+		// TODO Auto-generated method stub
 	}
 }

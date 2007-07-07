@@ -1,8 +1,8 @@
 package uk.org.squirm3.engine;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.EventListener;
+
+import javax.swing.event.EventListenerList;
 
 
 /**  
@@ -27,71 +27,140 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 public final class EngineDispatcher implements IEngineListener {
-	
-	private List iEngineListeners = new LinkedList();
-	
-	public void addListener(IEngineListener l) {
-		iEngineListeners.add(l);
-	}
-	
-	public void removeListener(IEngineListener l) {
-		iEngineListeners.remove(l);
-	}
 
+	private final EventListenerList listeners = new EventListenerList();
+
+	public void addEngineListener(IEngineListener listener) {
+		addAtomListener(listener);
+		addLevelListener(listener);
+		addPropertyListener(listener);
+		addReactionListener(listener);
+		addStateListener(listener);
+	}
+	
+	public void removeEngineListener(IEngineListener listener) {
+		removeAtomListener(listener);
+		removeLevelListener(listener);
+		removePropertyListener(listener);
+		removeReactionListener(listener);
+		removeStateListener(listener);
+	}
+	
+    public void addAtomListener(IAtomListener listener) {
+        listeners.add(IAtomListener.class, listener);
+    }
+    
+    public void removeAtomListener(IAtomListener listener) {
+        listeners.remove(IAtomListener.class, listener);
+    }
+    
+    public EventListener[] getAtomListeners() {
+        return listeners.getListeners(IAtomListener.class);
+    }
+
+    public void addLevelListener(ILevelListener listener) {
+        listeners.add(ILevelListener.class, listener);
+    }
+    
+    public void removeLevelListener(ILevelListener listener) {
+        listeners.remove(ILevelListener.class, listener);
+    }
+
+    public EventListener[] getLevelListeners() {
+        return listeners.getListeners(ILevelListener.class);
+    }
+
+    public void addPropertyListener(IPropertyListener listener) {
+        listeners.add(IPropertyListener.class, listener);
+    }
+    
+    public void removePropertyListener(IPropertyListener listener) {
+        listeners.remove(IPropertyListener.class, listener);
+    }
+    
+    public EventListener[] getPropertyListeners() {
+        return listeners.getListeners(IPropertyListener.class);
+    }
+    
+    public void addReactionListener(IReactionListener listener) {
+        listeners.add(IReactionListener.class, listener);
+    }
+    
+    public void removeReactionListener(IReactionListener listener) {
+        listeners.remove(IReactionListener.class, listener);
+    }
+    
+    public EventListener[] getReactionListeners() {
+        return listeners.getListeners(IReactionListener.class);
+    }
+
+    public void addStateListener(IStateListener listener) {
+        listeners.add(IStateListener.class, listener);
+    }
+    
+    public void removeStateListener(IStateListener listener) {
+        listeners.remove(IStateListener.class, listener);
+    }
+    
+    public EventListener[] getStateListeners() {
+        return listeners.getListeners(IStateListener.class);
+    }
+    
 	public void atomsHaveChanged() {
-		Iterator it = iEngineListeners.iterator();
-		while(it.hasNext()) {
-			((IEngineListener)it.next()).atomsHaveChanged();
+		EventListener[] atomListeners = getAtomListeners();
+		for(int i = 0; i < atomListeners.length ; i++) {
+			((IAtomListener)atomListeners[i]).atomsHaveChanged();
 		}
 	}
 
 	public void atomsNumberHasChanged() {
-		Iterator it = iEngineListeners.iterator();
-		while(it.hasNext()) {
-			((IEngineListener)it.next()).atomsNumberHasChanged();
+		EventListener[] propertyListeners = getPropertyListeners();
+		for(int i = 0; i < propertyListeners.length ; i++) {
+			((IPropertyListener)propertyListeners[i]).atomsNumberHasChanged();
 		}
 	}
 
 	public void draggingPointHasChanged() {
-		Iterator it = iEngineListeners.iterator();
-		while(it.hasNext()) {
-			((IEngineListener)it.next()).draggingPointHasChanged();
+		EventListener[] atomListeners = getAtomListeners();
+		for(int i = 0; i < atomListeners.length ; i++) {
+			((IAtomListener)atomListeners[i]).draggingPointHasChanged();
 		}
 	}
 
 	public void levelHasChanged() {
-		Iterator it = iEngineListeners.iterator();
-		while(it.hasNext()) {
-			((IEngineListener)it.next()).levelHasChanged();
+		EventListener[] levelListeners = getLevelListeners();
+		for(int i = 0; i < levelListeners.length ; i++) {
+			((ILevelListener)levelListeners[i]).levelHasChanged();
 		}
 	}
 
 	public void reactionsHaveChanged() {
-		Iterator it = iEngineListeners.iterator();
-		while(it.hasNext()) {
-			((IEngineListener)it.next()).reactionsHaveChanged();
+		EventListener[] reactionListeners = getReactionListeners();
+		for(int i = 0; i < reactionListeners.length ; i++) {
+			((IReactionListener)reactionListeners[i]).reactionsHaveChanged();
 		}
 	}
 
 	public void simulationSizeHasChanged() {
-		Iterator it = iEngineListeners.iterator();
-		while(it.hasNext()) {
-			((IEngineListener)it.next()).simulationSizeHasChanged();
+		EventListener[] propertyListeners = getPropertyListeners();
+		for(int i = 0; i < propertyListeners.length ; i++) {
+			((IPropertyListener)propertyListeners[i]).simulationSizeHasChanged();
 		}
 	}
 
 	public void simulationSpeedHasChanged() {
-		Iterator it = iEngineListeners.iterator();
-		while(it.hasNext()) {
-			((IEngineListener)it.next()).simulationSpeedHasChanged();
+		EventListener[] propertyListeners = getPropertyListeners();
+		for(int i = 0; i < propertyListeners.length ; i++) {
+			((IPropertyListener)propertyListeners[i]).simulationSpeedHasChanged();
 		}
 	}
 
 	public void simulationStateHasChanged() {
-		Iterator it = iEngineListeners.iterator();
-		while(it.hasNext()) {
-			((IEngineListener)it.next()).simulationStateHasChanged();
+		EventListener[] stateListeners = getStateListeners();
+		for(int i = 0; i < stateListeners.length ; i++) {
+			((IStateListener)stateListeners[i]).simulationStateHasChanged();
 		}
 	}
-
+	
+    /* TODO fireXXXChanged */
 }

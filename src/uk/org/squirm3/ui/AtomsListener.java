@@ -1,4 +1,3 @@
-
 package uk.org.squirm3.ui;
 
 import java.awt.BasicStroke;
@@ -35,9 +34,11 @@ import javax.swing.event.ChangeListener;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.DraggingPointData;
-import uk.org.squirm3.engine.EngineListenerAdapter;
+import uk.org.squirm3.data.DraggingPoint;
+import uk.org.squirm3.engine.EngineDispatcher;
 import uk.org.squirm3.engine.IApplicationEngine;
+import uk.org.squirm3.engine.IAtomListener;
+import uk.org.squirm3.engine.IPropertyListener;
 
 import com.oreilly.java.awt.RoundGradientPaint;
 
@@ -62,10 +63,10 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class AtomsListener extends EngineListenerAdapter {
+public class AtomsListener implements IView, IAtomListener, IPropertyListener {
 	private IApplicationEngine iApplicationEngine;
 	
-	private DraggingPointData draggingPointData;
+	private DraggingPoint draggingPoint;
 	private Atom[] latestAtomsCopy;
 	
 	private int simulationWidth;
@@ -94,7 +95,12 @@ public class AtomsListener extends EngineListenerAdapter {
 		needRepaint = true;
 		scale = 100;
 		collisionsPanel = createCollisionsPanel();
-		setApplicationEngine(iApplicationEngine);
+		this.iApplicationEngine = iApplicationEngine;
+		simulationSizeHasChanged();
+		atomsHaveChanged();
+		draggingPointHasChanged();
+		iApplicationEngine.addAtomListener(this);
+		iApplicationEngine.addPropertyListener(this);
 	}
 	
 	private static void createAtomsImages() {
@@ -169,13 +175,6 @@ public class AtomsListener extends EngineListenerAdapter {
 	public JPanel getControlsPanel() {
 		return controlsPanel;
 	}
-
-	public void setApplicationEngine(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
-		simulationSizeHasChanged();
-		atomsHaveChanged();
-		draggingPointHasChanged();
-	}
 	
 	public void atomsHaveChanged() {
 		Collection c = iApplicationEngine.getAtoms();
@@ -190,7 +189,7 @@ public class AtomsListener extends EngineListenerAdapter {
 	}
 
 	public void draggingPointHasChanged() {
-		draggingPointData = iApplicationEngine.getCurrentDraggingPoint();
+		draggingPoint = iApplicationEngine.getCurrentDraggingPoint();
 		imageHasChanged();
 	}
 
@@ -290,18 +289,18 @@ public class AtomsListener extends EngineListenerAdapter {
 		}
 		
 		// draw the dragging line if currently dragging
-		if(draggingPointData!=null) {
+		if(draggingPoint!=null) {
 			g2.setStroke(new BasicStroke(5));
 			g2.setPaint(new Color(0,0,0,100));
-			g2.drawLine((int)draggingPointData.getX(),(int)draggingPointData.getY(),(int)(atoms[draggingPointData.getWhichBeingDragging()].pos.x),
-				(int)(atoms[draggingPointData.getWhichBeingDragging()].pos.y));
+			g2.drawLine((int)draggingPoint.getX(),(int)draggingPoint.getY(),(int)(atoms[draggingPoint.getWhichBeingDragging()].pos.x),
+				(int)(atoms[draggingPoint.getWhichBeingDragging()].pos.y));
 			g2.setStroke(new BasicStroke(4)); // else the stroke would have been changed
 				// when outlining the collider area
 		}
 		
 		// draw the dragging point used
 		if(iApplicationEngine.getLastUsedDraggingPoint()!=null) {
-			DraggingPointData lastUsedDraggingPoint = iApplicationEngine.getLastUsedDraggingPoint();
+			DraggingPoint lastUsedDraggingPoint = iApplicationEngine.getLastUsedDraggingPoint();
 			g2.setStroke(new BasicStroke(1));
 			g2.setPaint(new Color(200,0,0,100));
 			g2.drawLine((int)lastUsedDraggingPoint.getX(),(int)lastUsedDraggingPoint.getY(),(int)(atoms[lastUsedDraggingPoint.getWhichBeingDragging()].pos.x),
@@ -333,7 +332,7 @@ public class AtomsListener extends EngineListenerAdapter {
 							for(int i=0;i<latestAtomsCopy.length;i++){
 								if(p2.distanceSq(latestAtomsCopy[i].pos)<R*R) {
 									iApplicationEngine.setDraggingPoint(
-											new DraggingPointData((long)p2.x,
+											new DraggingPoint((long)p2.x,
 													(long)p2.y, i));
 									break;
 								}
@@ -346,21 +345,21 @@ public class AtomsListener extends EngineListenerAdapter {
 			addMouseMotionListener(
 					new MouseMotionListener() {
 						public void mouseDragged(MouseEvent event) {
-							if(draggingPointData!=null) {
+							if(draggingPoint!=null) {
 								float zoom = ((float)scale)/100;
 								iApplicationEngine.setDraggingPoint(
-										new DraggingPointData((long)(event.getPoint().x/zoom),
+										new DraggingPoint((long)(event.getPoint().x/zoom),
 												(long)(event.getPoint().y/zoom), 
-												draggingPointData.getWhichBeingDragging()));
+												draggingPoint.getWhichBeingDragging()));
 							}
 						}
 						public void mouseMoved(MouseEvent event) {
-							if(draggingPointData!=null) {
+							if(draggingPoint!=null) {
 								float zoom = ((float)scale)/100;
 								iApplicationEngine.setDraggingPoint(
-										new DraggingPointData((long)(event.getPoint().x/zoom),
+										new DraggingPoint((long)(event.getPoint().x/zoom),
 												(long)(event.getPoint().y/zoom), 
-												draggingPointData.getWhichBeingDragging()));
+												draggingPoint.getWhichBeingDragging()));
 							}
 						}
 					});
@@ -393,6 +392,20 @@ public class AtomsListener extends EngineListenerAdapter {
 			return 1; //TODO
 		}
 	
+	}
+
+	public void isVisible(boolean b) {
+		// TODO Auto-generated method stub
+	}
+
+	public void atomsNumberHasChanged() {
+		// no use but part of IPropertyListener
+		// TODO write an adaptater ?
+	}
+
+	public void simulationSpeedHasChanged() {
+		// no use but part of IPropertyListener
+		// TODO write an adaptater ?
 	}
 
 }

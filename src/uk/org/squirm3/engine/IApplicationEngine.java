@@ -2,7 +2,7 @@ package uk.org.squirm3.engine;
 
 import java.util.Collection;
 
-import uk.org.squirm3.data.DraggingPointData;
+import uk.org.squirm3.data.DraggingPoint;
 import uk.org.squirm3.data.Level;
 
 
@@ -43,9 +43,9 @@ public interface IApplicationEngine {
 	public void removeReactions(Collection reactions);
 	public void clearReactions();
 	
-	public DraggingPointData getLastUsedDraggingPoint();
-	public DraggingPointData getCurrentDraggingPoint();
-	public void setDraggingPoint(DraggingPointData newDraggingPointData);
+	public DraggingPoint getLastUsedDraggingPoint();
+	public DraggingPoint getCurrentDraggingPoint();
+	public void setDraggingPoint(DraggingPoint newDraggingPoint);
 	
 	public void setSimulationSpeed(short newSleepPeriod);
 	public short getSimulationSpeed();
@@ -59,7 +59,22 @@ public interface IApplicationEngine {
 	public boolean simulationIsRunning();
 	public boolean simulationNeedReset();
 	
-	public void addListener(IEngineListener l);
-	public void removeListener(IEngineListener l);
+	public void addEngineListener(IEngineListener listener);
+	public void removeEngineListener(IEngineListener listener);
+
+    public void addAtomListener(IAtomListener listener);
+    public void removeAtomListener(IAtomListener listener);
+
+    public void addLevelListener(ILevelListener listener);
+    public void removeLevelListener(ILevelListener listener);
+    
+    public void addPropertyListener(IPropertyListener listener);
+    public void removePropertyListener(IPropertyListener listener);
+    
+    public void addReactionListener(IReactionListener listener);
+    public void removeReactionListener(IReactionListener listener);
+
+    public void addStateListener(IStateListener listener);
+    public void removeStateListener(IStateListener listener);
 	
 }

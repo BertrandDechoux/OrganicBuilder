@@ -8,7 +8,7 @@ import java.util.ListIterator;
 import java.util.Vector;
 
 import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.DraggingPointData;
+import uk.org.squirm3.data.DraggingPoint;
 import uk.org.squirm3.data.Reaction;
 
 
@@ -162,10 +162,10 @@ public class Collider
 		bucket_y = whichBucketY(a.pos.y);
 		buckets[bucket_x][bucket_y].add(new Integer(i));
 	}
-	public synchronized void doTimeStep(int width, int height, DraggingPointData draggingPointData) {
-		if(draggingPointData==null) doTimeStep(width, height, false , 0, 0, 0);
-		else doTimeStep(width, height, true , draggingPointData.getWhichBeingDragging(),
-				(int)draggingPointData.getX(), (int)draggingPointData.getY());
+	public synchronized void doTimeStep(int width, int height, DraggingPoint draggingPoint) {
+		if(draggingPoint==null) doTimeStep(width, height, false , 0, 0, 0);
+		else doTimeStep(width, height, true , draggingPoint.getWhichBeingDragging(),
+				(int)draggingPoint.getX(), (int)draggingPoint.getY());
 	}
 
 

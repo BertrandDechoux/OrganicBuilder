@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Vector;
 
 import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.DraggingPointData;
+import uk.org.squirm3.data.DraggingPoint;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.data.Reaction;
 
@@ -43,8 +43,8 @@ public class LocalEngine implements IApplicationEngine {
 	public boolean resetNeeded;
 	private short sleepPeriod; // how many milliseconds to sleep for each iteration (user changeable)
 	// things to do with the dragging around of atoms
-	private DraggingPointData draggingPointData;
-	private DraggingPointData lastUsedDraggingPoint;
+	private DraggingPoint draggingPoint;
+	private DraggingPoint lastUsedDraggingPoint;
 	private Level currentLevel;
 	
 	public LocalEngine(){	//TODO values should'nt be hardcoded, properties files ?
@@ -77,15 +77,15 @@ public class LocalEngine implements IApplicationEngine {
 		return (short)collider.getNumAtoms();
 	}
 
-	public DraggingPointData getCurrentDraggingPoint() {
-		return draggingPointData;
+	public DraggingPoint getCurrentDraggingPoint() {
+		return draggingPoint;
 	}
 
 	public Level getCurrentLevel() {
 		return currentLevel;
 	}
 
-	public DraggingPointData getLastUsedDraggingPoint() {
+	public DraggingPoint getLastUsedDraggingPoint() {
 		return lastUsedDraggingPoint;
 	}
 
@@ -157,8 +157,8 @@ public class LocalEngine implements IApplicationEngine {
 			new Runnable(){
 				public void run()  {
 					while (thread == Thread.currentThread()) {
-						lastUsedDraggingPoint = draggingPointData;
-						collider.doTimeStep(simulationWidth, simulationHeight, draggingPointData);
+						lastUsedDraggingPoint = draggingPoint;
+						collider.doTimeStep(simulationWidth, simulationHeight, draggingPoint);
 						engineDispatcher.atomsHaveChanged();
 						try {
 							Thread.sleep(sleepPeriod);
@@ -180,16 +180,16 @@ public class LocalEngine implements IApplicationEngine {
 		engineDispatcher.atomsNumberHasChanged();
 	}
 
-	public void setDraggingPoint(DraggingPointData newDraggingPointData) {
-		if(draggingPointData==null && newDraggingPointData==null) return;
-		if(draggingPointData==null && newDraggingPointData!=null
-				|| draggingPointData!=null && newDraggingPointData==null) {
-			draggingPointData = newDraggingPointData;
+	public void setDraggingPoint(DraggingPoint newDraggingPoint) {
+		if(draggingPoint==null && newDraggingPoint==null) return;
+		if(draggingPoint==null && newDraggingPoint!=null
+				|| draggingPoint!=null && newDraggingPoint==null) {
+			draggingPoint = newDraggingPoint;
 			engineDispatcher.draggingPointHasChanged();
 			return;
 		}
-		if(draggingPointData.equals(newDraggingPointData)) return;
-		draggingPointData = newDraggingPointData;
+		if(draggingPoint.equals(newDraggingPoint)) return;
+		draggingPoint = newDraggingPoint;
 		engineDispatcher.draggingPointHasChanged();
 	}
 
@@ -234,13 +234,52 @@ public class LocalEngine implements IApplicationEngine {
 		return resetNeeded;
 	}
 
-	public void addListener(IEngineListener l) {
-		engineDispatcher.addListener(l);	
+	public void addEngineListener(IEngineListener listener) {
+		engineDispatcher.addEngineListener(listener);
 	}
 
-	public void removeListener(IEngineListener l) {
-		engineDispatcher.removeListener(l);
+	public void removeEngineListener(IEngineListener listener) {
+		engineDispatcher.removeEngineListener(listener);
 	}
 
+	public void addAtomListener(IAtomListener listener) {
+		engineDispatcher.addAtomListener(listener);
+	}
+
+	public void removeAtomListener(IAtomListener listener) {
+		engineDispatcher.removeAtomListener(listener);
+	}
+
+	public void addLevelListener(ILevelListener listener) {
+		engineDispatcher.addLevelListener(listener);
+	}
+
+	public void removeLevelListener(ILevelListener listener) {
+		engineDispatcher.removeLevelListener(listener);
+	}
+
+	public void addPropertyListener(IPropertyListener listener) {
+		engineDispatcher.addPropertyListener(listener);
+	}
+
+	public void removePropertyListener(IPropertyListener listener) {
+		engineDispatcher.removePropertyListener(listener);
+	}
+
+	public void addReactionListener(IReactionListener listener) {
+		engineDispatcher.addReactionListener(listener);
+	}
+
+	public void removeReactionListener(IReactionListener listener) {
+		engineDispatcher.removeReactionListener(listener);
+	}
+
+	public void addStateListener(IStateListener listener) {
+		engineDispatcher.addStateListener(listener);
+	}
+
+	public void removeStateListener(IStateListener listener) {
+		engineDispatcher.removeStateListener(listener);
+	}
 
 }

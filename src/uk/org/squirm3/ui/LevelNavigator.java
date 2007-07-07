@@ -39,7 +39,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class LevelNavigator {
+public class LevelNavigator implements IView {
 	private IApplicationEngine iApplicationEngine;
 	
 	private final List levelList;
@@ -51,7 +51,7 @@ public class LevelNavigator {
 	
 	
 	public LevelNavigator(IApplicationEngine iApplicationEngine) {
-		setApplicationEngine(iApplicationEngine);
+		this.iApplicationEngine = iApplicationEngine;
 		levelList = new ArrayList();
 		addLevels();
 		intro = createIntroAction();
@@ -59,7 +59,6 @@ public class LevelNavigator {
 		levelComboBox = createLevelComboBox();
 		next = createNextAction();
 		last = createLastAction();
-		
 	}
 	
 	public Action getIntroAction() {
@@ -200,8 +199,8 @@ public class LevelNavigator {
 		levelComboBox.setSelectedIndex(levelNumber);
 	}
 
-	public void setApplicationEngine(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
+	public void isVisible(boolean b) {
+		// TODO Auto-generated method stub
 	}
 }
 

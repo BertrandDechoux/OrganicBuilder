@@ -60,11 +60,7 @@ public class Atom
 	}
 	
 	public boolean hasBondWith(Atom other) {
-		Iterator it = bonds.iterator();
-		while(it.hasNext()) {
-			if(it.next()==other) return true;
-		}
-		return false;
+		return bonds.contains(other);
 	}
 	
 	public void getAllConnectedAtoms(LinkedList list) {
@@ -81,15 +77,8 @@ public class Atom
 	
 	public void breakBondWith(Atom other) {
 		Iterator it = bonds.iterator();
-		while(it.hasNext()) {
-			Object atom = it.next();
-			if(atom==other) bonds.remove(atom);
-		}
-		it = other.bonds.iterator();
-		while(it.hasNext()) {
-			Object atom = it.next();
-			if(atom==other) other.bonds.remove(atom);
-		}
+		this.bonds.remove(other);
+		other.bonds.remove(this);
 	}
 
 	public void breakAllBonds() {

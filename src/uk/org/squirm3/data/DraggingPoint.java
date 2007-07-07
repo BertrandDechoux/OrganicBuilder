@@ -20,12 +20,12 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class DraggingPointData {
+public class DraggingPoint {
 	private final long x;
 	private final long y;
 	private final int whichBeingDragging;
 	
-	public DraggingPointData(long x, long y, int whichBeingDragging) {
+	public DraggingPoint(long x, long y, int whichBeingDragging) {
 		this.x = x;
 		this.y = y;
 		this.whichBeingDragging = whichBeingDragging;
@@ -50,7 +50,7 @@ public class DraggingPointData {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		final DraggingPointData other = (DraggingPointData) obj;
+		final DraggingPoint other = (DraggingPoint) obj;
 		if (whichBeingDragging != other.whichBeingDragging)
 			return false;
 		if (x != other.x)

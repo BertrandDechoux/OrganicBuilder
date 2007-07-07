@@ -22,21 +22,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-public interface IEngineListener {
-
-	public void atomsHaveChanged();
-	
-	public void atomsNumberHasChanged();
-	
-	public void draggingPointHasChanged();
-
-	public void levelHasChanged();
-
-	public void reactionsHaveChanged();
-	
-	public void simulationSizeHasChanged();
-	
-	public void simulationSpeedHasChanged();
-	
-	public void simulationStateHasChanged();
+public interface IEngineListener extends IAtomListener, ILevelListener, IPropertyListener, IReactionListener, IStateListener {
 }

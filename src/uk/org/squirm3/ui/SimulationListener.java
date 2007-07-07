@@ -20,8 +20,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import uk.org.squirm3.Application;
-import uk.org.squirm3.engine.EngineListenerAdapter;
 import uk.org.squirm3.engine.IApplicationEngine;
+import uk.org.squirm3.engine.IPropertyListener;
+import uk.org.squirm3.engine.IStateListener;
 
 
 /**  
@@ -44,7 +45,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class SimulationListener extends EngineListenerAdapter {
+public class SimulationListener implements IView, IStateListener, IPropertyListener {
 	
 	// Actions controlling the simulation
 	private final Action stop, run, reset;
@@ -56,12 +57,14 @@ public class SimulationListener extends EngineListenerAdapter {
 	private IApplicationEngine iApplicationEngine;
 
 	public SimulationListener(IApplicationEngine iApplicationEngine) {
-		setApplicationEngine(iApplicationEngine);
+		this.iApplicationEngine = iApplicationEngine;
 		stop = createStopAction();
 		run = createRunAction();
 		reset = createResetAction();
 		simulationStateHasChanged();
 		parametersPanel = createParametersPanel();
+		iApplicationEngine.addStateListener(this);
+		iApplicationEngine.addPropertyListener(this);
 	}
 	
 	public Action getRunAction() {
@@ -238,10 +241,6 @@ public class SimulationListener extends EngineListenerAdapter {
 		return parametersPanel;
 	}
 
-	public void setApplicationEngine(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
-	}
-
 	public void atomsNumberHasChanged() {
 		int number = iApplicationEngine.getAtomsNumber();
 		atomNumberSelector.setValue(number);
@@ -285,6 +284,10 @@ public class SimulationListener extends EngineListenerAdapter {
 		gbc.gridx = x;
 		gbc.gridy = y;
 		return gbc;
+	}
+
+	public void isVisible(boolean b) {
+		// TODO Auto-generated method stub
 	}
 
 }
