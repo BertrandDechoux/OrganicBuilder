@@ -107,8 +107,23 @@ public class CurrentLevelView implements IView, ILevelListener {
 				}
 				if(success) {
 					Resource.logSolution(currentLevel.getId(),iApplicationEngine.getReactions());
-					JOptionPane.showMessageDialog(currentLevelPanel, result,
-							Application.localize(new String[] {"interface","level","success","title"}), JOptionPane.INFORMATION_MESSAGE);
+					result = Application.localize(new String[] {"interface","level","fullsuccess"});
+					if(iApplicationEngine.getCurrentLevel().getId()+1>iApplicationEngine.getLevels().size()-1) {
+						JOptionPane.showMessageDialog(currentLevelPanel, result,
+							Application.localize(new String[] {"interface","level","success","title"}),
+							JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						Object[] options = {Application.localize(new String[] {"interface","level","yes"}),
+								Application.localize(new String[] {"interface","level","no"})};
+						int n = JOptionPane.showOptionDialog(currentLevelPanel,
+						    result, Application.localize(new String[] {"interface","level","success","title"}),
+						    JOptionPane.YES_NO_OPTION,
+						    JOptionPane.INFORMATION_MESSAGE,
+						    null,     
+						    options,  
+						    options[0]);
+						if(n==JOptionPane.YES_OPTION) iApplicationEngine.goToNextLevel();
+					}
 				} else {
 					JOptionPane.showMessageDialog(currentLevelPanel, result,
 							Application.localize(new String[] {"interface","level","error","title"}), JOptionPane.ERROR_MESSAGE);

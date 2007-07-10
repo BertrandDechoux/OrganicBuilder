@@ -1,6 +1,7 @@
 package uk.org.squirm3.engine;
 
 import java.util.Collection;
+import java.util.List;
 
 import uk.org.squirm3.data.DraggingPoint;
 import uk.org.squirm3.data.Level;
@@ -29,9 +30,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 public interface IApplicationEngine {
 	
+	public void goToLevel(int levelIndex);
+	public void goToFirstLevel();
+	public void goToLastLevel();
+	public void goToNextLevel();
+	public void goToPreviousLevel();
 	public void restartLevel();
-	public void setLevel(Level newLevel);
 	public Level getCurrentLevel();
+	public List getLevels();
 	
 	public Collection getAtoms();
 	public void setAtomsNumber(short newAtomsNumber);

@@ -122,7 +122,6 @@ public class GUI {
 		contentPane.add(toolBar, BorderLayout.NORTH);
 		contentPane.add(rootComponent, BorderLayout.CENTER);
 		
-		levelNavigatorView.init();
 		if(applet==null) {
 			frame.setContentPane(contentPane);
 			SwingUtilities.updateComponentTreeUI(frame);
