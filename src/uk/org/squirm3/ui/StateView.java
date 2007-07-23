@@ -26,7 +26,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
@@ -99,9 +99,4 @@ public class StateView implements IView, IStateListener {
 		stop.setEnabled(!resetNeeded && isRunning);
 		run.setEnabled(!resetNeeded && !isRunning);
 	}
-
-	public void isVisible(boolean b) {
-		// TODO Auto-generated method stub
-	}
-
 }

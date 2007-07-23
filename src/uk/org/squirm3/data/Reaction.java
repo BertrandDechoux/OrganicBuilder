@@ -19,7 +19,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
@@ -41,7 +41,8 @@ public class Reaction
 		this.future_b_state = future_b_state;
 	}
 	
-	public String getString() {
+	public String toString() {
+		//TODO find a more secure method than type_code string
 		String s = new String("error!");
 		// need to check that charAt isn't going to break on us
 		if(a_type>=0 && a_type<Atom.type_code.length() && b_type>=0 && b_type<Atom.type_code.length()) {
@@ -51,10 +52,6 @@ public class Reaction
 				Atom.type_code.charAt(b_type)+String.valueOf(future_b_state);
 		}
 		return s;
-	}
-	
-	public String toString() {
-		return getString();
 	}
 	
 	

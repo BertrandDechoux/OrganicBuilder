@@ -58,7 +58,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
@@ -104,7 +104,7 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 	
 	private static void createAtomsImages() {
 		//size
-		final float R = Atom.getAtomSize();
+		final float R = Atom.getAtomSize()-2;
 		final int w = (int)(2*R);
 		final int h = (int)(2*R);
 		for(int i = 0; i<atomsColors.length; i++) {
@@ -116,7 +116,7 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 					RenderingHints.VALUE_ANTIALIAS_ON);
 			// creation of the colors
 			Color baseColor = atomsColors[i];
-			final int colorOffset = 180;
+			final int colorOffset = 220;
 			int red = (baseColor.getRed()<255-colorOffset)?baseColor.getRed()+colorOffset:255;
 			int green = (baseColor.getGreen()<255-colorOffset)?baseColor.getGreen()+colorOffset:255;
 			int blue = (baseColor.getBlue()<255-colorOffset)?baseColor.getBlue()+colorOffset:255;
@@ -391,10 +391,6 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 			return 1; //TODO
 		}
 	
-	}
-
-	public void isVisible(boolean b) {
-		// TODO Auto-generated method stub
 	}
 
 	public void atomsNumberHasChanged() {

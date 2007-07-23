@@ -43,7 +43,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
@@ -141,7 +141,7 @@ public class Resource
 			  out.println(String.valueOf(reactions.size()));
 			  //TODO size is the number of reactions or the number of possibles reactions ? (size!=length)
 			  Iterator it = reactions.iterator();
-			  while(it.hasNext()) out.println(((Reaction)it.next()).getString());
+			  while(it.hasNext()) out.println(((Reaction)it.next()).toString());
 			  out.close();
 			  //to read (debug)
 			  BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));

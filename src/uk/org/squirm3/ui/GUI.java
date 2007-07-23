@@ -8,6 +8,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -44,7 +47,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
@@ -62,10 +65,11 @@ public class GUI {
 			frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		}
 
-			//listeners
+			//view
 		AtomsView atomsView = new AtomsView(iApplicationEngine);
 		CurrentLevelView currentLevelView = new CurrentLevelView(iApplicationEngine);
-		ReactionsView reactionsView = new ReactionsView(iApplicationEngine);
+		ReactionListView reactionListView = new ReactionListView(iApplicationEngine);
+		ReactionEditorView reactionEditorView = new ReactionEditorView(iApplicationEngine);
 		StateView stateView = new StateView(iApplicationEngine);
 		LevelNavigatorView levelNavigatorView = new LevelNavigatorView(iApplicationEngine);
 		PropertyView propertyView = new PropertyView(iApplicationEngine);
@@ -73,7 +77,19 @@ public class GUI {
 			//main panels
 		JComponent collisionsPanel 	= atomsView.getCollisionsPanel();
 		JPanel currentLevelPanel	= currentLevelView.getCurrentLevelPanel();
-		JPanel reactionsPanel		= reactionsView.getReactionsPanel();
+		JPanel reactionEditorPanel = reactionEditorView.getEditorPanel();
+		reactionEditorPanel.setMaximumSize(reactionEditorPanel.getMinimumSize());
+		
+		final JSplitPane reactionsPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+				true, reactionEditorView.getEditorPanel(), reactionListView.getListPanel());
+		reactionsPane.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent arg0) {
+				if(arg0.getPropertyName().equals("dividerLocation")
+					&& !arg0.getNewValue().toString().equals("1")) {
+							reactionsPane.setDividerLocation(-1);
+				}
+			}});
+		reactionsPane.setOneTouchExpandable(true);
 		
 			//toolbar
 		JPanel toolBar = new JPanel();
@@ -112,7 +128,7 @@ public class GUI {
 		toolBar.add(miscControlsPanel);
 		
 		// rootComponent
-		JSplitPane leftComponent = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, currentLevelPanel, reactionsPanel);
+		JSplitPane leftComponent = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, currentLevelPanel, reactionsPane);
 		leftComponent.setOneTouchExpandable(true);
 		JSplitPane rootComponent = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, leftComponent, collisionsPanel);
 		rootComponent.setOneTouchExpandable(true);
@@ -135,7 +151,8 @@ public class GUI {
 				new WindowAdapter() {
 					public void windowClosing(WindowEvent e) {
 						if(applet!=null) {
-							//TODO dock/undock text change
+							//TODO internationalisation of "dock" and "undock" texts
+							//putValue(Action.NAME,"Undock");
 							applet.setContentPane(contentPane);
 							SwingUtilities.updateComponentTreeUI(applet);
 						}
