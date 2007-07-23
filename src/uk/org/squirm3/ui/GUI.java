@@ -54,6 +54,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 public class GUI {
 	
 	public static void createGUI(final IApplicationEngine iApplicationEngine, final JApplet applet) {
+		new GUI(iApplicationEngine, applet);
+	}
+	
+	private boolean isDocked = true;
+	
+	public GUI(final IApplicationEngine iApplicationEngine, final JApplet applet) {
 		Resource.loadPictures();
 		
 			//frame
@@ -147,21 +153,9 @@ public class GUI {
 			SwingUtilities.updateComponentTreeUI(applet);
 		}
 		
-		frame.addWindowListener(
-				new WindowAdapter() {
-					public void windowClosing(WindowEvent e) {
-						if(applet!=null) {
-							//TODO internationalisation of "dock" and "undock" texts
-							//putValue(Action.NAME,"Undock");
-							applet.setContentPane(contentPane);
-							SwingUtilities.updateComponentTreeUI(applet);
-						}
-					}
-					public void windowDeiconified(WindowEvent e) {}
-					public void windowIconified(WindowEvent e) {}
-				});
-		
 	}
+	
+	
 	
 	private static JButton createIconButton(Action action, Color bg) {
 		final JButton button = new JButton(action);
@@ -207,18 +201,16 @@ public class GUI {
 	    return action;
 	}
 	
-	private static Action createAppletAction(final JFrame frame, final JApplet applet) { //TODO externalize strings
-		Action action = new AbstractAction() {
+	private static Action createAppletAction(final JFrame frame, final JApplet applet) {
+		final Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				if(frame.isVisible()) {
 					frame.setVisible(false);
-					putValue(Action.NAME,"Undock");
-					putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
+					putValue(Action.NAME,Application.localize(new String[] {"interface","undock"}));
 					applet.setContentPane(frame.getContentPane());
 					SwingUtilities.updateComponentTreeUI(applet);
 				} else {
-					putValue(Action.NAME,"Dock");
-					putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
+					putValue(Action.NAME,Application.localize(new String[] {"interface","dock"}));
 					frame.setContentPane(applet.getContentPane());
 					frame.setVisible(true);
 					SwingUtilities.updateComponentTreeUI(frame);
@@ -226,8 +218,17 @@ public class GUI {
 				}
 			}
 	    };
-	    action.putValue(Action.NAME,"Undock");
-	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
+	    action.putValue(Action.NAME,Application.localize(new String[] {"interface","undock"}));
+		frame.addWindowListener(
+				new WindowAdapter() {
+					public void windowClosing(WindowEvent e) {
+							action.putValue(Action.NAME,Application.localize(new String[] {"interface","undock"}));
+							applet.setContentPane(frame.getContentPane());
+							SwingUtilities.updateComponentTreeUI(applet);
+					}
+					public void windowDeiconified(WindowEvent e) {}
+					public void windowIconified(WindowEvent e) {}
+				});
 	    return action;
 	}
 
