@@ -40,7 +40,7 @@ public class LocalEngine implements IApplicationEngine {
 	
 	private final EngineDispatcher engineDispatcher;
 	
-	private final Collider collider;
+	private final EulerCollider collider;
 	private Thread thread;
 	// simulation's attributes
 	private int simulationHeight;
@@ -63,7 +63,7 @@ public class LocalEngine implements IApplicationEngine {
 		simulationWidth = 500;
 		resetNeeded = false;
 		sleepPeriod = 50;
-		collider = new Collider(50, simulationWidth, simulationHeight);
+		collider = new EulerCollider(50, simulationWidth, simulationHeight);
 		goToLevel(0);
 	}
 	

@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-public class Collider
+public class EulerCollider
 {	
 	// ------- data ---------
 
@@ -60,7 +60,7 @@ public class Collider
 
 	// ------- methods ---------
 	
-	public Collider(int number_of_atoms,int w,int h)
+	public EulerCollider(int number_of_atoms,int w,int h)
 	{
 		reactions = new Vector();
 		width = -1;
