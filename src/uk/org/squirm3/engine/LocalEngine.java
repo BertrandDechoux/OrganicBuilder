@@ -384,7 +384,7 @@ class Join_As extends Level //1
 	public String evaluate(Atom[] atoms) {
 		// is any non-'a' atom bonded with any other?
 		for(int i=0;i<atoms.length;i++)
-			if(atoms[i].type!=0 && atoms[i].bonds.size()>0)
+			if(atoms[i].type!=0 && atoms[i].getBonds().size()>0)
 				return Application.localize(new String[] {"levels","joinas","error","1" });
 		// is every 'a' atom bonded together in a big clump?
 		LinkedList a_atoms = new LinkedList();
@@ -423,12 +423,12 @@ class Make_ECs extends Level //2
 			int ec_pairs_found=0,loose_e_atoms_found=0,loose_c_atoms_found=0;
 			for(int i=0;i<atoms.length;i++) {
 				Atom atom = atoms[i];
-				if(atom.type!=2 && atom.type!=4 && atom.bonds.size()!=0)
+				if(atom.type!=2 && atom.type!=4 && atom.getBonds().size()!=0)
 					return Application.localize(new String[] {"levels","makeecs","error","1" });
 				if(atom.type==2 || atom.type==4) {
-					if(atom.bonds.size()>1)
+					if(atom.getBonds().size()>1)
 						return Application.localize(new String[] {"levels","makeecs","error","2" });
-					if(atom.bonds.size()==0) {
+					if(atom.getBonds().size()==0) {
 						if(atom.type==2) loose_c_atoms_found++;
 						else loose_e_atoms_found++;
 					}
@@ -466,13 +466,13 @@ class Line_Cs extends Level //3
 			for(int i=0;i<atoms.length;i++) {
 				Atom atom = atoms[i];
 				if(atom.type!=2) {
-					if(atom.bonds.size()!=0) 
+					if(atom.getBonds().size()!=0) 
 						return Application.localize(new String[] {"levels","linecs","error","1" });;
 					continue; // no other tests for non-'c' atoms
 				}
-				if(atom.bonds.size()==1) single_bonded_atoms_found++;
-				else if(atom.bonds.size()==2) double_bonded_atoms_found++;
-				else if(atom.bonds.size()==0)
+				if(atom.getBonds().size()==1) single_bonded_atoms_found++;
+				else if(atom.getBonds().size()==2) double_bonded_atoms_found++;
+				else if(atom.getBonds().size()==0)
 					return Application.localize(new String[] {"levels","linecs","error","2" });
 				else
 					return Application.localize(new String[] {"levels","linecs","error","3" });
@@ -527,12 +527,12 @@ class Connect_corners extends Level //5
 		newAtoms[0].state=1; 
 		newAtoms[0].type=5; 
 		newAtoms[0].pos.x=newAtoms[0].pos.y=atomSize*1.5f; 
-		newAtoms[0].stuck=true; 
+		newAtoms[0].setStuck(true);  
 		newAtoms[1].state=1; 
 		newAtoms[1].type=3; 
 		newAtoms[1].pos.x=width-atomSize*1.5f;
 		newAtoms[1].pos.y=height-atomSize*1.5f;
-		newAtoms[1].stuck=true; 
+		newAtoms[1].setStuck(true); 
 		return newAtoms;
 	}
 	
@@ -566,7 +566,7 @@ class Abcdef_chains extends Level //6
 			int num_abcdef_chains_found=0;
 			for(int i=0;i<atoms.length;i++) {
 				Atom a = atoms[i];
-				if(a.type==0 && a.bonds.size()==1) {
+				if(a.type==0 && a.getBonds().size()==1) {
 					// looks promising - let's check
 					LinkedList joined = new LinkedList();
 					a.getAllConnectedAtoms(joined);
@@ -653,7 +653,7 @@ class Match_template extends Level //8
 			newAtoms[i].type=PRNG.nextInt(6);
 			if(i>0)
 				newAtoms[i].bondWith(newAtoms[i-1]);
-			newAtoms[i].stuck=true;
+			newAtoms[i].setStuck(true); 
 		}
 		return newAtoms;
 	}
@@ -662,8 +662,8 @@ class Match_template extends Level //8
 				// does each atom 0-5 have another single type-matching atom attached?
 			for(int i=0;i<6;i++) {
 				Atom a = atoms[i];
-				Atom b = (Atom)a.bonds.getLast();
-				if(b.type!=a.type || b.bonds.size()!=1)
+				Atom b = (Atom)a.getBonds().getLast();
+				if(b.type!=a.type || b.getBonds().size()!=1)
 					return Application.localize(new String[] {"levels","matchtemplate","error","1" });
 				// (not a complete test, but hopefully ok)
 			}
@@ -709,7 +709,7 @@ class Break_molecule extends Level //9
 	public String evaluate(Atom[] atoms) {
 				int n_bonds[]={1,2,2,2,1,1,2,2,2,1};
 			for(int i=0;i<10;i++)
-				if(atoms[i].bonds.size() != n_bonds[i])
+				if(atoms[i].getBonds().size() != n_bonds[i])
 					return Application.localize(new String[] {"levels","breakmolecule","error","1" });
 	return null; }
 }
@@ -769,9 +769,9 @@ class Bond_prisoner extends Level //10
 	
 	public String evaluate(Atom[] atoms) {
 				// if atom 8 bonded with an f?
-			if(atoms[8].bonds.size()==0)
+			if(atoms[8].getBonds().size()==0)
 				return Application.localize(new String[] {"levels","bondprisonner","error","1" });
-			if(((Atom)atoms[8].bonds.getFirst()).type!=5)
+			if(((Atom)atoms[8].getBonds().getFirst()).type!=5)
 				return Application.localize(new String[] {"levels","bondprisonner","error","2" });
 	return null; }
 }
@@ -816,7 +816,7 @@ class Pass_message extends Level //11
 	public String evaluate(Atom[] atoms) {
 				int n_bonds[]={1,2,2,2,2,2,2,2,2,1};
 			for(int i=0;i<10;i++)
-				if(atoms[i].bonds.size() != n_bonds[i])
+				if(atoms[i].getBonds().size() != n_bonds[i])
 					return Application.localize(new String[] {"levels","passmessage","error","1" });
 				else if(atoms[i].state != 2)
 					return Application.localize(new String[] {"levels","passmessage","error","2" });
@@ -865,7 +865,7 @@ class Split_ladder extends Level //12
 	public String evaluate(Atom[] atoms) {
 				int n_bonds[]={1,2,2,2,2,2,2,2,2,1};
 			for(int i=0;i<20;i++)
-				if(atoms[i].bonds.size() != n_bonds[i%10])
+				if(atoms[i].getBonds().size() != n_bonds[i%10])
 					return Application.localize(new String[] {"levels","splitladder","error","1" });
 	return null; }
 }
@@ -918,7 +918,7 @@ class Insert_atom extends Level //13
 			Iterator it = joined.iterator();
 			while(it.hasNext()) {
 				Atom a = (Atom)it.next();
-				if(a.bonds.size()!=n_bonds[i])
+				if(a.getBonds().size()!=n_bonds[i])
 					return Application.localize(new String[] {"levels","insertatom","error","2" });
 				if( a.type!=types[i])
 					return Application.localize(new String[] {"levels","insertatom","error","3" });
@@ -985,9 +985,9 @@ class Make_ladder extends Level //14
 			while(it.hasNext()) { 
 				Atom a = (Atom)it.next();
 				if(a.type==4 || a.type==5) // 'e' and 'f' 
-					if(a.bonds.size()!=2) 
+					if(a.getBonds().size()!=2) 
 						return Application.localize(new String[] {"levels","makeladder","error","4" });
-				else if(a.bonds.size()!=3)  
+				else if(a.getBonds().size()!=3)  
 					return Application.localize(new String[] {"levels","makeladder","error","5" });
 			}
 	return null; }
@@ -1043,7 +1043,7 @@ class Selfrep extends Level //15
 			int bound_atoms = 0;
 			for(int i=0;i<atoms.length;i++) { // include the original
 				Atom first = atoms[i];
-				if(first.bonds.size()>0) {
+				if(first.getBonds().size()>0) {
 					bound_atoms++;
 					
 					if(first.type==4) {
@@ -1054,12 +1054,12 @@ class Selfrep extends Level //15
 							return Application.localize(new String[] {"levels","selfrep","error","1" });
 						
 						Atom last = (Atom)joined.getLast();
-						if (first.bonds.size()!=1 || last.bonds.size()!=1 || last.type!=5)
+						if (first.getBonds().size()!=1 || last.getBonds().size()!=1 || last.type!=5)
 							return Application.localize(new String[] {"levels","selfrep","error","2" });
 						
 						for(int j=1;j<joined.size()-1;j++) {
 							Atom a = (Atom)joined.get(j);
-							if (a.bonds.size()!=2)
+							if (a.getBonds().size()!=2)
 								return Application.localize(new String[] {"levels","selfrep","error","3" });				
 							if(a.type != atoms[j].type)
 								return Application.localize(new String[] {"levels","selfrep","error","4" });
@@ -1141,7 +1141,7 @@ class Grow_membrane extends Level //16
 			int i = 0;
 			while(it.hasNext()) {
 				Atom a = (Atom)it.next();
-				if(a.type!=0 || a.bonds.size()!=2)
+				if(a.type!=0 || a.getBonds().size()!=2)
 					return Application.localize(new String[] {"levels","growmembrane","error","1" });
 				x_points[i] = (int)a.pos.x; // (need these for polygon check, below)
 				y_points[i] = (int)a.pos.y;
@@ -1226,7 +1226,7 @@ class Membrane_transport extends Level //17
 			int i = 0;
 			while(it.hasNext()) {
 				Atom a = (Atom)it.next();
-				if(a.type!=0 || a.bonds.size()!=2)
+				if(a.type!=0 || a.getBonds().size()!=2)
 					return Application.localize(new String[] {"levels","membranetransport","error","1" });
 				x_points[i] = (int)a.pos.x; // (need these for polygon check, below)
 				y_points[i] = (int)a.pos.y;
@@ -1307,7 +1307,7 @@ class Membrane_division extends Level //18
 			for(int iLoop=0;iLoop<2;iLoop++) {
 				for(int i=0;i<loop[iLoop].size();i++) {
 					Atom a = (Atom)loop[iLoop].get(i);
-					if(a.type!=0 || a.bonds.size()!=2)
+					if(a.type!=0 || a.getBonds().size()!=2)
 						return Application.localize(new String[] {"levels","membranedivision","error","3" });
 				}
 			}
@@ -1382,7 +1382,7 @@ class Cell_division extends Level //19
 			}
 		}
 		// set one of the free-floating atoms to be a killer enzyme we must exclude from the cell
-		newAtoms[i].killer = true;
+		newAtoms[i].setKiller(true);
 		return newAtoms;
 	}
 	
@@ -1450,7 +1450,7 @@ class Cell_division extends Level //19
 			int n_found=0;
 			for(int i=0;i<atoms.length && n_found<2;i++) {
 				Atom a = atoms[i];
-				if(a.type==4 && a.state!=0 && a.bonds.size()==2) heads[n_found++]=a;
+				if(a.type==4 && a.state!=0 && a.getBonds().size()==2) heads[n_found++]=a;
 			}
 			if(n_found<2)
 				return Application.localize(new String[] {"levels","celldivision","error","3" });
@@ -1465,22 +1465,22 @@ class Cell_division extends Level //19
 				Atom current = heads[iCell];
 				seen.add(current);
 				sequence[iCell]="e"; // let's get things started
-				if(((Atom)current.bonds.getFirst()).bonds.size()==2)
-					current = (Atom)current.bonds.getFirst();
+				if(((Atom)current.getBonds().getFirst()).getBonds().size()==2)
+					current = (Atom)current.getBonds().getFirst();
 				else
-					current = (Atom)current.bonds.getLast();
+					current = (Atom)current.getBonds().getLast();
 				while(sequence[iCell].length()<10) {
 					// if the current atom has other than 2 bonds then we are done
-					if(current.bonds.size()!=2) break;
+					if(current.getBonds().size()!=2) break;
 					// append the type letter (a-f) to the string
 					sequence[iCell] += Atom.type_code.charAt(current.type);
 					// add the current atom to the list so that we will know we have seen it before
 					seen.add(current);
 					// move onto the next bond (we know this atom has exactly two) 
-					if(seen.contains((Atom)current.bonds.getFirst()))
-						current = (Atom)current.bonds.get(1);
+					if(seen.contains((Atom)current.getBonds().getFirst()))
+						current = (Atom)current.getBonds().get(1);
 					else
-						current = (Atom)current.bonds.getFirst();
+						current = (Atom)current.getBonds().getFirst();
 				}
 				//System.out.println(sequence[iCell]);
 				if(sequence[iCell].length()!=6 || sequence[iCell].charAt(0)!='e' ||

@@ -254,7 +254,7 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 			int offset_y= R;
 			int text_offset_y= (int)(R*8.0/22.0);
 			for (int i = 0; i < atoms.length; i++){
-				if(!atoms[i].killer) {
+				if(!atoms[i].isKiller()) {
 					// draw the normal colour atom image and label it
 					g2.drawImage(atomsImages[atoms[i].type], (int)atoms[i].pos.x-offset_x, (int)atoms[i].pos.y-offset_y, R*2, R*2, collisionsPanel);
 					String label = atoms[i].toString();
@@ -272,7 +272,7 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 		g2.setPaint(new Color(0,0,0,50));
 		if(atoms!=null) {
 			for (int i = 0; i < atoms.length; i++){
-				Iterator it = atoms[i].bonds.iterator();
+				Iterator it = atoms[i].getBonds().iterator();
 				while(it.hasNext()) {
 					Atom other = (Atom)it.next();
 					float x1 = atoms[i].pos.x;

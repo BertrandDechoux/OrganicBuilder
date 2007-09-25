@@ -1,54 +1,83 @@
 <project name="Organic Builder" default="dist" basedir=".">
-    <description>
-        build file to compile and package the application
-    </description>
-  <property name="src" location="src"/>
-  <property name="release" location="release"/>
-  <property name="build" location="${release}/build"/>
+	<description>
+		build file to compile, test and package the application
+	</description>
+	
+	<!-- Set global properties for this build -->
+	<property name="src"		location="src"/>
+	<property name="release"	location="release"/>
+	<property name="build"		location="build"/>
+	
+	<property name="JUNIT_HOME"	location="/usr/share/eclipse/plugins/org.junit_3.8.1"/>
+	
 
-  <target name="init">
-    <tstamp/>
-    <mkdir dir="${release}"/>
-    <mkdir dir="${build}"/>
-  </target>
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp/>
+		<!-- Create the directory structure -->
+		<mkdir dir="${release}"/>
+		<mkdir dir="${build}"/>
+	</target>
 
-  <target name="compile" depends="init"
-        description="compile the source " >
-    <javac srcdir="${src}" destdir="${build}" source="1.4" target="1.4"/>
-  </target>
+	<target name="compile" depends="init"
+			description="compile the source " >
+	    <!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}" excludes="test/**"
+			source="1.4" target="1.4"/>
+	</target>
+	
+	<target name="test" depends="compile"
+			description="compile and run the unit tests " if="JUNIT_HOME">
+		<!-- Compile the java code of unit tests from ${src} into ${build} -->
+		<javac debug="true" srcdir="${src}" destdir="${build}" 
+				source="1.4" target="1.4">
+			<include name="test/**/*.java"/>
+		</javac>
+        <java fork="yes" classname="junit.textui.TestRunner" 
+        		failonerror="true">
+            <arg value="test.uk.org.squirm3.AllJUnitTests"/>
+            <classpath>
+                <pathelement path="${build}" />
+                <pathelement path="${java.class.path}" />
+            </classpath>
+        </java>
+		<!-- Stop the process if one test failed -->
+	</target>
 
-  <target name="dist" depends="compile"
-        description="generate the distribution" >
-
-    <jar jarfile="${release}/OrganicBuilder.jar">
-        <fileset dir="." includes="about.html"/>
-        <fileset dir="." includes="about.txt"/>
-        <fileset dir="." includes="gpl.txt"/>
-        <fileset dir="." includes="help.txt"/>
-        <fileset dir="." includes="license.html"/>
-	<zipfileset dir="icons" prefix="icons"/>
-	<zipfileset dir="pictures" prefix="pictures"/>
-	<zipfileset dir="translations" prefix="translations"/>
-	<fileset dir="${build}"/>
-        <manifest>
-            <attribute name="Sealed" value="true"/>
-            <attribute name="Main-Class" value="uk.org.squirm3.Application"/>
-        </manifest>
-    </jar>
-
-    <zip destfile="${release}/OrganicBuilder-${DSTAMP}.zip">
-	<fileset dir="." includes="README.txt"/>
-        <fileset dir="${release}" includes="OrganicBuilder.jar"/>
-        <fileset dir="." includes="OrganicBuilder_linux.sh"/>
-        <fileset dir="." includes="OrganicBuilder_linux_fr.sh"/>
-	<fileset dir="." includes="OrganicBuilder_windows.bat"/>
-	<fileset dir="." includes="OrganicBuilder_windows_fr.bat"/>
-	<zipfileset dir="src" prefix="src"/>
-    </zip>
+	<target name="dist" depends="test"
+			description="generate the distribution " >
+		<!-- Create the application jar file -->
+		<jar jarfile="${release}/OrganicBuilder.jar">
+			<fileset dir="." includes="about.html"/>
+			<fileset dir="." includes="about.txt"/>
+			<fileset dir="." includes="gpl.txt"/>
+			<fileset dir="." includes="help.txt"/>
+			<fileset dir="." includes="license.html"/>
+			<zipfileset dir="icons" prefix="icons"/>
+			<zipfileset dir="pictures" prefix="pictures"/>
+			<zipfileset dir="translations" prefix="translations"/>
+			<fileset dir="${build}"/>
+			<manifest>
+				<attribute name="Sealed" value="true"/>
+				<attribute name="Main-Class"
+						value="uk.org.squirm3.Application"/>
+			</manifest>
+		</jar>
+		<!-- Create the release zip file -->
+		<zip destfile="${release}/OrganicBuilder-${DSTAMP}.zip">
+			<fileset dir="." includes="README.txt"/>
+			<fileset dir="${release}" includes="OrganicBuilder.jar"/>
+			<fileset dir="." includes="OrganicBuilder_linux.sh"/>
+			<fileset dir="." includes="OrganicBuilder_linux_fr.sh"/>
+			<fileset dir="." includes="OrganicBuilder_windows.bat"/>
+			<fileset dir="." includes="OrganicBuilder_windows_fr.bat"/>
+			<zipfileset dir="src" prefix="src"/>
+		</zip>
   </target>
 
   <target name="clean"
-        description="clean up" >
+        description="clean up " >
+  	<!-- Delete all -->
     <delete dir="${release}"/>
   </target>
 </project>

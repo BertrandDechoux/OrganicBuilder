@@ -1,8 +1,8 @@
 package uk.org.squirm3.data;
+
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.LinkedList;
-
 
 /**  
 Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
@@ -33,12 +33,12 @@ public class Atom
 	public Point2D.Float pos,velocity,acceleration; // acceleration only used in new correct physics code
 	public int type,state; // type: 0=a,..5=f
 
-	public LinkedList bonds;
+	private LinkedList bonds;
 	
-	public boolean stuck=false; // special marker for atoms that don't move
-	public boolean killer=false; // special marker for atoms that have a special caustic effect
+	private boolean stuck=false; // special marker for atoms that don't move
+	private boolean killer=false; // special marker for atoms that have a special caustic effect
 	
-	public boolean has_reacted=false; // has this atom been part of a reaction this timestep?
+	private boolean has_reacted=false; // has this atom been part of a reaction this timestep?
 	
 	static final public String type_code = "abcdefxy";
 	
@@ -51,12 +51,45 @@ public class Atom
 		this.bonds = new LinkedList();
 	}
 	
-	public void bondWith(Atom other) {
-		// could check for existing bond if you were worried
-		//if(this.bonds.contains(other) || other.bonds.contains(this)) {}
+	//TODO the copy should not allow modifications
+	public LinkedList getBonds() {
+		return bonds;
+	}
+	
+	//TODO remove, use a final field instead and create
+	// a new object if needed
+	public void setStuck(boolean b) {
+		stuck = b;
+	}
 
-		this.bonds.add(other);
-		other.bonds.add(this);
+	public boolean isStuck() {
+		return stuck;
+	}
+
+	//TODO remove, use a final field instead and create
+	// a new object if needed
+	public void setKiller(boolean b) {
+		killer = b;
+	}
+	
+	public boolean isKiller() {
+		return killer;
+	}
+	
+	public void setReacted(boolean b) {
+		has_reacted = b;
+	}
+	
+	public boolean hasReacted() {
+		return has_reacted;
+	}
+	
+	
+	public void bondWith(Atom other) {
+		if(!hasBondWith(other)) {
+			this.bonds.add(other);
+			other.bonds.add(this);
+		}
 	}
 	
 	public boolean hasBondWith(Atom other) {
@@ -76,16 +109,23 @@ public class Atom
 	}
 	
 	public void breakBondWith(Atom other) {
-		Iterator it = bonds.iterator();
-		this.bonds.remove(other);
-		other.bonds.remove(this);
+		if(hasBondWith(other)) {
+			this.bonds.remove(other);
+			other.bonds.remove(this);
+		}
 	}
 
 	public void breakAllBonds() {
+		// slower method but avoid the concurrent exception
+		// TODO faster one, using synchronisation ?
+		Object a[] = bonds.toArray();
+		for(int i = 0; i < a.length ; i++)
+			breakBondWith((Atom)a[i]);
+		/*
 		Iterator it = bonds.iterator();
 		while(it.hasNext()) {
 			breakBondWith((Atom)it.next());
-		}
+		} */
 	}
 	
 	public String toString() {

@@ -9,22 +9,14 @@ import java.awt.MediaTracker;
 import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.Collection;
-import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-
-import uk.org.squirm3.data.Reaction;
 
 
 /**  
@@ -124,34 +116,4 @@ public class Resource
 		if(sb!=null) return sb.toString();
 		return "ERROR : "+fileName;
 	}
-		
-	public static void logSolution(int levelNumber, Collection reactions){
-	  if(levelNumber>0) // do you want to log the solution or not?
-	  {
-		 try {
-			 // Old one http://www.sq3.org.uk/Evolution/Squirm3/OrganicBuilder/logger.pl
-			  URL url = new URL("http://organicbuilder.sourceforge.net/log-solution");
-			  URLConnection connection = url.openConnection();
-			  connection.setDoOutput(true);
-			  
-			  PrintWriter out = new PrintWriter(connection.getOutputStream());
-			  // chalenge number
-			  out.println(String.valueOf(levelNumber));
-			  // number of reactions
-			  out.println(String.valueOf(reactions.size()));
-			  //TODO size is the number of reactions or the number of possibles reactions ? (size!=length)
-			  Iterator it = reactions.iterator();
-			  while(it.hasNext()) out.println(((Reaction)it.next()).toString());
-			  out.close();
-			  //to read (debug)
-			  BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			  String inputLine;
-			  while ((inputLine = in.readLine()) != null) System.out.println(inputLine);
-			  in.close();
-		  } 
-		  // it doesn't matter too much if we couldn't connect, just skip it
-		 // catch all exceptions : MalformedURLException, IOException and others
-		  catch (Exception error) { }
-	  }
-}
 }

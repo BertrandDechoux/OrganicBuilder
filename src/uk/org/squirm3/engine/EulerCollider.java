@@ -85,7 +85,7 @@ public class EulerCollider extends AbstractCollider
 		
 		// starting over for this iteration
 		for(int i=0;i<atoms.length;i++)
-			atoms[i].has_reacted=false;
+			atoms[i].setReacted(false);
 		
 		float R = Atom.getAtomSize();
 		float diam = 2.0f*R;
@@ -141,7 +141,7 @@ public class EulerCollider extends AbstractCollider
 				}
 			}
 			// bonds act like springs
-			Iterator it = a.bonds.iterator();
+			Iterator it = a.getBonds().iterator();
 			while(it.hasNext()) {
 				Atom other =(Atom)it.next();
 				float sep = (float)a.pos.distance(other.pos);
@@ -180,7 +180,7 @@ public class EulerCollider extends AbstractCollider
 		for(int i=0;i<atoms.length;i++)
 		{
 			Atom a = atoms[i];
-			if(a.stuck) continue; // special atoms that don't move
+			if(a.isStuck()) continue; // special atoms that don't move
 			
 			int current_bucket_x,current_bucket_y;
 			current_bucket_x = whichBucketX(a.pos.x);

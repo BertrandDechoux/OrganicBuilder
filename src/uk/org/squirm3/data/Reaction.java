@@ -29,7 +29,9 @@ public class Reaction
 	private boolean bonded_before,bonded_after;
 	private int future_a_state,future_b_state;
 	
-	public Reaction(int a_type,int a_state,boolean bonded_before,int b_type,int b_state,int future_a_state,boolean bonded_after,int future_b_state)
+	public Reaction(int a_type,int a_state,boolean bonded_before,
+			int b_type,int b_state,int future_a_state,
+			boolean bonded_after,int future_b_state)
 	{
 		this.a_type = a_type;
 		this.a_state = a_state;
@@ -170,13 +172,13 @@ public class Reaction
 	}
 	
 	public static void tryReaction(Atom a, Atom b, Vector reactions) {
-		if(!a.killer && !b.killer)
+		if(!a.isKiller() && !b.isKiller())
 		{
-			for(int twice=0;twice<2 && !a.has_reacted && !b.has_reacted;twice++)
+			for(int twice=0;twice<2 && !a.hasReacted() && !b.hasReacted();twice++)
 			{
 				// try each reaction in turn
 				Iterator it = reactions.listIterator();
-				while(it.hasNext() && !a.has_reacted && !b.has_reacted)
+				while(it.hasNext() && !a.hasReacted() && !b.hasReacted())
 				{
 					Reaction r = (Reaction)it.next();
 					// is the type for 'a' specified and correct?
@@ -196,8 +198,8 @@ public class Reaction
 					a.state=r.future_a_state;
 					b.state=r.future_b_state;
 					
-					a.has_reacted=true; // (only want one reaction per atom per timestep)
-					b.has_reacted=true;
+					a.setReacted(true); // (only want one reaction per atom per timestep)
+					b.setReacted(true);
 				}
 				// now swap a and b and try again
 				Atom temp=a; a=b; b=temp;
@@ -205,7 +207,7 @@ public class Reaction
 		}
 		else {
 			// the killer atom breaks the other atoms bonds (unless other is an 'a' atom)
-			if(a.killer) { if(b.type!=0) b.breakAllBonds();}
+			if(a.isKiller()) { if(b.type!=0) b.breakAllBonds();}
 			else { if(a.type!=0) a.breakAllBonds(); }
 		}
 	}
