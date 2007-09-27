@@ -50,11 +50,11 @@
 			description="generate the release " >
 		<!-- Create the application jar file -->
 		<jar jarfile="${release}/OrganicBuilder.jar">
-			<fileset dir="." includes="about.html"/>
-			<fileset dir="." includes="about.txt"/>
-			<fileset dir="." includes="gpl.txt"/>
-			<fileset dir="." includes="help.txt"/>
-			<fileset dir="." includes="license.html"/>
+			<fileset dir="media" includes="about.html"/>
+			<fileset dir="media" includes="about.txt"/>
+			<fileset dir="media" includes="gpl.txt"/>
+			<fileset dir="media" includes="help.txt"/>
+			<fileset dir="media" includes="license.html"/>
 			<zipfileset dir="media/icons" prefix="icons"/>
 			<zipfileset dir="media/pictures" prefix="pictures"/>
 			<zipfileset dir="media/translations" prefix="translations"/>
@@ -67,7 +67,7 @@
 		</jar>
 		<!-- Create the release zip file -->
 		<zip destfile="${release}/OrganicBuilder-${DSTAMP}.zip">
-			<fileset dir="." includes="README.txt"/>
+			<fileset dir="media" includes="README.txt"/>
 			<fileset dir="${release}" includes="OrganicBuilder.jar"/>
 			<fileset dir="launchers" includes="*.sh"/>
 			<fileset dir="launchers" includes="*.bat"/>
