@@ -1,4 +1,4 @@
-<project name="Organic Builder" default="dist" basedir=".">
+<project name="Organic Builder" default="release" basedir=".">
 	<description>
 		build file to compile, test and package the application
 	</description>
@@ -19,15 +19,16 @@
 		<mkdir dir="${build}"/>
 	</target>
 
-	<target name="compile" depends="init"
-			description="compile the source " >
+	<!-- Compile the source files for the application -->
+	<target name="compile_application_source" depends="init">
 	    <!-- Compile the java code from ${src} into ${build} -->
 		<javac srcdir="${src}" destdir="${build}" excludes="test/**"
 			source="1.4" target="1.4"/>
 	</target>
 	
-	<target name="test" depends="compile"
-			description="compile and run the unit tests " if="JUNIT_HOME">
+	<!-- Compile and run the unit tests -->
+	<target name="compile_and_run_tests" depends="compile_application_source"
+			if="JUNIT_HOME">
 		<!-- Compile the java code of unit tests from ${src} into ${build} -->
 		<javac debug="true" srcdir="${src}" destdir="${build}" 
 				source="1.4" target="1.4">
@@ -44,8 +45,9 @@
 		<!-- Stop the process if one test failed -->
 	</target>
 
-	<target name="dist" depends="test"
-			description="generate the distribution " >
+	<!-- Generate a release : jar and zip files -->
+	<target name="release" depends="compile_and_run_tests"
+			description="generate the release " >
 		<!-- Create the application jar file -->
 		<jar jarfile="${release}/OrganicBuilder.jar">
 			<fileset dir="." includes="about.html"/>
@@ -71,11 +73,11 @@
 			<fileset dir="launchers" includes="*.bat"/>
 			<zipfileset dir="src" prefix="src"/>
 		</zip>
-  </target>
+ 	</target>
 
-  <target name="clean"
-        description="clean up " >
-  	<!-- Delete all -->
-    <delete dir="${release}"/>
-  </target>
+	<!-- Clean all : delete the release directory -->
+ 	<target name="clean" description="clean up " >
+		<!-- Delete all -->
+		<delete dir="${release}"/>
+	</target>
 </project>
