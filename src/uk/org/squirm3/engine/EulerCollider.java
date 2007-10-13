@@ -2,38 +2,40 @@ package uk.org.squirm3.engine;
 
 import java.awt.geom.Point2D;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Set;
 
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Reaction;
 
 
 /**  
-Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
-
-This file is part of Organic Builder.
-
-Organic Builder is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-Organic Builder is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Organic Builder; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
+ 
+ This file is part of Organic Builder.
+ 
+ Organic Builder is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ Organic Builder is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with Organic Builder; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
 
 public class EulerCollider extends AbstractCollider
 {	
 	private float MAX_SPEED=5.0f; // recomputed when R changes (thanks Ralph)
-
+	private Set reactedAtoms = new HashSet();
 	// ------- methods ---------
 	
 	public EulerCollider(int number_of_atoms,int w,int h) {
@@ -42,9 +44,9 @@ public class EulerCollider extends AbstractCollider
 		float R = Atom.getAtomSize();
 		MAX_SPEED = 5.0f*R/22.0f; // (thanks Ralph)
 	}
-
+	
 	public synchronized void doTimeStep(int width, int height,boolean is_dragging,int which_being_dragged,
-		int mouse_x,int mouse_y) {
+			int mouse_x,int mouse_y) {
 		// straight Euler method computation of spring forces per timestep
 		// uses a maximum speed limiter to prevent numerical problems
 		// doesn't lose overall speed however, since force computation typically overestimates anyway
@@ -61,12 +63,11 @@ public class EulerCollider extends AbstractCollider
 	}
 	
 	private synchronized void recomputeVelocitiesAndReact(int width, int height,boolean is_dragging,int which_being_dragged,
-		int mouse_x,int mouse_y)
-	{
+			int mouse_x,int mouse_y) {
 		// exception fix, to be removed !!! there is no change of atoms number....
 		
 		// old code before we started experimenting with the proper way to do the physics...
-
+		
 		// if the size has changed, refresh the buckets
 		if(width != this.width || height != this.height)
 			refreshBuckets(width,height);
@@ -85,15 +86,13 @@ public class EulerCollider extends AbstractCollider
 		Collections.shuffle(reactions);
 		
 		// starting over for this iteration
-		for(int i=0;i<atoms.length;i++)
-			atoms[i].setReacted(false);
+		reactedAtoms.clear();
 		
 		float R = Atom.getAtomSize();
 		float diam = 2.0f*R;
 		float diam2 = diam*diam; 
-
-		for(int i=0;i<atoms.length;i++)
-		{
+		
+		for(int i=0;i<atoms.length;i++) {
 			Atom a = atoms[i];
 			// bounce off the walls
 			if(a.getPhysicalPoint().getPositionX()<R)
@@ -112,22 +111,35 @@ public class EulerCollider extends AbstractCollider
 			int wx = whichBucketX(a.getPhysicalPoint().getPositionX());
 			int wy = whichBucketY(a.getPhysicalPoint().getPositionY());
 			// accumulate the list of any atoms in this square radius (clamped to the valid area)
-			for(int x=Math.max(0,wx-rx);x<=Math.min(n_buckets_x-1,wx+rx);x++)
-			{
-				for(int y=Math.max(0,wy-ry);y<=Math.min(n_buckets_y-1,wy+ry);y++)
-				{
+			for(int x=Math.max(0,wx-rx);x<=Math.min(n_buckets_x-1,wx+rx);x++) {
+				for(int y=Math.max(0,wy-ry);y<=Math.min(n_buckets_y-1,wy+ry);y++) {
 					// add each atom that is in this bucket
 					Iterator it = buckets[x][y].listIterator();
-					while(it.hasNext())
-					{
+					while(it.hasNext())	{
 						int iOther = ((Integer)it.next()).intValue();
 						if(iOther<=i) continue; // using Newton's "action&reaction" as a shortcut
 						Atom b = atoms[iOther];
 						if((new Point2D.Float(a.getPhysicalPoint().getPositionX(), a.getPhysicalPoint().getPositionY())).distanceSq(
-								new Point2D.Float(b.getPhysicalPoint().getPositionX(), b.getPhysicalPoint().getPositionY()))<diam2) 
-						{
+								new Point2D.Float(b.getPhysicalPoint().getPositionX(), b.getPhysicalPoint().getPositionY()))<diam2) {
 							// this is a collision - can any reactions apply to these two atoms?
-							Reaction.tryReaction(a,b, reactions);
+							if(!a.isKiller() && !b.isKiller()) {
+								for(int twice=0;twice<2 && !reactedAtoms.contains(a) && !reactedAtoms.contains(b);twice++) {
+									// try each reaction in turn
+									Iterator iterator = reactions.listIterator();
+									while(iterator.hasNext() && !reactedAtoms.contains(a) && !reactedAtoms.contains(b)) {
+										if(((Reaction)iterator.next()).tryOn(a,b)) {
+											reactedAtoms.add(a);
+											reactedAtoms.add(b);
+										}
+									}
+									// now swap a and b and try again
+									Atom temp=a; a=b; b=temp;
+								}
+							} else {
+								// the killer atom breaks the other atoms bonds (unless other is an 'a' atom)
+								if(a.isKiller()) { if(b.getType()!=0) b.breakAllBonds();}
+								else { if(a.getType()!=0) a.breakAllBonds(); }
+							}
 							// atoms bounce off other atoms
 							float sep = (float)(new Point2D.Float(a.getPhysicalPoint().getPositionX(), a.getPhysicalPoint().getPositionY())).distance(
 									new Point2D.Float(b.getPhysicalPoint().getPositionX(), b.getPhysicalPoint().getPositionY()));
@@ -178,7 +190,7 @@ public class EulerCollider extends AbstractCollider
 			}
 		}
 	}
-
+	
 	private synchronized void moveAtoms()
 	{
 		for(int i=0;i<atoms.length;i++)

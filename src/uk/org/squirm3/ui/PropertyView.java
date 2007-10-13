@@ -53,7 +53,7 @@ public class PropertyView implements IView, IPropertyListener {
 	public PropertyView(IApplicationEngine iApplicationEngine) {
 		this.iApplicationEngine = iApplicationEngine;
 		parametersPanel = createParametersPanel();
-		iApplicationEngine.addPropertyListener(this);
+		iApplicationEngine.getEngineDispatcher().addPropertyListener(this);
 	}
 	
 	public JPanel getParametersPanel() {

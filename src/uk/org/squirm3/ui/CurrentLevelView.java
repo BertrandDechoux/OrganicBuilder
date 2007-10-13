@@ -60,7 +60,7 @@ public class CurrentLevelView implements IView, ILevelListener {
 		currentLevelPanel = createCurrentLevelPanel();
 		this.iApplicationEngine = iApplicationEngine;
 		levelHasChanged();
-		iApplicationEngine.addLevelListener(this);	
+		iApplicationEngine.getEngineDispatcher().addLevelListener(this);	
 	}
 
 	private JPanel createCurrentLevelPanel() {

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 import uk.org.squirm3.data.Atom;
+import uk.org.squirm3.data.FixedPoint;
 import uk.org.squirm3.data.MobilePoint;
 
 /**  
@@ -42,14 +43,8 @@ public class AtomTest extends TestCase {
 		Atom a = new Atom(new MobilePoint(), 0, 0);
 		assertFalse(a.isStuck());
 		
-		a.setStuck(false);
-		assertFalse(a.isStuck());
-		
-		a.setStuck(true);
+		a = new Atom(new FixedPoint(0,0), 0, 0);
 		assertTrue(a.isStuck());
-		
-		a.setStuck(false);
-		assertFalse(a.isStuck());
 	}
 	
 	/** Test de la propriete killer. **/
@@ -57,29 +52,8 @@ public class AtomTest extends TestCase {
 		Atom a = new Atom(new MobilePoint(), 0, 0);
 		assertFalse(a.isKiller());
 		
-		a.setKiller(false);
-		assertFalse(a.isKiller());
-		
-		a.setKiller(true);
-		assertTrue(a.isKiller());
-		
-		a.setKiller(false);
-		assertFalse(a.isKiller());		
-	}
-	
-	/** Test de la propriete reacted. **/
-	public void testReacted() {
-		Atom a = new Atom(new MobilePoint(), 0, 0);
-		assertFalse(a.hasReacted());
-		
-		a.setReacted(false);
-		assertFalse(a.hasReacted());
-		
-		a.setReacted(true);
-		assertTrue(a.hasReacted());
-		
-		a.setReacted(false);
-		assertFalse(a.hasReacted());		
+		a = new Atom(new MobilePoint(), Atom.KILLER_TYPE, 0);
+		assertTrue(a.isKiller());		
 	}
 
 	/** Test of basic bonding and breaking. */

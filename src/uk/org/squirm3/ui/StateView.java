@@ -43,7 +43,7 @@ public class StateView implements IView, IStateListener {
 		run = createRunAction();
 		reset = createResetAction();
 		simulationStateHasChanged();
-		iApplicationEngine.addStateListener(this);
+		iApplicationEngine.getEngineDispatcher().addStateListener(this);
 	}
 	
 	public Action getRunAction() {

@@ -1,6 +1,5 @@
 package uk.org.squirm3.data;
 
-
 /**  
 Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
 
@@ -22,9 +21,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 public abstract class Level
-{			
+{
+	public final int[] TYPES = {0, 1, 2, 3, 4, 5};
 	private final String title, challenge, hint;
 	private byte id; // keep the number of this level
+	//TODO remove : should not be coded like that
+	// the element of the collection should not know where it is located
 	
 	public Level(String title, String challenge, String hint){
 		this.title = title;
@@ -73,6 +75,31 @@ public abstract class Level
 		
 		return newAtoms;
 	
+	}
+	
+	protected static boolean createAtoms(int numberOfAtoms, int[] types, float x0, float x1, float y0, float y1, Atom[] atoms) {
+		if(types.length <1 || numberOfAtoms > atoms.length) return false;
+		final float atomSize = Atom.getAtomSize();
+		
+		// check that enough space will be let to allow clean reactions
+		final int evaluation = (int)((x1-x0)/(atomSize*3)) * (int)((y1-y0)/(atomSize*3));
+		if(evaluation<numberOfAtoms) return false;
+		
+		// creation of the atoms
+		final IPhysicalPoint iPhysicalPoint = new MobilePoint();
+		final float ms = atomSize/3;
+		int n= atoms.length-numberOfAtoms;
+		
+		for(float x = x0 + 2*atomSize; x < x1-2*atomSize && n< atoms.length ; x += 3*atomSize)
+			for(float y = y0 + 2*atomSize; y < y1-2*atomSize && n < atoms.length ; y += 3*atomSize) {
+				iPhysicalPoint.setPositionX(x);
+				iPhysicalPoint.setPositionY(y);
+				iPhysicalPoint.setSpeedX((float)(Math.random()*ms-ms/2.0));
+				iPhysicalPoint.setSpeedY((float)(Math.random()*ms-ms/2.0));
+				atoms[n] = new Atom(iPhysicalPoint,types[n%types.length],0);
+				n++;
+			}
+		return true;
 	}
 
 	public byte getId() {

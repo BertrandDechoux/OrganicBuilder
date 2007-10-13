@@ -1,7 +1,5 @@
 package test.uk.org.squirm3.data;
 
-import java.util.Vector;
-
 import junit.framework.TestCase;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.MobilePoint;
@@ -59,9 +57,8 @@ public class ReactionTest extends TestCase {
 		Reaction r = new Reaction(a_type, a_state, bonded_before,
 				b_type, b_state, future_a_state,
 				bonded_after, future_b_state);
-		Vector v = new Vector(0);
-		Reaction.parse(r.toString(),v);
-		assertTrue(r.toString().equals(v.firstElement().toString()));
+		Reaction parsedReaction = Reaction.parse(r.toString());
+		assertTrue(r.toString().equals(parsedReaction.toString()));
 	}
 
 	/** Test of the reaction process. **/
@@ -78,19 +75,17 @@ public class ReactionTest extends TestCase {
 		Reaction r = new Reaction(a_type, a_state, bonded_before,
 				b_type, b_state, future_a_state,
 				bonded_after, future_b_state);
-		Vector v = new Vector();
-		v.add(r);
 		// creation of the atoms
 		Atom a1 = new Atom(new MobilePoint(), 0, 0);
 		Atom a2 = new Atom(new MobilePoint(), 1, 1);
 		// test of the reaction
-		Reaction.tryReaction(a1, a2, v);
+		r.tryOn(a1, a2);
 		assertTrue(a1.getType()==0 && a1.getState()==2
 				&& a2.getType()==1 && a2.getState()==2
 				&& a1.hasBondWith(a2));
 		// test when no reaction should occur
 		a1.setState(0);
-		Reaction.tryReaction(a1, a2, v);
+		r.tryOn(a1, a2);
 		assertTrue(a1.getType()==0 && a1.getState()==0
 				&& a2.getType()==1 && a2.getState()==2
 				&& a1.hasBondWith(a2));

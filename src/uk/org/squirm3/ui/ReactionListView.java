@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.beans.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -69,7 +70,7 @@ public class ReactionListView implements IView, IReactionListener {
 		this.iApplicationEngine = iApplicationEngine;
 		listPanel = createListPanel();
 		textArea = new JTextArea();
-		iApplicationEngine.addReactionListener(this);
+		iApplicationEngine.getEngineDispatcher().addReactionListener(this);
 		reactionsHaveChanged();
 		updateDeleteButton();
 	}
@@ -140,8 +141,26 @@ public class ReactionListView implements IView, IReactionListener {
 	public void updateReactions() {
 		if(isBeingEdited==false) return;
 		else isBeingEdited = false;
-		Vector v = new Vector();
-		String result = Reaction.parse(textArea.getText(), v);
+		
+		String result = null;
+		Vector v = new Vector();	
+		// System.out.println("Input: "+text); // DEBUG
+		// for each line in the text			
+		StringTokenizer lines = new StringTokenizer(textArea.getText(),"\n",true);
+		String line = new String();
+		while(lines.hasMoreTokens()) {
+			line = lines.nextToken();
+			line = line.trim(); // remove leading and trailing whitespace and control chars
+			if(line.length()==0) continue; // nothing doing
+			if(line.length()>2 && line.charAt(0)=='/' && line.charAt(1)=='/')
+				continue; // this line contains a comment, skip it
+			// System.out.println("Parsing line: "+line+" (length "+String.valueOf(line.length())+")");
+			Reaction r = Reaction.parse(line);
+			// System.out.println(r.getString()+"\n"); // DEBUG
+			if(r!=null) v.add(r);
+			else result = line;
+		}
+
 		if(result!=null) {
 			JOptionPane.showMessageDialog(listPanel,result,
 					Application.localize(new String[] {"interface","reactions","parsing","error"}),

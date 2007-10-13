@@ -25,6 +25,7 @@ public interface IPhysicalPoint {
 	public float getPositionY();
 	public float getSpeedX();
 	public float getSpeedY();
+	// acceleration only used in new correct physics code
 	public float getAccelerationX();
 	public float getAccelerationY();
 

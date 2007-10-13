@@ -98,8 +98,8 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 		simulationSizeHasChanged();
 		atomsHaveChanged();
 		draggingPointHasChanged();
-		iApplicationEngine.addAtomListener(this);
-		iApplicationEngine.addPropertyListener(this);
+		iApplicationEngine.getEngineDispatcher().addAtomListener(this);
+		iApplicationEngine.getEngineDispatcher().addPropertyListener(this);
 	}
 	
 	private static void createAtomsImages() {

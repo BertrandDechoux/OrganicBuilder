@@ -1,7 +1,6 @@
 package uk.org.squirm3.data;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**  
 Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
@@ -23,16 +22,17 @@ along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class Reaction
-{
-	private int a_type,b_type,a_state,b_state; // for type: 0=a..5=f,6=x,7=y
-	private boolean bonded_before,bonded_after;
-	private int future_a_state,future_b_state;
+public class Reaction {
+	private static final Pattern pattern = Pattern.compile("([a-f]|[xy])(\\d{1,2})" + "( ?\\+ ?| ?)" +
+			"([a-f]|[xy])(\\d{1,2})" + " ?=> ?" + "\\1(\\d{1,2})" +
+			"( ?\\+ ?| ?)" + "\\4(\\d{1,2})$");
+	private final int a_type,b_type,a_state,b_state; // for type: 0=a..5=f,6=x,7=y
+	private final boolean bonded_before,bonded_after;
+	private final int future_a_state,future_b_state;
 	
 	public Reaction(int a_type,int a_state,boolean bonded_before,
 			int b_type,int b_state,int future_a_state,
-			boolean bonded_after,int future_b_state)
-	{
+			boolean bonded_after,int future_b_state) {
 		this.a_type = a_type;
 		this.a_state = a_state;
 		this.bonded_before = bonded_before;
@@ -41,6 +41,10 @@ public class Reaction
 		this.future_a_state = future_a_state;
 		this.bonded_after = bonded_after;
 		this.future_b_state = future_b_state;
+	}
+	
+	private Reaction() {
+		this(0, 0, false, 0, 0, 0, false, 0);
 	}
 	
 	public String toString() {
@@ -56,144 +60,39 @@ public class Reaction
 		return s;
 	}
 	
-	public static Reaction parseString(String description) {
-		String line = description;
-		String s;
-		Reaction r = new Reaction(0,0,false,0,0,0,false,0); // the target
-		boolean error_found=false; // is there an error on this line?
-		// using abcdefxy characters as the tokens, work through the line
-		StringTokenizer reactants = new StringTokenizer(line,Atom.type_code,true);
-		int element=0;
-		while(reactants.hasMoreTokens()) {
-			s = reactants.nextToken();
-			//System.out.println("Token "+String.valueOf(element)+": "+s+"\n"); // DEBUG
-			if(s.length()==0) error_found=true;
-			try { 
-				switch(element++) {
-					case 0:  // deal with the first character of the first reactant
-						r.a_type = Atom.type_code.indexOf(s.charAt(0)); 
-						break;
-					case 1: // deal with the character up until the next type (state + optional "+")
-					{
-						int nd = findNDigits(s);
-						if(nd>0)
-							r.a_state = Integer.parseInt(s.substring(0,nd));
-						else 
-							error_found=true;
-						r.bonded_before = (s.indexOf('+')==-1);
-						break;
-					}
-				case 2:  // deal with the first character of the second reactant
-					r.b_type = Atom.type_code.indexOf(s.charAt(0)); break;
-				case 3: // deal with the character up until the next type (state + "=>")
-					{
-						int nd = findNDigits(s);
-						if(nd>0)
-							r.b_state = Integer.parseInt(s.substring(0,nd));
-						else 
-							error_found=true;
-						break;
-					}
-				case 4:  // a_type after (should validate on this)
-					break;
-				case 5: // deal with the character up until the next type (state + optional "+")
-					{
-						int nd = findNDigits(s);
-						if(nd>0)
-							r.future_a_state = Integer.parseInt(s.substring(0,nd));
-						else 
-							error_found=true;
-						r.bonded_after = (s.indexOf('+')==-1);
-						break;
-					}
-				case 6:  // b_type after (should validate on this)
-					break;
-				case 7: // deal with the character up until the next type (state + "=>")
-					{
-						int nd = findNDigits(s);
-						if(nd>0)
-							r.future_b_state = Integer.parseInt(s.substring(0,nd));
-						else 
-							error_found=true;
-						break;
-					}
-				}
-			} catch(NumberFormatException nfe) {  // (parseInt may throw an exception)
-				error_found=true;
-			}
-			if(error_found) return null;
-		}
-		// were sufficient tokens parsed on this line? (more than 8 we ignore)
-		if(element<8) return null;
+	public static Reaction parse(String description) {
+		Matcher m = pattern.matcher(description);
+		boolean b = m.matches();
+		if(!b) return null;
+		final int a_type = m.group(1).charAt(0)-'a';
+		final int a_state = Integer.parseInt(m.group(2));
+		final boolean bonded_before = !m.group(3).contains("+");
+		final int b_type = m.group(4).charAt(0)-'a';
+		final int b_state = Integer.parseInt(m.group(5));
+		final int future_a_state = Integer.parseInt(m.group(6));
+		final boolean bonded_after = !m.group(7).contains("+");
+		final int future_b_state = Integer.parseInt(m.group(8));
+		Reaction r = new Reaction(a_type, a_state, bonded_before,
+				 b_type, b_state, future_a_state, bonded_after, future_b_state);
 		return r;
 	}
-
-	public static String parse(String text, Vector reactions_found) {
-		// System.out.println("Input: "+text); // DEBUG
-		// for each line in the text			
-		StringTokenizer lines = new StringTokenizer(text,"\n",true);
-		String s = new String();
-		String line = new String();
-		while(lines.hasMoreTokens()) {
-			line = lines.nextToken();
-			line = line.trim(); // remove leading and trailing whitespace and control chars
-			if(line.length()==0) continue; // nothing doing
-			if(line.length()>2 && line.charAt(0)=='/' && line.charAt(1)=='/')
-				continue; // this line contains a comment, skip it
-			// System.out.println("Parsing line: "+line+" (length "+String.valueOf(line.length())+")");
-			Reaction r = parseString(line);
-			// System.out.println(r.getString()+"\n"); // DEBUG
-			reactions_found.add(r);	
-		}
-		return null;
-	}
 	
-	private static int findNDigits(String s){
-		// how many digits 0-9 are at the start of this string?
-		int i=0;
-		while(i<s.length() && "0123456789".indexOf(s.charAt(i))!=-1)
-			i++;
-		return i;
-	}
-	
-	public static void tryReaction(Atom a, Atom b, Vector reactions) {
-		if(!a.isKiller() && !b.isKiller())
-		{
-			for(int twice=0;twice<2 && !a.hasReacted() && !b.hasReacted();twice++)
-			{
-				// try each reaction in turn
-				Iterator it = reactions.listIterator();
-				while(it.hasNext() && !a.hasReacted() && !b.hasReacted())
-				{
-					Reaction r = (Reaction)it.next();
-					// is the type for 'a' specified and correct?
-					if(r.a_type<6 && a.getType()!=r.a_type) continue;
-					// is the type for 'b' specified and correct?
-					if(r.b_type<6 && b.getType()!=r.b_type) continue;
-					// is the type for 'b' specified as matching that of 'a' and correct?
-					if(r.b_type>5 && r.b_type==r.a_type && b.getType()!=a.getType()) continue; // both x or both y
-					// is the state of 'a' and 'b' correct?
-					if(r.a_state!=a.getState() || r.b_state!=b.getState()) continue;
-					// is the bonded/not status correct?
-					if( (r.bonded_before && !a.hasBondWith(b)) || (!r.bonded_before && a.hasBondWith(b)) ) continue;
-					
-					// ok, we can now apply the reaction		
-					if(!r.bonded_before && r.bonded_after) a.bondWith(b);
-					else if(r.bonded_before && !r.bonded_after) a.breakBondWith(b);
-					a.setState(r.future_a_state);
-					b.setState(r.future_b_state);
-					
-					a.setReacted(true); // (only want one reaction per atom per timestep)
-					b.setReacted(true);
-				}
-				// now swap a and b and try again
-				Atom temp=a; a=b; b=temp;
-			}
-		}
-		else {
-			// the killer atom breaks the other atoms bonds (unless other is an 'a' atom)
-			if(a.isKiller()) { if(b.getType()!=0) b.breakAllBonds();}
-			else { if(a.getType()!=0) a.breakAllBonds(); }
-		}
+	public boolean tryOn(Atom a, Atom b) { //TODO remove test of 'specified'
+		//is the type for 'a' specified and correct?
+		if(a_type<6 && a.getType()!=a_type) return false;
+		// is the type for 'b' specified and correct?
+		if(b_type<6 && b.getType()!=b_type) return false;
+		// is the type for 'b' specified as matching that of 'a' and correct?
+		if(b_type>5 && b_type==a_type && b.getType()!=a.getType()) return false; // both x or both y
+		// is the state of 'a' and 'b' correct?
+		if(a_state!=a.getState() || b_state!=b.getState()) return false;
+		// is the bonded/not status correct?
+		if( (bonded_before && !a.hasBondWith(b)) || (!bonded_before && a.hasBondWith(b)) ) return false;
+		// ok, we can now apply the reaction		
+		if(!bonded_before && bonded_after) a.bondWith(b);
+		else if(bonded_before && !bonded_after) a.breakBondWith(b);
+		a.setState(future_a_state);
+		b.setState(future_b_state);
+		return true;
 	}
 }

@@ -49,7 +49,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 		levelComboBox = createLevelComboBox();
 		next = createNextAction();
 		last = createLastAction();
-		iApplicationEngine.addLevelListener(this);
+		iApplicationEngine.getEngineDispatcher().addLevelListener(this);
 		levelHasChanged();
 	}
 	

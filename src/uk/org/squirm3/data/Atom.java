@@ -27,57 +27,23 @@ public class Atom
 {
 	// TODO should not be hardcoded, properties file ?
 	static private final float R = 22.0f;
-	// acceleration only used in new correct physics code
+	
 	private IPhysicalPoint iPhysicalPoint;
 	private int state; // type: 0=a,..5=f
-	private int type;
-	private LinkedList bonds;
-	private boolean stuck=false; // special marker for atoms that don't move
-	private boolean killer=false; // special marker for atoms that have a special caustic effect
-	private boolean has_reacted=false; // has this atom been part of a reaction this timestep?
+	private final int type;
+	private final LinkedList bonds;
 	static final public String type_code = "abcdefxy";
+	
+	public static final int KILLER_TYPE = -1;  // special marker for atoms that have a special caustic effect
+	private static final char killer_char = 'K';
 
 
 	public Atom(IPhysicalPoint iPhysicalPoint,int t,int s) {
 		this.iPhysicalPoint = iPhysicalPoint.copy();
-		setType(t);
+		type = t;
 		setState(s);
 		bonds = new LinkedList();
 	}
-	
-	//TODO the copy should not allow modifications
-	public LinkedList getBonds() {
-		return bonds;
-	}
-	
-	//TODO remove, use a final field instead and create
-	// a new object if needed
-	public void setStuck(boolean b) {
-		stuck = b;
-	}
-
-	public boolean isStuck() {
-		return stuck;
-	}
-
-	//TODO remove, use a final field instead and create
-	// a new object if needed
-	public void setKiller(boolean b) {
-		killer = b;
-	}
-	
-	public boolean isKiller() {
-		return killer;
-	}
-	
-	public void setReacted(boolean b) {
-		has_reacted = b;
-	}
-	
-	public boolean hasReacted() {
-		return has_reacted;
-	}
-	
 	
 	public void bondWith(Atom other) {
 		if(!hasBondWith(other)) {
@@ -123,31 +89,28 @@ public class Atom
 	}
 	
 	public String toString() {
+		if(type==KILLER_TYPE) return killer_char + String.valueOf(getState());
 		return type_code.charAt(getType()) + String.valueOf(getState());
 	}
+
+	//TODO find a better way
+	public boolean isStuck() {
+		return iPhysicalPoint instanceof FixedPoint;
+	}
 	
-	public static float getAtomSize(){
-		return R;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setState(int state) {
-		this.state = state;
-	}
-
-	public int getState() {
-		return state;
-	}
-
-	public IPhysicalPoint getPhysicalPoint() {
-		return iPhysicalPoint;
-	}
+	//TODO the copy should not allow modifications
+	public LinkedList getBonds() { return bonds; }
+	
+	public boolean isKiller() { return type==KILLER_TYPE; }
+	
+	public void setState(int state) { this.state = state; }
+	
+	public int getState() { return state; }
+	
+	public int getType() { return type; }
+	
+	public IPhysicalPoint getPhysicalPoint() { return iPhysicalPoint; }
+	
+	public static float getAtomSize(){ return R; }
 	
 } // class sq3Atom

@@ -65,19 +65,5 @@ public interface IApplicationEngine {
 	public boolean simulationIsRunning();
 	public boolean simulationNeedReset();
 
-    public void addAtomListener(IAtomListener listener);
-    public void removeAtomListener(IAtomListener listener);
-
-    public void addLevelListener(ILevelListener listener);
-    public void removeLevelListener(ILevelListener listener);
-    
-    public void addPropertyListener(IPropertyListener listener);
-    public void removePropertyListener(IPropertyListener listener);
-    
-    public void addReactionListener(IReactionListener listener);
-    public void removeReactionListener(IReactionListener listener);
-
-    public void addStateListener(IStateListener listener);
-    public void removeStateListener(IStateListener listener);
-	
+    public EngineDispatcher getEngineDispatcher();	
 }

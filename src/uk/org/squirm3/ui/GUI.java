@@ -64,7 +64,7 @@ public class GUI {
 		
 			//frame
 		JFrame frame = new JFrame(Application.localize(new String[] {"interface","application","title"}));
-		frame.setSize(950,600);
+		frame.setSize(1070,620);
 		if(applet==null) {
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		} else {
