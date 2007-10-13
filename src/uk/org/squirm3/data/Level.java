@@ -48,16 +48,22 @@ public abstract class Level
 	}
 	
 	protected static Atom[] getDefaultReset(int numberOfAtoms, int width, int height){
-		Atom[] newAtoms = new Atom[numberOfAtoms];
-		float atomSize = Atom.getAtomSize();
-		int side = (int)Math.ceil(Math.sqrt(numberOfAtoms));
-		int spacing_x=(int)(width/(side+2));
-		int spacing_y=(int)(height/(side+2));
-		
+		final Atom[] newAtoms = new Atom[numberOfAtoms];
+		final float atomSize = Atom.getAtomSize();
+		final int side = (int)Math.ceil(Math.sqrt(numberOfAtoms));
+		final int spacing_x=(int)(width/(side+2));
+		final int spacing_y=(int)(height/(side+2));
+		final IPhysicalPoint iPhysicalPoint = new MobilePoint();
+		final float ms = atomSize/3;
+
 		for (int i=0;i<newAtoms.length;i++) {
 			int row = (int)Math.floor(i/(float)side);
 			int column = i%side;
-			newAtoms[i] = new Atom((row+1)*spacing_x,(column+1)*spacing_y,i%6,0,atomSize/3);
+			iPhysicalPoint.setPositionX((row+1)*spacing_x);
+			iPhysicalPoint.setPositionY((column+1)*spacing_y);
+			iPhysicalPoint.setSpeedX((float)(Math.random()*ms-ms/2.0));
+			iPhysicalPoint.setSpeedY((float)(Math.random()*ms-ms/2.0));
+			newAtoms[i] = new Atom(iPhysicalPoint,i%6,0);
 		}
 		
 		/* older code: used to scatter at random (is ok for old physics, causes excess energy in new)

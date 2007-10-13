@@ -26,25 +26,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-public final class EngineDispatcher implements IEngineListener {
+public final class EngineDispatcher {
 
 	private final EventListenerList listeners = new EventListenerList();
-
-	public void addEngineListener(IEngineListener listener) {
-		addAtomListener(listener);
-		addLevelListener(listener);
-		addPropertyListener(listener);
-		addReactionListener(listener);
-		addStateListener(listener);
-	}
-	
-	public void removeEngineListener(IEngineListener listener) {
-		removeAtomListener(listener);
-		removeLevelListener(listener);
-		removePropertyListener(listener);
-		removeReactionListener(listener);
-		removeStateListener(listener);
-	}
 	
     public void addAtomListener(IAtomListener listener) {
         listeners.add(IAtomListener.class, listener);
@@ -161,6 +145,4 @@ public final class EngineDispatcher implements IEngineListener {
 			((IStateListener)stateListeners[i]).simulationStateHasChanged();
 		}
 	}
-	
-    /* TODO fireXXXChanged */
 }

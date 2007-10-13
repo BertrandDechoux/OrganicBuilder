@@ -64,9 +64,6 @@ public interface IApplicationEngine {
 	public void pauseSimulation();
 	public boolean simulationIsRunning();
 	public boolean simulationNeedReset();
-	
-	public void addEngineListener(IEngineListener listener);
-	public void removeEngineListener(IEngineListener listener);
 
     public void addAtomListener(IAtomListener listener);
     public void removeAtomListener(IAtomListener listener);

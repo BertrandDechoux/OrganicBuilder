@@ -1,6 +1,7 @@
 package uk.org.squirm3.engine;
 
 import java.awt.Polygon;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -260,14 +261,6 @@ public class LocalEngine implements IApplicationEngine {
 		return resetNeeded;
 	}
 
-	public void addEngineListener(IEngineListener listener) {
-		engineDispatcher.addEngineListener(listener);
-	}
-
-	public void removeEngineListener(IEngineListener listener) {
-		engineDispatcher.removeEngineListener(listener);
-	}
-
 	public void addAtomListener(IAtomListener listener) {
 		engineDispatcher.addAtomListener(listener);
 	}
@@ -384,19 +377,19 @@ class Join_As extends Level //1
 	public String evaluate(Atom[] atoms) {
 		// is any non-'a' atom bonded with any other?
 		for(int i=0;i<atoms.length;i++)
-			if(atoms[i].type!=0 && atoms[i].getBonds().size()>0)
+			if(atoms[i].getType()!=0 && atoms[i].getBonds().size()>0)
 				return Application.localize(new String[] {"levels","joinas","error","1" });
 		// is every 'a' atom bonded together in a big clump?
 		LinkedList a_atoms = new LinkedList();
 		for(int i=0;i<atoms.length;i++) {
-			if(atoms[i].type==0) {
+			if(atoms[i].getType()==0) {
 				// this will do as our starting point
 				atoms[i].getAllConnectedAtoms(a_atoms);
 				break;
 			}
 		}
 		for(int i=0;i<atoms.length;i++) 
-			if(atoms[i].type==0 && !a_atoms.contains(atoms[i]))
+			if(atoms[i].getType()==0 && !a_atoms.contains(atoms[i]))
 				return Application.localize(new String[] {"levels","joinas","error","2" });
 		return null;
 	}
@@ -423,13 +416,13 @@ class Make_ECs extends Level //2
 			int ec_pairs_found=0,loose_e_atoms_found=0,loose_c_atoms_found=0;
 			for(int i=0;i<atoms.length;i++) {
 				Atom atom = atoms[i];
-				if(atom.type!=2 && atom.type!=4 && atom.getBonds().size()!=0)
+				if(atom.getType()!=2 && atom.getType()!=4 && atom.getBonds().size()!=0)
 					return Application.localize(new String[] {"levels","makeecs","error","1" });
-				if(atom.type==2 || atom.type==4) {
+				if(atom.getType()==2 || atom.getType()==4) {
 					if(atom.getBonds().size()>1)
 						return Application.localize(new String[] {"levels","makeecs","error","2" });
 					if(atom.getBonds().size()==0) {
-						if(atom.type==2) loose_c_atoms_found++;
+						if(atom.getType()==2) loose_c_atoms_found++;
 						else loose_e_atoms_found++;
 					}
 				}
@@ -452,8 +445,8 @@ class Line_Cs extends Level //3
 	
 	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
 		Atom[] newAtoms = Level.getDefaultReset(numberOfAtoms, width, height);
-		newAtoms[0].state=1; 
-		newAtoms[0].type=2; 
+		newAtoms[0].setState(1); 
+		newAtoms[0].setType(2); 
 		return newAtoms;
 	}
 	
@@ -465,7 +458,7 @@ class Line_Cs extends Level //3
 			// fail on bonds<1 or >2, or not in 'joined' list
 			for(int i=0;i<atoms.length;i++) {
 				Atom atom = atoms[i];
-				if(atom.type!=2) {
+				if(atom.getType()!=2) {
 					if(atom.getBonds().size()!=0) 
 						return Application.localize(new String[] {"levels","linecs","error","1" });;
 					continue; // no other tests for non-'c' atoms
@@ -524,14 +517,15 @@ class Connect_corners extends Level //5
 	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
 		Atom[] newAtoms = Level.getDefaultReset(numberOfAtoms, width, height);
 		float atomSize = Atom.getAtomSize();
-		newAtoms[0].state=1; 
-		newAtoms[0].type=5; 
-		newAtoms[0].pos.x=newAtoms[0].pos.y=atomSize*1.5f; 
+		newAtoms[0].setState(1); 
+		newAtoms[0].setType(5); 
+		newAtoms[0].getPhysicalPoint().setPositionX(atomSize*1.5f);
+		newAtoms[0].getPhysicalPoint().setPositionY(atomSize*1.5f); 
 		newAtoms[0].setStuck(true);  
-		newAtoms[1].state=1; 
-		newAtoms[1].type=3; 
-		newAtoms[1].pos.x=width-atomSize*1.5f;
-		newAtoms[1].pos.y=height-atomSize*1.5f;
+		newAtoms[1].setState(1); 
+		newAtoms[1].setType(3); 
+		newAtoms[1].getPhysicalPoint().setPositionX(width-atomSize*1.5f);
+		newAtoms[1].getPhysicalPoint().setPositionY(height-atomSize*1.5f);
 		newAtoms[1].setStuck(true); 
 		return newAtoms;
 	}
@@ -566,15 +560,15 @@ class Abcdef_chains extends Level //6
 			int num_abcdef_chains_found=0;
 			for(int i=0;i<atoms.length;i++) {
 				Atom a = atoms[i];
-				if(a.type==0 && a.getBonds().size()==1) {
+				if(a.getType()==0 && a.getBonds().size()==1) {
 					// looks promising - let's check
 					LinkedList joined = new LinkedList();
 					a.getAllConnectedAtoms(joined);
 					if(joined.size()!=6) continue;
 					Iterator it = joined.iterator();
-					if(((Atom)it.next()).type==0 && ((Atom)it.next()).type==1
-						&& ((Atom)it.next()).type==2 && ((Atom)it.next()).type==3
-						&& ((Atom)it.next()).type==4 && ((Atom)it.next()).type==5)
+					if(((Atom)it.next()).getType()==0 && ((Atom)it.next()).getType()==1
+						&& ((Atom)it.next()).getType()==2 && ((Atom)it.next()).getType()==3
+						&& ((Atom)it.next()).getType()==4 && ((Atom)it.next()).getType()==5)
 						num_abcdef_chains_found++;
 					// (this isn't a perfect test but hopefully close enough)
 				}
@@ -612,12 +606,12 @@ class Join_same extends Level //7
 				Iterator it = joined.iterator();
 				while(it.hasNext()) {
 					Atom other = (Atom)it.next();
-					if(other.type != atom.type)
+					if(other.getType() != atom.getType())
 						return Application.localize(new String[] {"levels","joinsame","error","1" });
 				}
 				// are there any atoms of the same type not on this list?
 				for(int j=0;j<atoms.length;j++)
-					if(atoms[j].type == atom.type && !joined.contains(atoms[j]))
+					if(atoms[j].getType() == atom.getType() && !joined.contains(atoms[j]))
 						return Application.localize(new String[] {"levels","joinsame","error","1" });
 			}
 	return null; }
@@ -641,16 +635,16 @@ class Match_template extends Level //8
 				// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*4.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*4.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
 		}
 		// place and bond six random atoms to form a template
 		for(int i=0;i<6;i++)
 		{
-			newAtoms[i].pos.x = atomSize*1.5f;
-			newAtoms[i].pos.y = atomSize*5.0f+i*atomSize*2.1f;
-			newAtoms[i].state=1;
-			newAtoms[i].type=PRNG.nextInt(6);
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*1.5f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*5.0f+i*atomSize*2.1f);
+			newAtoms[i].setState(1);
+			newAtoms[i].setType(PRNG.nextInt(6));
 			if(i>0)
 				newAtoms[i].bondWith(newAtoms[i-1]);
 			newAtoms[i].setStuck(true); 
@@ -663,7 +657,7 @@ class Match_template extends Level //8
 			for(int i=0;i<6;i++) {
 				Atom a = atoms[i];
 				Atom b = (Atom)a.getBonds().getLast();
-				if(b.type!=a.type || b.getBonds().size()!=1)
+				if(b.getType()!=a.getType() || b.getBonds().size()!=1)
 					return Application.localize(new String[] {"levels","matchtemplate","error","1" });
 				// (not a complete test, but hopefully ok)
 			}
@@ -687,19 +681,19 @@ class Break_molecule extends Level //9
 			// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*4.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*4.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
 		}
 		// place and bond n atoms to form a template
 		for(int i=0;i<10;i++)
 		{
-			newAtoms[i].pos.x = atomSize*1.5f;
-			newAtoms[i].pos.y = atomSize*1.5f+i*atomSize*2.1f;
-			newAtoms[i].state=1;
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*1.5f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*1.5f+i*atomSize*2.1f);
+			newAtoms[i].setState(1);
 			if(i<5)
-				newAtoms[i].type=0; // 'a'
+				newAtoms[i].setType(0); // 'a'
 			else 
-				newAtoms[i].type=3; // 'd'
+				newAtoms[i].setType(3); // 'd'
 			if(i>0)
 				newAtoms[i].bondWith(newAtoms[i-1]);
 		}
@@ -731,39 +725,39 @@ class Bond_prisoner extends Level //10
 		// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*8.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
-			newAtoms[i].type = (i%5)+1; // free atoms in states b-f only (for grow_membrane level)
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*8.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
+			newAtoms[i].setType((i%5)+1); // free atoms in states b-f only (for grow_membrane level)
 		}
 		// place and bond 8 atoms to form a loop
 		int pos_x[]={-1,0,1,1,1,0,-1,-1};
 		int pos_y[]={-1,-1,-1,0,1,1,1,0};
 		for(int i=0;i<8;i++)
 		{
-			newAtoms[i].pos.x = atomSize*4.0f + pos_x[i]*atomSize*2.0f;
-			newAtoms[i].pos.y = atomSize*7.0f + pos_y[i]*atomSize*2.0f;
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*4.0f + pos_x[i]*atomSize*2.0f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*7.0f + pos_y[i]*atomSize*2.0f);
 			if(i==0)
-				newAtoms[i].state=3;
+				newAtoms[i].setState(3);
 			else if(i==1)
-				newAtoms[i].state=4;
+				newAtoms[i].setState(4);
 			else
-				newAtoms[i].state=2;
-			newAtoms[i].type=0;
+				newAtoms[i].setState(2);
+			newAtoms[i].setType(0);
 			newAtoms[i].bondWith(newAtoms[(i+1)%8]);
 		}
 		// add the prisoner (f1)
-		newAtoms[8].pos.x = atomSize*4.0f;
-		newAtoms[8].pos.y = atomSize*7.0f;
-		newAtoms[8].state=1;
-		newAtoms[8].type=5;
+		newAtoms[8].getPhysicalPoint().setPositionX(atomSize*4.0f);
+		newAtoms[8].getPhysicalPoint().setPositionY(atomSize*7.0f);
+		newAtoms[8].setState(1);
+		newAtoms[8].setType(5);
 		// make sure that there's at least one f elsewhere
-		newAtoms[9].pos.x = atomSize*10.0f;
-		newAtoms[9].pos.y = atomSize*7.0f;
-		newAtoms[9].state=0;
-		newAtoms[9].type=5;
+		newAtoms[9].getPhysicalPoint().setPositionX(atomSize*10.0f);
+		newAtoms[9].getPhysicalPoint().setPositionY(atomSize*7.0f);
+		newAtoms[9].setState(0);
+		newAtoms[9].setType(5);
 		// make sure there are exactly 6 free a atoms elsewhere to grow the membrane with (also ok for bond_prisoner level)
 		for(int i=10;i<10+6;i++)
-			newAtoms[i].type=0;
+			newAtoms[i].setType(0);
 		return newAtoms;
 	}
 	
@@ -771,7 +765,7 @@ class Bond_prisoner extends Level //10
 				// if atom 8 bonded with an f?
 			if(atoms[8].getBonds().size()==0)
 				return Application.localize(new String[] {"levels","bondprisonner","error","1" });
-			if(((Atom)atoms[8].getBonds().getFirst()).type!=5)
+			if(((Atom)atoms[8].getBonds().getFirst()).getType()!=5)
 				return Application.localize(new String[] {"levels","bondprisonner","error","2" });
 	return null; }
 }
@@ -794,19 +788,19 @@ class Pass_message extends Level //11
 			// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*4.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*4.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
 		}
 		// place and bond n atoms to form a template
 		for(int i=0;i<10;i++)
 		{
-			newAtoms[i].pos.x = atomSize*1.5f;
-			newAtoms[i].pos.y = atomSize*1.5f+i*atomSize*2.1f;
-			newAtoms[i].type=PRNG.nextInt(6);
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*1.5f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*1.5f+i*atomSize*2.1f);
+			newAtoms[i].setType(PRNG.nextInt(6));
 			if(i==0)
-				newAtoms[i].state=2;
+				newAtoms[i].setState(2);
 			else 
-				newAtoms[i].state=1;
+				newAtoms[i].setState(1);
 			if(i>0)
 				newAtoms[i].bondWith(newAtoms[i-1]);
 		}
@@ -818,7 +812,7 @@ class Pass_message extends Level //11
 			for(int i=0;i<10;i++)
 				if(atoms[i].getBonds().size() != n_bonds[i])
 					return Application.localize(new String[] {"levels","passmessage","error","1" });
-				else if(atoms[i].state != 2)
+				else if(atoms[i].getState() != 2)
 					return Application.localize(new String[] {"levels","passmessage","error","2" });
 	return null; }
 }
@@ -841,19 +835,19 @@ class Split_ladder extends Level //12
 				// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*6.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*6.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
 		}
 		// place and bond n atoms to form a template
 		for(int i=0;i<20;i++)
 		{
-			newAtoms[i].pos.x = (i<10)?atomSize*1.5f:atomSize*3.7f;
-			newAtoms[i].pos.y = (i<10)?(atomSize*6.0f+i*atomSize*2.1f):(atomSize*6.0f+(i-10)*atomSize*2.1f);
-			newAtoms[i].type=(i<10)?(PRNG.nextInt(6)):newAtoms[i-10].type;
+			newAtoms[i].getPhysicalPoint().setPositionX((i<10)?atomSize*1.5f:atomSize*3.7f);
+			newAtoms[i].getPhysicalPoint().setPositionY((i<10)?(atomSize*6.0f+i*atomSize*2.1f):(atomSize*6.0f+(i-10)*atomSize*2.1f));
+			newAtoms[i].setType((i<10)?(PRNG.nextInt(6)):newAtoms[i-10].getType());
 			if(i==0 || i==10)
-				newAtoms[i].state=2;
+				newAtoms[i].setState(2);
 			else
-				newAtoms[i].state=1;
+				newAtoms[i].setState(1);
 			if(i!=0 && i!=10)
 				newAtoms[i].bondWith(newAtoms[i-1]);
 			if(i>=10)
@@ -887,20 +881,20 @@ class Insert_atom extends Level //13
 				// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*4.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*4.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
 		}
 		// place and bond n atoms to form a template
 		for(int i=0;i<10;i++)
 		{
-			newAtoms[i].pos.x = atomSize*1.5f;
-			newAtoms[i].pos.y = atomSize*3.0f+i*atomSize*2.1f;
-			newAtoms[i].type=4; // 'e'
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*1.5f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*3.0f+i*atomSize*2.1f);
+			newAtoms[i].setType(4); // 'e'
 			if(i==4)
-				newAtoms[i].state=2; 
+				newAtoms[i].setState(2); 
 			else if(i==5)
-				newAtoms[i].state=3; 
-			else newAtoms[i].state=1;
+				newAtoms[i].setState(3); 
+			else newAtoms[i].setState(1);
 			if(i>0)
 				newAtoms[i].bondWith(newAtoms[i-1]);
 		}
@@ -920,7 +914,7 @@ class Insert_atom extends Level //13
 				Atom a = (Atom)it.next();
 				if(a.getBonds().size()!=n_bonds[i])
 					return Application.localize(new String[] {"levels","insertatom","error","2" });
-				if( a.type!=types[i])
+				if( a.getType()!=types[i])
 					return Application.localize(new String[] {"levels","insertatom","error","3" });
 				i++;
 			}
@@ -945,21 +939,21 @@ class Make_ladder extends Level //14
 				// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*4.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*4.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
 		}
 		// place and bond six atoms to form a template
 		for(int i=0;i<6;i++)
 		{
-			newAtoms[i].pos.x = atomSize*1.5f;
-			newAtoms[i].pos.y = atomSize*6.0f+i*atomSize*2.1f;
-			newAtoms[i].state=1;
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*1.5f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*6.0f+i*atomSize*2.1f);
+			newAtoms[i].setState(1);
 			if(i==0)
-				newAtoms[i].type=4; // 'e' at the top
+				newAtoms[i].setType(4); // 'e' at the top
 			else if(i==5)
-				newAtoms[i].type=5; // 'f' at the bottom
+				newAtoms[i].setType(5); // 'f' at the bottom
 			else
-				newAtoms[i].type=PRNG.nextInt(4); // 'a'-'d'
+				newAtoms[i].setType(PRNG.nextInt(4)); // 'a'-'d'
 			if(i>0)
 					newAtoms[i].bondWith(newAtoms[i-1]);
 		}
@@ -975,16 +969,16 @@ class Make_ladder extends Level //14
 				return Application.localize(new String[] {"levels","makeladder","error","2" });
 			// are the types matching?
 			int original_type_count[] = {0,0,0,0,0,0},new_type_count[]={0,0,0,0,0,0};
-			for(int i=0;i<6;i++) original_type_count[atoms[i].type]++;
+			for(int i=0;i<6;i++) original_type_count[atoms[i].getType()]++;
 			Iterator it = joined.iterator();
-			while(it.hasNext()) new_type_count[((Atom)it.next()).type]++;
+			while(it.hasNext()) new_type_count[((Atom)it.next()).getType()]++;
 			for(int i=0;i<6;i++)
 				if(new_type_count[i] != original_type_count[i]*2) 
 					return Application.localize(new String[] {"levels","makeladder","error","3" });
 			it = joined.iterator();
 			while(it.hasNext()) { 
 				Atom a = (Atom)it.next();
-				if(a.type==4 || a.type==5) // 'e' and 'f' 
+				if(a.getType()==4 || a.getType()==5) // 'e' and 'f' 
 					if(a.getBonds().size()!=2) 
 						return Application.localize(new String[] {"levels","makeladder","error","4" });
 				else if(a.getBonds().size()!=3)  
@@ -1011,8 +1005,8 @@ class Selfrep extends Level //15
 		// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*4.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*4.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
 		}
 		// place and bond six atoms to form a template
 		
@@ -1021,15 +1015,15 @@ class Selfrep extends Level //15
 		int which_genome = PRNG.nextInt(5); 
 		for(int i=0;i<6;i++)
 		{
-			newAtoms[i].pos.x = atomSize*1.5f;
-			newAtoms[i].pos.y = atomSize*6.0f+i*atomSize*2.1f;
-			newAtoms[i].state=1;
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*1.5f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*6.0f+i*atomSize*2.1f);
+			newAtoms[i].setState(1);
 			if(i==0)
-				newAtoms[i].type=4; // 'e' at the top
+				newAtoms[i].setType(4); // 'e' at the top
 			else if(i==5)
-				newAtoms[i].type=5; // 'f' at the bottom
+				newAtoms[i].setType(5); // 'f' at the bottom
 			else
-				newAtoms[i].type=genomes[which_genome][i-1];
+				newAtoms[i].setType(genomes[which_genome][i-1]);
 			if(i>0)
 				newAtoms[i].bondWith(newAtoms[i-1]);
 		}
@@ -1046,7 +1040,7 @@ class Selfrep extends Level //15
 				if(first.getBonds().size()>0) {
 					bound_atoms++;
 					
-					if(first.type==4) {
+					if(first.getType()==4) {
 						joined.clear();
 						first.getAllConnectedAtoms(joined);
 						
@@ -1054,14 +1048,14 @@ class Selfrep extends Level //15
 							return Application.localize(new String[] {"levels","selfrep","error","1" });
 						
 						Atom last = (Atom)joined.getLast();
-						if (first.getBonds().size()!=1 || last.getBonds().size()!=1 || last.type!=5)
+						if (first.getBonds().size()!=1 || last.getBonds().size()!=1 || last.getType()!=5)
 							return Application.localize(new String[] {"levels","selfrep","error","2" });
 						
 						for(int j=1;j<joined.size()-1;j++) {
 							Atom a = (Atom)joined.get(j);
 							if (a.getBonds().size()!=2)
 								return Application.localize(new String[] {"levels","selfrep","error","3" });				
-							if(a.type != atoms[j].type)
+							if(a.getType() != atoms[j].getType())
 								return Application.localize(new String[] {"levels","selfrep","error","4" });
 						}
 						n_found++;
@@ -1095,39 +1089,39 @@ class Grow_membrane extends Level //16
 		// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*8.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
-			newAtoms[i].type = (i%5)+1; // free atoms in states b-f only (for grow_membrane level)
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*8.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
+			newAtoms[i].setType((i%5)+1); // free atoms in states b-f only (for grow_membrane level)
 		}
 		// place and bond 8 atoms to form a loop
 		int pos_x[]={-1,0,1,1,1,0,-1,-1};
 		int pos_y[]={-1,-1,-1,0,1,1,1,0};
 		for(int i=0;i<8;i++)
 		{
-			newAtoms[i].pos.x = atomSize*4.0f + pos_x[i]*atomSize*2.0f;
-			newAtoms[i].pos.y = atomSize*7.0f + pos_y[i]*atomSize*2.0f;
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*4.0f + pos_x[i]*atomSize*2.0f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*7.0f + pos_y[i]*atomSize*2.0f);
 			if(i==0)
-				newAtoms[i].state=3;
+				newAtoms[i].setState(3);
 			else if(i==1)
-				newAtoms[i].state=4;
+				newAtoms[i].setState(4);
 			else
-				newAtoms[i].state=2;
-			newAtoms[i].type=0;
+				newAtoms[i].setState(2);
+			newAtoms[i].setType(0);
 			newAtoms[i].bondWith(newAtoms[(i+1)%8]);
 		}
 		// add the prisoner (f1)
-		newAtoms[8].pos.x = atomSize*4.0f;
-		newAtoms[8].pos.y = atomSize*7.0f;
-		newAtoms[8].state=1;
-		newAtoms[8].type=5;
+		newAtoms[8].getPhysicalPoint().setPositionX(atomSize*4.0f);
+		newAtoms[8].getPhysicalPoint().setPositionY(atomSize*7.0f);
+		newAtoms[8].setState(1);
+		newAtoms[8].setType(5);
 		// make sure that there's at least one f elsewhere
-		newAtoms[9].pos.x = atomSize*10.0f;
-		newAtoms[9].pos.y = atomSize*7.0f;
-		newAtoms[9].state=0;
-		newAtoms[9].type=5;
+		newAtoms[9].getPhysicalPoint().setPositionX(atomSize*10.0f);
+		newAtoms[9].getPhysicalPoint().setPositionY(atomSize*7.0f);
+		newAtoms[9].setState(0);
+		newAtoms[9].setType(5);
 		// make sure there are exactly 6 free a atoms elsewhere to grow the membrane with (also ok for bond_prisoner level)
 		for(int i=10;i<10+6;i++)
-			newAtoms[i].type=0;
+			newAtoms[i].setType(0);
 		return newAtoms;
 	}
 	
@@ -1141,21 +1135,21 @@ class Grow_membrane extends Level //16
 			int i = 0;
 			while(it.hasNext()) {
 				Atom a = (Atom)it.next();
-				if(a.type!=0 || a.getBonds().size()!=2)
+				if(a.getType()!=0 || a.getBonds().size()!=2)
 					return Application.localize(new String[] {"levels","growmembrane","error","1" });
-				x_points[i] = (int)a.pos.x; // (need these for polygon check, below)
-				y_points[i] = (int)a.pos.y;
+				x_points[i] = (int)a.getPhysicalPoint().getPositionX(); // (need these for polygon check, below)
+				y_points[i] = (int)a.getPhysicalPoint().getPositionY();
 				i++;
 			}
 			// inside the polygon formed by the a atoms there should be exactly one atom - the original f1 (although its state may have changed)
 			Atom f1 = atoms[8]; // see the setup code for this level
 			Polygon poly = new Polygon(x_points,y_points,joined.size());
-			if(!poly.contains(f1.pos))
+			if(!poly.contains(new Point2D.Float(f1.getPhysicalPoint().getPositionX(),f1.getPhysicalPoint().getPositionY())))
 				return Application.localize(new String[] {"levels","growmembrane","error","2" });
 			// and no other 'a' atoms around
 			for(i=0;i<atoms.length;i++) {
 				Atom a = atoms[i];
-				if(!joined.contains(a) && a.type==0)
+				if(!joined.contains(a) && a.getType()==0)
 					return Application.localize(new String[] {"levels","growmembrane","error","3" });
 			}
 	return null; }
@@ -1178,9 +1172,9 @@ class Membrane_transport extends Level //17
 				// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*8.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
-			newAtoms[i].type = (i%5); // just types a-e in the wild, since we want to control the number of f's
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*8.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
+			newAtoms[i].setType((i%5)); // just types a-e in the wild, since we want to control the number of f's
 		}
 		// place and bond N atoms to form a loop
 		final int N=12;
@@ -1189,30 +1183,30 @@ class Membrane_transport extends Level //17
 		int i; // atom index incremented in loops but also used elsewhere without resetting
 		for(i=0;i<N;i++)
 		{
-			newAtoms[i].pos.x = atomSize*4.0f + pos_x[i]*atomSize*2.0f;
-			newAtoms[i].pos.y = atomSize*7.0f + pos_y[i]*atomSize*2.0f;
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*4.0f + pos_x[i]*atomSize*2.0f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*7.0f + pos_y[i]*atomSize*2.0f);
 			if(i==0)
-				newAtoms[i].state=3;
+				newAtoms[i].setState(3);
 			else if(i==1)
-				newAtoms[i].state=4;
+				newAtoms[i].setState(4);
 			else
-				newAtoms[i].state=2;
-			newAtoms[i].type=0;
+				newAtoms[i].setState(2);
+			newAtoms[i].setType(0);
 			newAtoms[i].bondWith(newAtoms[(i+1)%N]);
 		}
 		// put two e1 atoms and one b1 atom inside
 		int so_far=i;
 		for(;i<so_far+3;i++)
 		{
-			newAtoms[i].pos.y = atomSize*(7.0f+(i-so_far)*2.0f);
-			newAtoms[i].pos.x = atomSize*4.0f;
-			newAtoms[i].state=1;
-			newAtoms[i].type=((i-so_far)==0?1:4);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*(7.0f+(i-so_far)*2.0f));
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*4.0f);
+			newAtoms[i].setState(1);
+			newAtoms[i].setType(((i-so_far)==0?1:4));
 		}
 		// make sure there are exactly 4 free f atoms elsewhere to put inside
 		so_far=i;
 		for(;i<so_far+4;i++)
-			newAtoms[i].type=5;
+			newAtoms[i].setType(5);
 		return newAtoms;
 	}
 	
@@ -1226,23 +1220,23 @@ class Membrane_transport extends Level //17
 			int i = 0;
 			while(it.hasNext()) {
 				Atom a = (Atom)it.next();
-				if(a.type!=0 || a.getBonds().size()!=2)
+				if(a.getType()!=0 || a.getBonds().size()!=2)
 					return Application.localize(new String[] {"levels","membranetransport","error","1" });
-				x_points[i] = (int)a.pos.x; // (need these for polygon check, below)
-				y_points[i] = (int)a.pos.y;
+				x_points[i] = (int)a.getPhysicalPoint().getPositionX(); // (need these for polygon check, below)
+				y_points[i] = (int)a.getPhysicalPoint().getPositionY();
 				i++;
 			}
 			// inside should be the original 'b' atom, and all the 'f' atoms, and nothing else
 			Atom b1 = atoms[12]; // see the setup code for this level
 			Polygon poly = new Polygon(x_points,y_points,joined.size());
-			if(!poly.contains(b1.pos))
+			if(!poly.contains(new Point2D.Float(b1.getPhysicalPoint().getPositionX(),b1.getPhysicalPoint().getPositionY())))
 				return Application.localize(new String[] {"levels","membranetransport","error","2" });
 			// check the other atoms (want: f's inside, other's outside)
 			for(i=joined.size()+1;i<atoms.length;i++) {
 				Atom a = atoms[i];
-				if(a.type==5 && !poly.contains(a.pos))
+				if(a.getType()==5 && !poly.contains(new Point2D.Float(a.getPhysicalPoint().getPositionX(),a.getPhysicalPoint().getPositionY())))
 					return Application.localize(new String[] {"levels","membranetransport","error","3" });
-				else if(a.type!=5 && poly.contains(a.pos))
+				else if(a.getType()!=5 && poly.contains(new Point2D.Float(a.getPhysicalPoint().getPositionX(),a.getPhysicalPoint().getPositionY())))
 					return Application.localize(new String[] {"levels","membranetransport","error","4" });
 			}
 	return null; }
@@ -1265,8 +1259,8 @@ class Membrane_division extends Level //18
 		// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*8.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*8.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
 		}
 		// place and bond N atoms to form a loop
 		final int N=12;
@@ -1274,15 +1268,15 @@ class Membrane_division extends Level //18
 		int pos_x[]={-1,-1,-1,-1,-1,0,1,1,1,1,1,0};
 		for(int i=0;i<N;i++)
 		{
-			newAtoms[i].pos.x = atomSize*4.0f + pos_x[i]*atomSize*2.0f;
-			newAtoms[i].pos.y = atomSize*7.0f + pos_y[i]*atomSize*2.0f;
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*4.0f + pos_x[i]*atomSize*2.0f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*7.0f + pos_y[i]*atomSize*2.0f);
 			if(i==0)
-				newAtoms[i].state=3;
+				newAtoms[i].setState(3);
 			else if(i==N/2)
-				newAtoms[i].state=4;
+				newAtoms[i].setState(4);
 			else
-				newAtoms[i].state=2;
-			newAtoms[i].type=0;
+				newAtoms[i].setState(2);
+			newAtoms[i].setType(0);
 			newAtoms[i].bondWith(newAtoms[(i+1)%N]);
 		}
 		return newAtoms;
@@ -1307,7 +1301,7 @@ class Membrane_division extends Level //18
 			for(int iLoop=0;iLoop<2;iLoop++) {
 				for(int i=0;i<loop[iLoop].size();i++) {
 					Atom a = (Atom)loop[iLoop].get(i);
-					if(a.type!=0 || a.getBonds().size()!=2)
+					if(a.getType()!=0 || a.getBonds().size()!=2)
 						return Application.localize(new String[] {"levels","membranedivision","error","3" });
 				}
 			}
@@ -1333,10 +1327,10 @@ class Cell_division extends Level //19
 		// first move all the atoms out of the way
 		for(int i=0;i<newAtoms.length;i++)
 		{
-			while(newAtoms[i].pos.x < atomSize*8.0f)
-				newAtoms[i].pos.x += atomSize*2.0f;
+			while(newAtoms[i].getPhysicalPoint().getPositionX() < atomSize*8.0f)
+				newAtoms[i].getPhysicalPoint().setPositionX(atomSize*2.0f+newAtoms[i].getPhysicalPoint().getPositionX());
 			final int n_extra=6;
-			newAtoms[i].type = Math.max(0,i%(6+n_extra)-n_extra); // extra a's for membrane growth
+			newAtoms[i].setType(Math.max(0,i%(6+n_extra)-n_extra)); // extra a's for membrane growth
 		}
 		// place and bond N atoms to form a loop
 		final int N=18;
@@ -1345,13 +1339,13 @@ class Cell_division extends Level //19
 		int i; // atom index incremented in loops but also used elsewhere without resetting
 		for(i=0;i<N;i++)
 		{
-			newAtoms[i].pos.x = atomSize*4.0f + pos_x[i]*atomSize*2.0f;
-			newAtoms[i].pos.y = atomSize*7.0f + pos_y[i]*atomSize*2.0f;
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*4.0f + pos_x[i]*atomSize*2.0f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*7.0f + pos_y[i]*atomSize*2.0f);
 			if(i==N-1 || i==N/2-1)
-				newAtoms[i].state=3;
+				newAtoms[i].setState(3);
 			else
-				newAtoms[i].state=2;
-			newAtoms[i].type=0;
+				newAtoms[i].setState(2);
+			newAtoms[i].setType(0);
 			newAtoms[i].bondWith(newAtoms[(i+1)%N]);
 		}
 		// place and bond six atoms to form a template
@@ -1361,23 +1355,23 @@ class Cell_division extends Level //19
 		int so_far=i;
 		for(;i<so_far+6;i++)
 		{
-			newAtoms[i].pos.x = atomSize*4.0f;
-			newAtoms[i].pos.y = atomSize*7.0f+(i-so_far)*atomSize*2.0f;
-			newAtoms[i].state=1;
+			newAtoms[i].getPhysicalPoint().setPositionX(atomSize*4.0f);
+			newAtoms[i].getPhysicalPoint().setPositionY(atomSize*7.0f+(i-so_far)*atomSize*2.0f);
+			newAtoms[i].setState(1);
 			if(i-so_far==0)
 			{
-				newAtoms[i].type=4; // 'e' at the top
+				newAtoms[i].setType(4); // 'e' at the top
 				newAtoms[i].bondWith(newAtoms[N-1]);
 			}
 			else if(i-so_far==5)
 			{
-				newAtoms[i].type=5; // 'f' at the bottom
+				newAtoms[i].setType(5); // 'f' at the bottom
 				newAtoms[i].bondWith(newAtoms[N/2-1]);
 				newAtoms[i].bondWith(newAtoms[i-1]);
 			}
 			else
 			{
-				newAtoms[i].type=genomes[which_genome][(i-so_far)-1];
+				newAtoms[i].setType(genomes[which_genome][(i-so_far)-1]);
 				newAtoms[i].bondWith(newAtoms[i-1]);
 			}
 		}
@@ -1425,8 +1419,8 @@ class Cell_division extends Level //19
 					for(int i=0;i<NP;i++)
 					{
 						Atom a = ((Atom)((LinkedList)components.get(iComp)).get(i));
-						px[i]=(int)a.pos.x;
-						py[i]=(int)a.pos.y;
+						px[i]=(int)a.getPhysicalPoint().getPositionX();
+						py[i]=(int)a.getPhysicalPoint().getPositionY();
 					}
 					poly[iComp] = new Polygon(px,py,NP);
 				}
@@ -1438,7 +1432,7 @@ class Cell_division extends Level //19
 					for(int i=0;i<NP;i++) {
 						Atom a = (Atom)c.get(i);
 						// is this point inside the other polygon?
-						if(poly[1-iComp].contains(a.pos))
+						if(poly[1-iComp].contains(new Point2D.Float(a.getPhysicalPoint().getPositionX(),a.getPhysicalPoint().getPositionY())))
 							return Application.localize(new String[] {"levels","celldivision","error","2" });
 					}
 				}
@@ -1450,7 +1444,7 @@ class Cell_division extends Level //19
 			int n_found=0;
 			for(int i=0;i<atoms.length && n_found<2;i++) {
 				Atom a = atoms[i];
-				if(a.type==4 && a.state!=0 && a.getBonds().size()==2) heads[n_found++]=a;
+				if(a.getType()==4 && a.getState()!=0 && a.getBonds().size()==2) heads[n_found++]=a;
 			}
 			if(n_found<2)
 				return Application.localize(new String[] {"levels","celldivision","error","3" });
@@ -1473,7 +1467,7 @@ class Cell_division extends Level //19
 					// if the current atom has other than 2 bonds then we are done
 					if(current.getBonds().size()!=2) break;
 					// append the type letter (a-f) to the string
-					sequence[iCell] += Atom.type_code.charAt(current.type);
+					sequence[iCell] += Atom.type_code.charAt(current.getType());
 					// add the current atom to the list so that we will know we have seen it before
 					seen.add(current);
 					// move onto the next bond (we know this atom has exactly two) 

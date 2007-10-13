@@ -256,14 +256,18 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 			for (int i = 0; i < atoms.length; i++){
 				if(!atoms[i].isKiller()) {
 					// draw the normal colour atom image and label it
-					g2.drawImage(atomsImages[atoms[i].type], (int)atoms[i].pos.x-offset_x, (int)atoms[i].pos.y-offset_y, R*2, R*2, collisionsPanel);
+					g2.drawImage(atomsImages[atoms[i].getType()], 
+							(int)atoms[i].getPhysicalPoint().getPositionX()-offset_x,
+							(int)atoms[i].getPhysicalPoint().getPositionY()-offset_y,
+							R*2, R*2, collisionsPanel);
 					String label = atoms[i].toString();
 					int width = g2.getFontMetrics().stringWidth(label);
-					g2.drawString(label, (int)atoms[i].pos.x-width/2, (int)atoms[i].pos.y+text_offset_y); 
+					g2.drawString(label, (int)atoms[i].getPhysicalPoint().getPositionX()-width/2,
+							(int)atoms[i].getPhysicalPoint().getPositionY()+text_offset_y); 
 				} else {
 					// draw a special spiky image and no label
-					g2.drawImage(Resource.getSpikyImage(),(int)atoms[i].pos.x-offset_x, 
-							(int)atoms[i].pos.y-offset_y, R*2, R*2, collisionsPanel);
+					g2.drawImage(Resource.getSpikyImage(),(int)atoms[i].getPhysicalPoint().getPositionX()-offset_x, 
+							(int)atoms[i].getPhysicalPoint().getPositionY()-offset_y, R*2, R*2, collisionsPanel);
 				}
 			}
 		}
@@ -275,10 +279,10 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 				Iterator it = atoms[i].getBonds().iterator();
 				while(it.hasNext()) {
 					Atom other = (Atom)it.next();
-					float x1 = atoms[i].pos.x;
-					float y1 = atoms[i].pos.y;
-					float dx = other.pos.x - x1;
-					float dy = other.pos.y - y1;
+					float x1 = atoms[i].getPhysicalPoint().getPositionX();
+					float y1 = atoms[i].getPhysicalPoint().getPositionY();
+					float dx = other.getPhysicalPoint().getPositionX() - x1;
+					float dy = other.getPhysicalPoint().getPositionY() - y1;
 					float d = (float)Math.sqrt(dx*dx+dy*dy);
 					float x_cut = dx*R*0.8f/d;
 					float y_cut = dy*R*0.8f/d;
@@ -291,8 +295,9 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 		if(draggingPoint!=null) {
 			g2.setStroke(new BasicStroke(5));
 			g2.setPaint(new Color(0,0,0,100));
-			g2.drawLine((int)draggingPoint.getX(),(int)draggingPoint.getY(),(int)(atoms[draggingPoint.getWhichBeingDragging()].pos.x),
-				(int)(atoms[draggingPoint.getWhichBeingDragging()].pos.y));
+			g2.drawLine((int)draggingPoint.getX(),(int)draggingPoint.getY(),
+					(int)(atoms[draggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionX()),
+					(int)(atoms[draggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionY()));
 			g2.setStroke(new BasicStroke(4)); // else the stroke would have been changed
 				// when outlining the collider area
 		}
@@ -302,8 +307,9 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 			DraggingPoint lastUsedDraggingPoint = iApplicationEngine.getLastUsedDraggingPoint();
 			g2.setStroke(new BasicStroke(1));
 			g2.setPaint(new Color(200,0,0,100));
-			g2.drawLine((int)lastUsedDraggingPoint.getX(),(int)lastUsedDraggingPoint.getY(),(int)(atoms[lastUsedDraggingPoint.getWhichBeingDragging()].pos.x),
-				(int)(atoms[lastUsedDraggingPoint.getWhichBeingDragging()].pos.y));
+			g2.drawLine((int)lastUsedDraggingPoint.getX(),(int)lastUsedDraggingPoint.getY(),
+					(int)(atoms[lastUsedDraggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionX()),
+					(int)(atoms[lastUsedDraggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionY()));
 			g2.setStroke(new BasicStroke(4)); // else the stroke would have been changed
 				// when outlining the collider area
 		}
@@ -327,9 +333,12 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 							Point p = event.getPoint();
 							int R = (int) Atom.getAtomSize();
 							float zoom = ((float)scale)/100;
+							Point2D.Float p1 = new Point2D.Float();
 							Point2D.Float p2 = new Point2D.Float(p.x/zoom,p.y/zoom);
 							for(int i=0;i<latestAtomsCopy.length;i++){
-								if(p2.distanceSq(latestAtomsCopy[i].pos)<R*R) {
+								p1.x = latestAtomsCopy[i].getPhysicalPoint().getPositionX();
+								p1.y = latestAtomsCopy[i].getPhysicalPoint().getPositionY();
+								if(p2.distanceSq(p1)<R*R) {
 									iApplicationEngine.setDraggingPoint(
 											new DraggingPoint((long)p2.x,
 													(long)p2.y, i));

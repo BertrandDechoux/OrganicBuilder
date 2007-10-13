@@ -1,5 +1,6 @@
 package uk.org.squirm3.engine;
 
+import java.awt.geom.Point2D;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -95,21 +96,21 @@ public class EulerCollider extends AbstractCollider
 		{
 			Atom a = atoms[i];
 			// bounce off the walls
-			if(a.pos.x<R)
-				a.velocity.x += getForce(R-a.pos.x);
-			if(a.pos.y<R)
-				a.velocity.y += getForce(R-a.pos.y);
-			if(a.pos.x>width-R)
-				a.velocity.x -= getForce(a.pos.x-(width-R));
-			if(a.pos.y>height-R)
-				a.velocity.y -= getForce(a.pos.y-(height-R));
+			if(a.getPhysicalPoint().getPositionX()<R)
+				a.getPhysicalPoint().setSpeedX(a.getPhysicalPoint().getSpeedX() + getForce(R-a.getPhysicalPoint().getPositionX()));
+			if(a.getPhysicalPoint().getPositionY()<R)
+				a.getPhysicalPoint().setSpeedY(a.getPhysicalPoint().getSpeedY() + getForce(R-a.getPhysicalPoint().getPositionY()));
+			if(a.getPhysicalPoint().getPositionX()>width-R)
+				a.getPhysicalPoint().setSpeedX(a.getPhysicalPoint().getSpeedX() - getForce(a.getPhysicalPoint().getPositionX()-(width-R)));
+			if(a.getPhysicalPoint().getPositionY()>height-R)
+				a.getPhysicalPoint().setSpeedY(a.getPhysicalPoint().getSpeedY() - getForce(a.getPhysicalPoint().getPositionY()-(height-R)));
 			// bounce off other atoms that are within 2R distance of this one
 			// what square radius must we search for neighbours?
 			int rx = (int)Math.ceil(diam/bucket_width);
 			int ry = (int)Math.ceil(diam/bucket_height);
 			// what bucket is the atom in?
-			int wx = whichBucketX(a.pos.x);
-			int wy = whichBucketY(a.pos.y);
+			int wx = whichBucketX(a.getPhysicalPoint().getPositionX());
+			int wy = whichBucketY(a.getPhysicalPoint().getPositionY());
 			// accumulate the list of any atoms in this square radius (clamped to the valid area)
 			for(int x=Math.max(0,wx-rx);x<=Math.min(n_buckets_x-1,wx+rx);x++)
 			{
@@ -122,20 +123,22 @@ public class EulerCollider extends AbstractCollider
 						int iOther = ((Integer)it.next()).intValue();
 						if(iOther<=i) continue; // using Newton's "action&reaction" as a shortcut
 						Atom b = atoms[iOther];
-						if(a.pos.distanceSq(b.pos)<diam2) 
+						if((new Point2D.Float(a.getPhysicalPoint().getPositionX(), a.getPhysicalPoint().getPositionY())).distanceSq(
+								new Point2D.Float(b.getPhysicalPoint().getPositionX(), b.getPhysicalPoint().getPositionY()))<diam2) 
 						{
 							// this is a collision - can any reactions apply to these two atoms?
 							Reaction.tryReaction(a,b, reactions);
 							// atoms bounce off other atoms
-							float sep = (float)a.pos.distance(b.pos);
+							float sep = (float)(new Point2D.Float(a.getPhysicalPoint().getPositionX(), a.getPhysicalPoint().getPositionY())).distance(
+									new Point2D.Float(b.getPhysicalPoint().getPositionX(), b.getPhysicalPoint().getPositionY()));
 							float force = getForce(diam-sep);
 							// push from the other atom
-							float dx = force * (a.pos.x - b.pos.x)/sep;
-							float dy = force * (a.pos.y - b.pos.y)/sep;
-							a.velocity.x += dx;
-							a.velocity.y += dy;
-							b.velocity.x -= dx; // using Newton's "action&reaction" as a shortcut
-							b.velocity.y -= dy;
+							float dx = force * (a.getPhysicalPoint().getPositionX() - b.getPhysicalPoint().getPositionX())/sep;
+							float dy = force * (a.getPhysicalPoint().getPositionY() - b.getPhysicalPoint().getPositionY())/sep;
+							a.getPhysicalPoint().setSpeedX(a.getPhysicalPoint().getSpeedX() + dx);
+							a.getPhysicalPoint().setSpeedY(a.getPhysicalPoint().getSpeedY() + dy);
+							b.getPhysicalPoint().setSpeedX(b.getPhysicalPoint().getSpeedX() - dx); // using Newton's "action&reaction" as a shortcut
+							b.getPhysicalPoint().setSpeedY(b.getPhysicalPoint().getSpeedY() - dy);
 						}
 					}
 				}
@@ -144,33 +147,34 @@ public class EulerCollider extends AbstractCollider
 			Iterator it = a.getBonds().iterator();
 			while(it.hasNext()) {
 				Atom other =(Atom)it.next();
-				float sep = (float)a.pos.distance(other.pos);
+				float sep = (float)(new Point2D.Float(a.getPhysicalPoint().getPositionX(), a.getPhysicalPoint().getPositionY())).distance(
+						new Point2D.Float(other.getPhysicalPoint().getPositionX(), other.getPhysicalPoint().getPositionY()));
 				float force = getForce(sep-diam)/4.0f; // this determines the bond spring stiffness
 				// pull towards the other atom
-				float dx = force * (other.pos.x - a.pos.x)/sep;
-				float dy = force * (other.pos.y - a.pos.y)/sep;
-				a.velocity.x += dx;
-				a.velocity.y += dy;
+				float dx = force * (other.getPhysicalPoint().getPositionX() - a.getPhysicalPoint().getPositionX())/sep;
+				float dy = force * (other.getPhysicalPoint().getPositionY() - a.getPhysicalPoint().getPositionY())/sep;
+				a.getPhysicalPoint().setSpeedX(a.getPhysicalPoint().getSpeedX() + dx);
+				a.getPhysicalPoint().setSpeedY(a.getPhysicalPoint().getSpeedY() + dy);
 			}
 			// the user can pull atoms about using the mouse
 			if(is_dragging && which_being_dragged==i)
 			{
 				// normalise the pull vector
-				float pullX = mouse_x-a.pos.x;
-				float pullY = mouse_y-a.pos.y;
+				float pullX = mouse_x-a.getPhysicalPoint().getPositionX();
+				float pullY = mouse_y-a.getPhysicalPoint().getPositionY();
 				float dist = (float)Math.sqrt(pullX*pullX+pullY*pullY);
 				pullX /= dist;
 				pullY /= dist;
-				a.velocity.x += 2.0f*pullX;
-				a.velocity.y += 2.0f*pullY;
+				a.getPhysicalPoint().setSpeedX(a.getPhysicalPoint().getSpeedX() + 2.0f*pullX);
+				a.getPhysicalPoint().setSpeedY(a.getPhysicalPoint().getSpeedY() + 2.0f*pullY);
 				
 			}
 			// limit the velocity of each atom to prevent numerical problems
-			float speed = (float)Math.sqrt(a.velocity.x*a.velocity.x + a.velocity.y*a.velocity.y);
+			float speed = (float)Math.sqrt(a.getPhysicalPoint().getSpeedX()*a.getPhysicalPoint().getSpeedX() + a.getPhysicalPoint().getSpeedY()*a.getPhysicalPoint().getSpeedY());
 			if(speed>MAX_SPEED)
 			{
-				a.velocity.x *= MAX_SPEED/speed;
-				a.velocity.y *= MAX_SPEED/speed;
+				a.getPhysicalPoint().setSpeedX(a.getPhysicalPoint().getSpeedX() * MAX_SPEED/speed);
+				a.getPhysicalPoint().setSpeedY(a.getPhysicalPoint().getSpeedY() * MAX_SPEED/speed);
 			}
 		}
 	}
@@ -183,15 +187,15 @@ public class EulerCollider extends AbstractCollider
 			if(a.isStuck()) continue; // special atoms that don't move
 			
 			int current_bucket_x,current_bucket_y;
-			current_bucket_x = whichBucketX(a.pos.x);
-			current_bucket_y = whichBucketY(a.pos.y);
+			current_bucket_x = whichBucketX(a.getPhysicalPoint().getPositionX());
+			current_bucket_y = whichBucketY(a.getPhysicalPoint().getPositionY());
 			
-			a.pos.x+=atoms[i].velocity.x;
-			a.pos.y+=atoms[i].velocity.y;
+			a.getPhysicalPoint().setPositionX(a.getPhysicalPoint().getPositionX()+atoms[i].getPhysicalPoint().getSpeedX());
+			a.getPhysicalPoint().setPositionY(a.getPhysicalPoint().getPositionY()+atoms[i].getPhysicalPoint().getSpeedY());
 			
 			int new_bucket_x,new_bucket_y;
-			new_bucket_x = whichBucketX(a.pos.x);
-			new_bucket_y = whichBucketY(a.pos.y);
+			new_bucket_x = whichBucketX(a.getPhysicalPoint().getPositionX());
+			new_bucket_y = whichBucketY(a.getPhysicalPoint().getPositionY());
 			
 			// do we need to move the atom to a new bucket?
 			if(new_bucket_x!=current_bucket_x || new_bucket_y!=current_bucket_y)

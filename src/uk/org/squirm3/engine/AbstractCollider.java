@@ -143,8 +143,8 @@ public abstract class AbstractCollider
 	{
 		Atom a = atoms[i];
 		int bucket_x,bucket_y;
-		bucket_x = whichBucketX(a.pos.x);
-		bucket_y = whichBucketY(a.pos.y);
+		bucket_x = whichBucketX(a.getPhysicalPoint().getPositionX());
+		bucket_y = whichBucketY(a.getPhysicalPoint().getPositionY());
 		buckets[bucket_x][bucket_y].add(new Integer(i));
 	}
 

@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 import uk.org.squirm3.data.Atom;
+import uk.org.squirm3.data.MobilePoint;
 import uk.org.squirm3.data.Reaction;
 
 
@@ -80,18 +81,18 @@ public class ReactionTest extends TestCase {
 		Vector v = new Vector();
 		v.add(r);
 		// creation of the atoms
-		Atom a1 = new Atom(0, 0, 0, 0, 0);
-		Atom a2 = new Atom(0, 0, 1, 1, 0);
+		Atom a1 = new Atom(new MobilePoint(), 0, 0);
+		Atom a2 = new Atom(new MobilePoint(), 1, 1);
 		// test of the reaction
 		Reaction.tryReaction(a1, a2, v);
-		assertTrue(a1.type==0 && a1.state==2
-				&& a2.type==1 && a2.state==2
+		assertTrue(a1.getType()==0 && a1.getState()==2
+				&& a2.getType()==1 && a2.getState()==2
 				&& a1.hasBondWith(a2));
 		// test when no reaction should occur
-		a1.state = 0;
+		a1.setState(0);
 		Reaction.tryReaction(a1, a2, v);
-		assertTrue(a1.type==0 && a1.state==0
-				&& a2.type==1 && a2.state==2
+		assertTrue(a1.getType()==0 && a1.getState()==0
+				&& a2.getType()==1 && a2.getState()==2
 				&& a1.hasBondWith(a2));
 	}
 

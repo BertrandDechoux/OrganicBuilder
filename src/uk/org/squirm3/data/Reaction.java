@@ -56,109 +56,94 @@ public class Reaction
 		return s;
 	}
 	
-	
-	public static String parse(String text, Vector reactions_found) {
-		//System.out.println("Input: "+text); // DEBUG
-		
-		// for each line in the text			
-		StringTokenizer lines = new StringTokenizer(text,"\n",true);
-		String s = new String();
-		String line = new String();
-		while(lines.hasMoreTokens()) 
-		{
-			line = lines.nextToken();
-			line = line.trim(); // remove leading and trailing whitespace and control chars
-			if(line.length()==0) continue; // nothing doing
-			
-			if(line.length()>2 && line.charAt(0)=='/' && line.charAt(1)=='/')
-				continue; // this line contains a comment, skip it
-			
-			//System.out.println("Parsing line: "+line+" (length "+String.valueOf(line.length())+")");
-			
-			Reaction r = new Reaction(0,0,false,0,0,0,false,0); // the target
-			
-			boolean error_found=false; // is there an error on this line?
-			
-			// using abcdefxy characters as the tokens, work through the line
-			StringTokenizer reactants = new StringTokenizer(line,Atom.type_code,true);
-			int element=0;
-			while(reactants.hasMoreTokens()) 
-			{
-				s = reactants.nextToken();
-				
-				//System.out.println("Token "+String.valueOf(element)+": "+s+"\n"); // DEBUG
-				
-				if(s.length()==0) error_found=true;
-				
-				try // (parseInt may throw an exception)
-				{ 
-					switch(element++)
-					{
+	public static Reaction parseString(String description) {
+		String line = description;
+		String s;
+		Reaction r = new Reaction(0,0,false,0,0,0,false,0); // the target
+		boolean error_found=false; // is there an error on this line?
+		// using abcdefxy characters as the tokens, work through the line
+		StringTokenizer reactants = new StringTokenizer(line,Atom.type_code,true);
+		int element=0;
+		while(reactants.hasMoreTokens()) {
+			s = reactants.nextToken();
+			//System.out.println("Token "+String.valueOf(element)+": "+s+"\n"); // DEBUG
+			if(s.length()==0) error_found=true;
+			try { 
+				switch(element++) {
 					case 0:  // deal with the first character of the first reactant
 						r.a_type = Atom.type_code.indexOf(s.charAt(0)); 
 						break;
 					case 1: // deal with the character up until the next type (state + optional "+")
-						{
-							int nd = findNDigits(s);
-							if(nd>0)
-								r.a_state = Integer.parseInt(s.substring(0,nd));
-							else 
-								error_found=true;
-							r.bonded_before = (s.indexOf('+')==-1);
-							break;
-						}
-					case 2:  // deal with the first character of the second reactant
-						r.b_type = Atom.type_code.indexOf(s.charAt(0)); break;
-					case 3: // deal with the character up until the next type (state + "=>")
-						{
-							int nd = findNDigits(s);
-							if(nd>0)
-								r.b_state = Integer.parseInt(s.substring(0,nd));
-							else 
-								error_found=true;
-							break;
-						}
-					case 4:  // a_type after (should validate on this)
+					{
+						int nd = findNDigits(s);
+						if(nd>0)
+							r.a_state = Integer.parseInt(s.substring(0,nd));
+						else 
+							error_found=true;
+						r.bonded_before = (s.indexOf('+')==-1);
 						break;
-					case 5: // deal with the character up until the next type (state + optional "+")
-						{
-							int nd = findNDigits(s);
-							if(nd>0)
-								r.future_a_state = Integer.parseInt(s.substring(0,nd));
-							else 
-								error_found=true;
-							r.bonded_after = (s.indexOf('+')==-1);
-							break;
-						}
-					case 6:  // b_type after (should validate on this)
+					}
+				case 2:  // deal with the first character of the second reactant
+					r.b_type = Atom.type_code.indexOf(s.charAt(0)); break;
+				case 3: // deal with the character up until the next type (state + "=>")
+					{
+						int nd = findNDigits(s);
+						if(nd>0)
+							r.b_state = Integer.parseInt(s.substring(0,nd));
+						else 
+							error_found=true;
 						break;
-					case 7: // deal with the character up until the next type (state + "=>")
-						{
-							int nd = findNDigits(s);
-							if(nd>0)
-								r.future_b_state = Integer.parseInt(s.substring(0,nd));
-							else 
-								error_found=true;
-							break;
-						}
+					}
+				case 4:  // a_type after (should validate on this)
+					break;
+				case 5: // deal with the character up until the next type (state + optional "+")
+					{
+						int nd = findNDigits(s);
+						if(nd>0)
+							r.future_a_state = Integer.parseInt(s.substring(0,nd));
+						else 
+							error_found=true;
+						r.bonded_after = (s.indexOf('+')==-1);
+						break;
+					}
+				case 6:  // b_type after (should validate on this)
+					break;
+				case 7: // deal with the character up until the next type (state + "=>")
+					{
+						int nd = findNDigits(s);
+						if(nd>0)
+							r.future_b_state = Integer.parseInt(s.substring(0,nd));
+						else 
+							error_found=true;
+						break;
 					}
 				}
-				catch(NumberFormatException nfe)
-				{
-					error_found=true;
-				}
-				if(error_found)
-					return "\nParse error on line:\n\""+line+"\"";
+			} catch(NumberFormatException nfe) {  // (parseInt may throw an exception)
+				error_found=true;
 			}
-			
-			// were sufficient tokens parsed on this line? (more than 8 we ignore)
-			if(element<8)
-				return "\nParse error on line:\n\""+line+"\"";
+			if(error_found) return null;
+		}
+		// were sufficient tokens parsed on this line? (more than 8 we ignore)
+		if(element<8) return null;
+		return r;
+	}
 
-			
-			//System.out.println(r.getString()+"\n"); // DEBUG
-			
-			reactions_found.add(r);
+	public static String parse(String text, Vector reactions_found) {
+		// System.out.println("Input: "+text); // DEBUG
+		// for each line in the text			
+		StringTokenizer lines = new StringTokenizer(text,"\n",true);
+		String s = new String();
+		String line = new String();
+		while(lines.hasMoreTokens()) {
+			line = lines.nextToken();
+			line = line.trim(); // remove leading and trailing whitespace and control chars
+			if(line.length()==0) continue; // nothing doing
+			if(line.length()>2 && line.charAt(0)=='/' && line.charAt(1)=='/')
+				continue; // this line contains a comment, skip it
+			// System.out.println("Parsing line: "+line+" (length "+String.valueOf(line.length())+")");
+			Reaction r = parseString(line);
+			// System.out.println(r.getString()+"\n"); // DEBUG
+			reactions_found.add(r);	
 		}
 		return null;
 	}
@@ -182,21 +167,21 @@ public class Reaction
 				{
 					Reaction r = (Reaction)it.next();
 					// is the type for 'a' specified and correct?
-					if(r.a_type<6 && a.type!=r.a_type) continue;
+					if(r.a_type<6 && a.getType()!=r.a_type) continue;
 					// is the type for 'b' specified and correct?
-					if(r.b_type<6 && b.type!=r.b_type) continue;
+					if(r.b_type<6 && b.getType()!=r.b_type) continue;
 					// is the type for 'b' specified as matching that of 'a' and correct?
-					if(r.b_type>5 && r.b_type==r.a_type && b.type!=a.type) continue; // both x or both y
+					if(r.b_type>5 && r.b_type==r.a_type && b.getType()!=a.getType()) continue; // both x or both y
 					// is the state of 'a' and 'b' correct?
-					if(r.a_state!=a.state || r.b_state!=b.state) continue;
+					if(r.a_state!=a.getState() || r.b_state!=b.getState()) continue;
 					// is the bonded/not status correct?
 					if( (r.bonded_before && !a.hasBondWith(b)) || (!r.bonded_before && a.hasBondWith(b)) ) continue;
 					
 					// ok, we can now apply the reaction		
 					if(!r.bonded_before && r.bonded_after) a.bondWith(b);
 					else if(r.bonded_before && !r.bonded_after) a.breakBondWith(b);
-					a.state=r.future_a_state;
-					b.state=r.future_b_state;
+					a.setState(r.future_a_state);
+					b.setState(r.future_b_state);
 					
 					a.setReacted(true); // (only want one reaction per atom per timestep)
 					b.setReacted(true);
@@ -207,8 +192,8 @@ public class Reaction
 		}
 		else {
 			// the killer atom breaks the other atoms bonds (unless other is an 'a' atom)
-			if(a.isKiller()) { if(b.type!=0) b.breakAllBonds();}
-			else { if(a.type!=0) a.breakAllBonds(); }
+			if(a.isKiller()) { if(b.getType()!=0) b.breakAllBonds();}
+			else { if(a.getType()!=0) a.breakAllBonds(); }
 		}
 	}
 }

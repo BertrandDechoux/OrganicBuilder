@@ -1,6 +1,5 @@
 package uk.org.squirm3.data;
 
-import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -26,29 +25,24 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 public class Atom 
 {
+	// TODO should not be hardcoded, properties file ?
 	static private final float R = 22.0f;
-	//TODO should not be hardcoded, properties file ?
-	
-	//TODO remove "public" !!!
-	public Point2D.Float pos,velocity,acceleration; // acceleration only used in new correct physics code
-	public int type,state; // type: 0=a,..5=f
-
+	// acceleration only used in new correct physics code
+	private IPhysicalPoint iPhysicalPoint;
+	private int state; // type: 0=a,..5=f
+	private int type;
 	private LinkedList bonds;
-	
 	private boolean stuck=false; // special marker for atoms that don't move
 	private boolean killer=false; // special marker for atoms that have a special caustic effect
-	
 	private boolean has_reacted=false; // has this atom been part of a reaction this timestep?
-	
 	static final public String type_code = "abcdefxy";
-	
-	public Atom(float x,float y,int t,int s,float ms) {
-		this.pos = new Point2D.Float(x,y);
-		this.velocity = new Point2D.Float((float)(Math.random()*ms-ms/2.0),(float)(Math.random()*ms-ms/2.0));
-		this.acceleration = new Point2D.Float(0,0);
-		this.type = t;
-		this.state = s;
-		this.bonds = new LinkedList();
+
+
+	public Atom(IPhysicalPoint iPhysicalPoint,int t,int s) {
+		this.iPhysicalPoint = iPhysicalPoint.copy();
+		setType(t);
+		setState(s);
+		bonds = new LinkedList();
 	}
 	
 	//TODO the copy should not allow modifications
@@ -129,11 +123,31 @@ public class Atom
 	}
 	
 	public String toString() {
-		return type_code.charAt(type) + String.valueOf(state);
+		return type_code.charAt(getType()) + String.valueOf(getState());
 	}
 	
 	public static float getAtomSize(){
 		return R;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setState(int state) {
+		this.state = state;
+	}
+
+	public int getState() {
+		return state;
+	}
+
+	public IPhysicalPoint getPhysicalPoint() {
+		return iPhysicalPoint;
 	}
 	
 } // class sq3Atom

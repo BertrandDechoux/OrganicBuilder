@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.DraggingPoint;
 
 
 /**  
@@ -67,16 +66,16 @@ public class VerletCollider extends AbstractCollider
 			Atom a = atoms[i];
 
 			int current_bucket_x,current_bucket_y;
-			current_bucket_x = whichBucketX(a.pos.x);
-			current_bucket_y = whichBucketY(a.pos.y);
+			current_bucket_x = whichBucketX(a.getPhysicalPoint().getPositionX());
+			current_bucket_y = whichBucketY(a.getPhysicalPoint().getPositionY());
 			
 			// update the atom's position
-			a.pos.x += WORLD_SCALE*R * (a.velocity.x * dt + a.acceleration.x * halfdt2); // halfdt2 = 0.5*dt*dt
-			a.pos.y += WORLD_SCALE*R * (a.velocity.y * dt + a.acceleration.y * halfdt2);
+			a.getPhysicalPoint().setPositionX((float)(a.getPhysicalPoint().getPositionX() + WORLD_SCALE*R * (a.getPhysicalPoint().getSpeedX() * dt + a.getPhysicalPoint().getAccelerationX() * halfdt2))); // halfdt2 = 0.5*dt*dt
+			a.getPhysicalPoint().setPositionY((float)(a.getPhysicalPoint().getPositionY() + WORLD_SCALE*R * (a.getPhysicalPoint().getSpeedY() * dt + a.getPhysicalPoint().getAccelerationY() * halfdt2)));
 			
 			int new_bucket_x,new_bucket_y;
-			new_bucket_x = whichBucketX(a.pos.x);
-			new_bucket_y = whichBucketY(a.pos.y);
+			new_bucket_x = whichBucketX(a.getPhysicalPoint().getPositionX());
+			new_bucket_y = whichBucketY(a.getPhysicalPoint().getPositionY());
 			// do we need to move the atom to a new bucket?
 			if(new_bucket_x!=current_bucket_x || new_bucket_y!=current_bucket_y)
 			{
@@ -91,15 +90,15 @@ public class VerletCollider extends AbstractCollider
 				buckets[new_bucket_x][new_bucket_y].add(new Integer(i));
 			}
 
-			a.velocity.x += a.acceleration.x * halfdt; // add old acceleration , halfdt = 0.5*dt
-			a.velocity.y += a.acceleration.y * halfdt;
+			a.getPhysicalPoint().setSpeedX((float)(a.getPhysicalPoint().getSpeedX() +  a.getPhysicalPoint().getAccelerationX() * halfdt)); // add old acceleration , halfdt = 0.5*dt
+			a.getPhysicalPoint().setSpeedY((float)(a.getPhysicalPoint().getSpeedY() +  a.getPhysicalPoint().getAccelerationY() * halfdt));
 		}
 		computeAcceleration(width, height,is_dragging,which_being_dragged,mouse_x,mouse_y);
 		for (int i = 0; i<atoms.length;i++)  // add new acceleration
 		{
 			Atom a = atoms[i];
-			a.velocity.x += a.acceleration.x * halfdt;
-			a.velocity.y += a.acceleration.y * halfdt;
+			a.getPhysicalPoint().setSpeedX((float)(a.getPhysicalPoint().getSpeedX() + a.getPhysicalPoint().getAccelerationX() * halfdt));
+			a.getPhysicalPoint().setSpeedY((float)( a.getPhysicalPoint().getSpeedY() + a.getPhysicalPoint().getAccelerationY() * halfdt));
 		}
 		// some possible alternative physics:
 		// - a hard-sphere type physics, where instead of a constant timestep we search for future
@@ -117,8 +116,8 @@ public class VerletCollider extends AbstractCollider
 		// set the accelerations for this iteration to zero
 		for(int i=0;i<atoms.length;i++) 
 		{
-			atoms[i].acceleration.x = 0;
-			atoms[i].acceleration.y = 0;
+			atoms[i].getPhysicalPoint().setAccelerationX(0);
+			atoms[i].getPhysicalPoint().setAccelerationY(0);
 		}
 		for(int i=0;i<atoms.length-1;i++)
 		{
@@ -128,8 +127,8 @@ public class VerletCollider extends AbstractCollider
 			int rx = (int)Math.ceil(radius/bucket_width);
 			int ry = (int)Math.ceil(radius/bucket_height);
 			// what bucket is the atom in?
-			int wx = whichBucketX(a.pos.x);
-			int wy = whichBucketY(a.pos.y);
+			int wx = whichBucketX(a.getPhysicalPoint().getPositionX());
+			int wy = whichBucketY(a.getPhysicalPoint().getPositionY());
 			// accumulate the list of any atoms in this square radius (clamped to the valid area)
 			for(int x=Math.max(0,wx-rx);x<=Math.min(n_buckets_x-1,wx+rx);x++)
 			{
@@ -142,8 +141,8 @@ public class VerletCollider extends AbstractCollider
 						int iOther = ((Integer)it.next()).intValue();
 						if(iOther<=i) continue; // action-reaction
 						Atom b = atoms[iOther];
-						double dx = a.pos.x-b.pos.x;
-						double dy = a.pos.y-b.pos.y;
+						double dx = a.getPhysicalPoint().getPositionX()-b.getPhysicalPoint().getPositionX();
+						double dy = a.getPhysicalPoint().getPositionY()-b.getPhysicalPoint().getPositionY();
 						dx /= WORLD_SCALE*R;
 						dy /= WORLD_SCALE*R;
 						double r2 = dx*dx+dy*dy;
@@ -154,10 +153,10 @@ public class VerletCollider extends AbstractCollider
 							double fOverR = 48.0*oneOverR6*(oneOverR6*0.5)*oneOverR2;
 							double fx = fOverR*dx;
 							double fy = fOverR*dy;
-							a.acceleration.x += fx;
-							a.acceleration.y += fy;
-							b.acceleration.x -= fx;
-							b.acceleration.y -= fy;
+							a.getPhysicalPoint().setAccelerationX((float)(a.getPhysicalPoint().getAccelerationX() + fx));
+							a.getPhysicalPoint().setAccelerationX((float)(a.getPhysicalPoint().getAccelerationY() + fy));
+							b.getPhysicalPoint().setAccelerationX((float)(b.getPhysicalPoint().getAccelerationX() - fx));
+							b.getPhysicalPoint().setAccelerationX((float)(b.getPhysicalPoint().getAccelerationY() - fy));
 							// (could include reactions checking here, but haven't done this due to other 
 							//  problems with this type of physics)
 						}
@@ -173,10 +172,10 @@ public class VerletCollider extends AbstractCollider
 			{
 				double dx=0,dy=0;
 				switch(wall) {
-					case 0: dx=a.pos.x; break;
-					case 1: dx=a.pos.x-width; break;
-					case 2: dy=a.pos.y; break;
-					case 3: dy=a.pos.y-height; break;
+					case 0: dx=a.getPhysicalPoint().getPositionX(); break;
+					case 1: dx=a.getPhysicalPoint().getPositionX()-width; break;
+					case 2: dy=a.getPhysicalPoint().getPositionY(); break;
+					case 3: dy=a.getPhysicalPoint().getPositionY()-height; break;
 				}
 				dx /= WORLD_SCALE*R;
 				dy /= WORLD_SCALE*R;
@@ -188,8 +187,8 @@ public class VerletCollider extends AbstractCollider
 					double fOverR = 48.0*oneOverR6*(oneOverR6*0.5)*oneOverR2;
 					double fx = fOverR*dx;
 					double fy = fOverR*dy;
-					a.acceleration.x += fx;
-					a.acceleration.y += fy;
+					a.getPhysicalPoint().setAccelerationX((float)(a.getPhysicalPoint().getAccelerationX() + fx));
+					a.getPhysicalPoint().setAccelerationY((float)(a.getPhysicalPoint().getAccelerationY() + fy));
 				}
 			}
 		}
@@ -198,13 +197,13 @@ public class VerletCollider extends AbstractCollider
 		{
 			Atom a = atoms[which_being_dragged];
 			// normalise the pull vector
-			float pullX = mouse_x-a.pos.x;
-			float pullY = mouse_y-a.pos.y;
+			float pullX = mouse_x-a.getPhysicalPoint().getPositionX();
+			float pullY = mouse_y-a.getPhysicalPoint().getPositionY();
 			float dist = (float)Math.sqrt(pullX*pullX+pullY*pullY);
 			pullX /= dist;
 			pullY /= dist;
-			a.acceleration.x += 3.0*R*pullX;
-			a.acceleration.y += 3.0*R*pullY;
+			a.getPhysicalPoint().setAccelerationX((float)(a.getPhysicalPoint().getAccelerationX() + 3.0*R*pullX));
+			a.getPhysicalPoint().setAccelerationY((float)(a.getPhysicalPoint().getAccelerationY() + 3.0*R*pullY));
 		}
 	}
 }

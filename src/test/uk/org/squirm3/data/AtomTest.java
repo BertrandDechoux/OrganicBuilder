@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 import uk.org.squirm3.data.Atom;
+import uk.org.squirm3.data.MobilePoint;
 
 /**  
 Copyright 2007 Bertrand Dechoux
@@ -29,21 +30,16 @@ public class AtomTest extends TestCase {
 
 	/** Test of the constructor. **/
 	public void testAtom() {
-		float x = 1;
-		float y = 2;
-		float ms = 3;
 		int t = 4;
 		int s = 5;
-		Atom a = new Atom(x, y, t, s, ms);
-		assertTrue(a.pos.x == x);
-		assertTrue(a.pos.y == y);
-		assertTrue(a.type == t);
-		assertTrue(a.state == s);
+		Atom a = new Atom(new MobilePoint(), t, s);
+		assertTrue(a.getType() == t);
+		assertTrue(a.getState() == s);
 	}
 	
 	/** Test de la propriete stuck. **/
 	public void testStuck() {
-		Atom a = new Atom(0, 0, 0, 0, 0);
+		Atom a = new Atom(new MobilePoint(), 0, 0);
 		assertFalse(a.isStuck());
 		
 		a.setStuck(false);
@@ -58,7 +54,7 @@ public class AtomTest extends TestCase {
 	
 	/** Test de la propriete killer. **/
 	public void testKiller() {
-		Atom a = new Atom(0, 0, 0, 0, 0);
+		Atom a = new Atom(new MobilePoint(), 0, 0);
 		assertFalse(a.isKiller());
 		
 		a.setKiller(false);
@@ -73,7 +69,7 @@ public class AtomTest extends TestCase {
 	
 	/** Test de la propriete reacted. **/
 	public void testReacted() {
-		Atom a = new Atom(0, 0, 0, 0, 0);
+		Atom a = new Atom(new MobilePoint(), 0, 0);
 		assertFalse(a.hasReacted());
 		
 		a.setReacted(false);
@@ -88,8 +84,8 @@ public class AtomTest extends TestCase {
 
 	/** Test of basic bonding and breaking. */
 	public void testBondingAndBreaking() {
-		Atom a1 = new Atom(0, 0, 0, 1, 0);
-		Atom a2 = new Atom(0, 0, 0, 2, 0);
+		Atom a1 = new Atom(new MobilePoint(), 0, 1);
+		Atom a2 = new Atom(new MobilePoint(), 0, 2);
 		assertFalse(a1.hasBondWith(a2));
 		assertFalse(a2.hasBondWith(a1));
 		
@@ -105,12 +101,13 @@ public class AtomTest extends TestCase {
 
 	/** Test of breakAllBonds() and getAllConnectedAtoms(). **/
 	public void testGeneralMethods() {
-		Atom a1 = new Atom(0, 0, 0, 1, 0);
-		Atom a2 = new Atom(0, 0, 0, 2, 0);
-		Atom a3 = new Atom(0, 0, 0, 3, 0);
-		Atom a4 = new Atom(0, 0, 0, 4, 0);
-		Atom a5 = new Atom(0, 0, 0, 3, 0);
-		Atom a6 = new Atom(0, 0, 0, 4, 0);
+		MobilePoint physicalPoint = new MobilePoint();
+		Atom a1 = new Atom(physicalPoint, 0, 1);
+		Atom a2 = new Atom(physicalPoint, 0, 2);
+		Atom a3 = new Atom(physicalPoint, 0, 3);
+		Atom a4 = new Atom(physicalPoint, 0, 4);
+		Atom a5 = new Atom(physicalPoint, 0, 3);
+		Atom a6 = new Atom(physicalPoint, 0, 4);
 		
 		a1.bondWith(a2);
 		a1.bondWith(a3);
@@ -139,7 +136,7 @@ public class AtomTest extends TestCase {
 
 	/** Test of the string representation. **/
 	public void testToString() {
-		Atom a = new Atom(0, 0, 1, 1, 0);
+		Atom a = new Atom(new MobilePoint(), 1, 1);
 		assertTrue("b1".equals(a.toString()));
 	}
 }
