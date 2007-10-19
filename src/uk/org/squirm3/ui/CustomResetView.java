@@ -2,11 +2,14 @@ package uk.org.squirm3.ui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,10 +20,10 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import uk.org.squirm3.Application;
+import uk.org.squirm3.data.Configuration;
+import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.IApplicationEngine;
 import uk.org.squirm3.engine.ILevelListener;
-import uk.org.squirm3.engine.IPropertyListener;
-import uk.org.squirm3.util.Analyzer;
 
 
 /**  
@@ -43,167 +46,142 @@ along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class PropertyView implements IView, IPropertyListener, ILevelListener {
+public class CustomResetView implements IView, ILevelListener {
 
 	// components reflecting simulation's parameters
-	private /*final*/ JSlider speedSelector, atomNumberSelector, heightSelector, widthSelector;
-	private /*final*/ JFormattedTextField speedTF, atomNumberTF, heightTF, widthTF;
-	private final JPanel parametersPanel;
+	private /*final*/ JSlider atomNumberSelector, heightSelector, widthSelector;
+	private /*final*/ JFormattedTextField atomNumberTF, heightTF, widthTF;
+	private final JPanel panel;
 	// use to communicate
 	private IApplicationEngine iApplicationEngine;
 
-	public PropertyView(IApplicationEngine iApplicationEngine) {
+	public CustomResetView(IApplicationEngine iApplicationEngine) {
 		this.iApplicationEngine = iApplicationEngine;
-		parametersPanel = createParametersPanel();
-		iApplicationEngine.getEngineDispatcher().addPropertyListener(this);
+		panel = createParametersPanel();
+		iApplicationEngine.getEngineDispatcher().addLevelListener(this);
+		configurationHasChanged();
 	}
 	
-	public JPanel getParametersPanel() {
-		return parametersPanel;
+	public JPanel getPanel() {
+		return panel;
 	}
 
 	public JPanel createParametersPanel() {
 		// parameters panel
 		JPanel parametersPanel = new JPanel();
 		parametersPanel.setLayout(new GridBagLayout());
-		parametersPanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), Application.localize(new String[] {"interface","parameters","title"})));
+		parametersPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		// parameters
-			// speed
+			// number of atoms
 		GridBagConstraints gbc = createCustomGBC(0,0);
-		parametersPanel.add(new JLabel(Application.localize(new String[] {"interface","parameters","speed"})),gbc);
+		parametersPanel.add(new JLabel(Application.localize(new String[] {"interface","parameters","number"})),gbc);
 		gbc = createCustomGBC(1,0);
 		gbc.weightx = 80;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		speedSelector = new JSlider(1,300,iApplicationEngine.getSimulationSpeed());
-		speedSelector.setInverted(true);
-		speedSelector.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-			    JSlider source = (JSlider)e.getSource();
-			    if (!source.getValueIsAdjusting()) {
-			        iApplicationEngine.setSimulationSpeed((short)source.getValue());
-			    }
-			}
-		});
-		parametersPanel.add(speedSelector,gbc);
-		gbc = createCustomGBC(2,0);
-		gbc.weightx = 5;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		speedTF = createCustomTF(1, 300, iApplicationEngine.getSimulationSpeed());
-		speedTF.addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent e) {
-				if ("value".equals(e.getPropertyName())) {
-					iApplicationEngine.setSimulationSpeed(((Number)e.getNewValue()).shortValue());
-				}
-			}
-		});
-		parametersPanel.add(speedTF,gbc);
-			// number of atoms
-		gbc = createCustomGBC(0,2);
-		parametersPanel.add(new JLabel(Application.localize(new String[] {"interface","parameters","number"})),gbc);
-		gbc = createCustomGBC(1,2);
-		gbc.weightx = 80;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		atomNumberSelector = new JSlider(30,300,iApplicationEngine.getAtomsNumber());
+		atomNumberSelector = new JSlider(30,300,30);
 		atomNumberSelector.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 			    JSlider source = (JSlider)e.getSource();
 			    if (!source.getValueIsAdjusting()) {
-			        iApplicationEngine.setAtomsNumber((short)source.getValue());
+			    	updateNumberOfAtoms(source.getValue());
 			    }
 			}
 		});
 		parametersPanel.add(atomNumberSelector,gbc);
-		gbc = createCustomGBC(2,2);
+		gbc = createCustomGBC(2,0);
 		gbc.weightx = 5;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		atomNumberTF = createCustomTF(30,300,iApplicationEngine.getAtomsNumber());
+		atomNumberTF = createCustomTF(30,300,30);
 		atomNumberTF.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e) {
 				if ("value".equals(e.getPropertyName())) {
-					iApplicationEngine.setAtomsNumber(((Number)e.getNewValue()).shortValue());
+					updateNumberOfAtoms(((Number)e.getNewValue()).intValue());
 				}
 			}
 		});
 		parametersPanel.add(atomNumberTF,gbc);
 			// height
-		gbc = createCustomGBC(0,3);
+		gbc = createCustomGBC(0,1);
 		parametersPanel.add(new JLabel(Application.localize(new String[] {"interface","parameters","height"})),gbc);
-		gbc = createCustomGBC(1,3);
+		gbc = createCustomGBC(1,1);
 		gbc.weightx = 80;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		heightSelector = new JSlider(50,2000,iApplicationEngine.getSimulationHeight());
+		heightSelector = new JSlider(50,2000,50);
 		heightSelector.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 			    JSlider source = (JSlider)e.getSource();
 			    if (!source.getValueIsAdjusting()) {
-			        iApplicationEngine.setSimulationSize(iApplicationEngine.getSimulationWidth(), source.getValue());
+			        updateHeight(source.getValue());
 			    }
 			}
 		});
 		parametersPanel.add(heightSelector,gbc);
-		gbc = createCustomGBC(2,3);
+		gbc = createCustomGBC(2,1);
 		gbc.weightx = 5;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		heightTF = createCustomTF(50,2000,iApplicationEngine.getSimulationHeight());
+		heightTF = createCustomTF(50,2000,50);
 		heightTF.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e) {
 				if ("value".equals(e.getPropertyName())) {
-					iApplicationEngine.setSimulationSize(iApplicationEngine.getSimulationWidth(),((Number)e.getNewValue()).intValue());
+					updateHeight(((Number)e.getNewValue()).intValue());
 				}
 			}
 		});
 		parametersPanel.add(heightTF,gbc);
 			// width
-		gbc = createCustomGBC(0,4);
+		gbc = createCustomGBC(0,2);
 		parametersPanel.add(new JLabel(Application.localize(new String[] {"interface","parameters","width"})),gbc);
-		gbc = createCustomGBC(1,4);
+		gbc = createCustomGBC(1,2);
 		gbc.weightx = 80;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		widthSelector = new JSlider(50,2000,iApplicationEngine.getSimulationWidth());
+		widthSelector = new JSlider(50,2000,50);
 		widthSelector.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 			    JSlider source = (JSlider)e.getSource();
 			    if (!source.getValueIsAdjusting()) {
-			        iApplicationEngine.setSimulationSize(source.getValue(), iApplicationEngine.getSimulationHeight());
+			        updateWidth(source.getValue());
 			    }
 			}
 		});
 		parametersPanel.add(widthSelector,gbc);
-		gbc = createCustomGBC(2,4);
+		gbc = createCustomGBC(2,2);
 		gbc.weightx = 5;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		widthTF = createCustomTF(50,2000,iApplicationEngine.getSimulationWidth());
+		widthTF = createCustomTF(50,2000,50);
 		widthTF.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e) {
 				if ("value".equals(e.getPropertyName())) {
-					iApplicationEngine.setSimulationSize(((Number)e.getNewValue()).intValue(), iApplicationEngine.getSimulationHeight());
+					updateWidth(((Number)e.getNewValue()).intValue());
 				}
 			}
 		});
 		parametersPanel.add(widthTF,gbc);
+		
+		gbc = createCustomGBC(2,3);
+		JButton resetButton = new JButton(Application.localize(new String[] {"interface","simulation","reset"}));
+		resetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Configuration configuration = new Configuration(atomNumberSelector.getValue(),
+						Level.TYPES, widthSelector.getValue(), heightSelector.getValue());
+				iApplicationEngine.restartLevel(configuration);
+			}});
+		parametersPanel.add(resetButton,gbc);
 		return parametersPanel;
 	}
 
-	public void atomsNumberHasChanged() {
-		int number = iApplicationEngine.getAtomsNumber();
-		atomNumberSelector.setValue(number);
-		atomNumberTF.setValue(new Integer(number));
+	public void updateNumberOfAtoms(int numberOfAtoms) {
+		atomNumberSelector.setValue(numberOfAtoms);
+		atomNumberTF.setValue(new Integer(numberOfAtoms));
 	}
 
-	public void simulationSizeHasChanged() {
-		int width = iApplicationEngine.getSimulationWidth();
+	public void updateWidth(int width) {
 		widthTF.setValue(new Integer(width));
 		widthSelector.setValue(width);
-		int height = iApplicationEngine.getSimulationHeight();
+	}
+	
+	public void updateHeight(int height) {
 		heightTF.setValue(new Integer(height));
 		heightSelector.setValue(height);
-	}
-
-	public void simulationSpeedHasChanged() {
-		int speed = iApplicationEngine.getSimulationSpeed();
-		speedTF.setValue(new Integer(speed));
-		speedSelector.setValue(speed);
 	}
 	
 	private JFormattedTextField createCustomTF(int min, int max, int now) {
@@ -223,12 +201,15 @@ public class PropertyView implements IView, IPropertyListener, ILevelListener {
 		return gbc;
 	}
 
-	public void levelHasChanged() { }
+	public void levelHasChanged() {
+		configurationHasChanged();
+	}
 
 	public void configurationHasChanged() {
-		// TODO Auto-generated method stub
-		System.out.println(Analyzer.analyzeObject(
-				iApplicationEngine.getCurrentLevel().getConfiguration()));
+		Configuration configuration = iApplicationEngine.getCurrentLevel().getConfiguration();
+		updateNumberOfAtoms(configuration.getNumberOfAtoms());
+		updateWidth((int)configuration.getWidth());
+		updateHeight((int)configuration.getHeight());
 	}
 
 }
