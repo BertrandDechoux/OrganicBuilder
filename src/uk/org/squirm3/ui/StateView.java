@@ -85,7 +85,7 @@ public class StateView implements IView, IStateListener {
 	private Action createResetAction() {
 		final Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.restartLevel();;
+				iApplicationEngine.restartLevel(null);
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","reset"}));

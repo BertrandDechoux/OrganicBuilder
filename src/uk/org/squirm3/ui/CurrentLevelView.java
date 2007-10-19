@@ -114,12 +114,13 @@ public class CurrentLevelView implements IView, ILevelListener {
 				if(success) {
 					//TODO keep always the same object
 					// TODO store the url into a configuration file
+					final int levelNumber = iApplicationEngine.getLevels().indexOf(currentLevel);
 					ILogger logger = new NetLogger("http://organicbuilder.sourceforge.net/log-solution");
 					// Old one http://www.sq3.org.uk/Evolution/Squirm3/OrganicBuilder/logger.pl
-					logger.writeSolution(currentLevel.getId(), iApplicationEngine.getReactions());
+					logger.writeSolution(levelNumber, iApplicationEngine.getReactions());
 					
 					result = Application.localize(new String[] {"interface","level","fullsuccess"});
-					if(iApplicationEngine.getCurrentLevel().getId()+1>iApplicationEngine.getLevels().size()-1) {
+					if(levelNumber+1>iApplicationEngine.getLevels().size()-1) {
 						JOptionPane.showMessageDialog(currentLevelPanel, result,
 							Application.localize(new String[] {"interface","level","success","title"}),
 							JOptionPane.INFORMATION_MESSAGE);

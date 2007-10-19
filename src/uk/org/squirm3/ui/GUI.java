@@ -78,7 +78,8 @@ public class GUI {
 		ReactionEditorView reactionEditorView = new ReactionEditorView(iApplicationEngine);
 		StateView stateView = new StateView(iApplicationEngine);
 		LevelNavigatorView levelNavigatorView = new LevelNavigatorView(iApplicationEngine);
-		PropertyView propertyView = new PropertyView(iApplicationEngine);
+		CustomResetView customResetView = new CustomResetView(iApplicationEngine);
+		SpeedView speedView = new SpeedView(iApplicationEngine);
 		
 			//main panels
 		JComponent collisionsPanel 	= atomsView.getCollisionsPanel();
@@ -109,7 +110,7 @@ public class GUI {
 			simControlsPanel.add(createIconButton(stateView.getStopAction(),bg));
 			simControlsPanel.add(createIconButton(stateView.getRunAction(),bg));
 			simControlsPanel.add(createIconButton(stateView.getResetAction(),bg));
-			simControlsPanel.add(createIconButton(createParametersAction(propertyView.getParametersPanel(),atomsView.getControlsPanel()),bg));
+			simControlsPanel.add(createIconButton(createParametersAction(customResetView.getPanel(), speedView.getPanel(),atomsView.getControlsPanel()),bg));
 		toolBar.add(simControlsPanel);
 		toolBar.add(Box.createHorizontalGlue());
 			// navigation controls
@@ -165,11 +166,12 @@ public class GUI {
 		return button;
 	}
 	
-	private static Action createParametersAction(final JPanel p1, final JPanel p2) {
+	private static Action createParametersAction(final JPanel p1, final JPanel p2, final JPanel p3) {
 		final JPanel message = new JPanel();
 		message.setLayout(new BoxLayout(message, BoxLayout.PAGE_AXIS));
 		message.add(p1);
 		message.add(p2);
+		message.add(p3);
 		Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null, message,

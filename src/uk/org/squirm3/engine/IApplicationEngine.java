@@ -3,6 +3,7 @@ package uk.org.squirm3.engine;
 import java.util.Collection;
 import java.util.List;
 
+import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.DraggingPoint;
 import uk.org.squirm3.data.Level;
 
@@ -30,18 +31,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 public interface IApplicationEngine {
 	
-	public void goToLevel(int levelIndex);
+	public void goToLevel(int levelIndex, Configuration configuration);
 	public void goToFirstLevel();
 	public void goToLastLevel();
 	public void goToNextLevel();
 	public void goToPreviousLevel();
-	public void restartLevel();
+	public void restartLevel(Configuration configuration);
 	public Level getCurrentLevel();
 	public List getLevels();
 	
 	public Collection getAtoms();
-	public void setAtomsNumber(short newAtomsNumber);
-	public short getAtomsNumber();
 	
 	public Collection getReactions();
 	public void setReactions(Collection reactions);
@@ -55,10 +54,6 @@ public interface IApplicationEngine {
 	
 	public void setSimulationSpeed(short newSleepPeriod);
 	public short getSimulationSpeed();
-	
-	public void setSimulationSize(int width, int height);
-	public int getSimulationWidth();
-	public int getSimulationHeight();
 	
 	public void runSimulation();
 	public void pauseSimulation();

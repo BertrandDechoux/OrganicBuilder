@@ -37,7 +37,7 @@ import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.DraggingPoint;
 import uk.org.squirm3.engine.IApplicationEngine;
 import uk.org.squirm3.engine.IAtomListener;
-import uk.org.squirm3.engine.IPropertyListener;
+import uk.org.squirm3.engine.ILevelListener;
 
 import com.oreilly.java.awt.RoundGradientPaint;
 
@@ -62,7 +62,7 @@ along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class AtomsView implements IView, IAtomListener, IPropertyListener {
+public class AtomsView implements IView, IAtomListener, ILevelListener {
 	private IApplicationEngine iApplicationEngine;
 	
 	private DraggingPoint draggingPoint;
@@ -99,7 +99,7 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 		atomsHaveChanged();
 		draggingPointHasChanged();
 		iApplicationEngine.getEngineDispatcher().addAtomListener(this);
-		iApplicationEngine.getEngineDispatcher().addPropertyListener(this);
+		iApplicationEngine.getEngineDispatcher().addLevelListener(this);
 	}
 	
 	private static void createAtomsImages() {
@@ -193,8 +193,8 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 	}
 
 	public void simulationSizeHasChanged() {
-		simulationHeight = iApplicationEngine.getSimulationHeight();
-		simulationWidth = iApplicationEngine.getSimulationWidth();
+		simulationHeight = (int)iApplicationEngine.getCurrentLevel().getConfiguration().getHeight();
+		simulationWidth = (int)iApplicationEngine.getCurrentLevel().getConfiguration().getWidth();
 		imageSizeHasChanged();
 	}
 	
@@ -402,14 +402,12 @@ public class AtomsView implements IView, IAtomListener, IPropertyListener {
 	
 	}
 
-	public void atomsNumberHasChanged() {
-		// no use but part of IPropertyListener
-		// TODO write an adaptater ?
+	public void levelHasChanged() {
+		simulationSizeHasChanged();
 	}
 
-	public void simulationSpeedHasChanged() {
-		// no use but part of IPropertyListener
-		// TODO write an adaptater ?
+	public void configurationHasChanged() {
+		simulationSizeHasChanged();
 	}
 
 }

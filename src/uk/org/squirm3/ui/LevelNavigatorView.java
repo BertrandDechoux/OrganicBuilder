@@ -88,7 +88,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 		cb.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						iApplicationEngine.goToLevel(levelComboBox.getSelectedIndex());
+						iApplicationEngine.goToLevel(levelComboBox.getSelectedIndex(),null);
 					}
 				});
 		cb.setToolTipText(Application.localize(new String[] {"interface","navigation","selected"}));
@@ -141,7 +141,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 
 	private void updateControls() {
 		final List levelList = iApplicationEngine.getLevels();
-		final int levelNumber = iApplicationEngine.getCurrentLevel().getId();
+		final int levelNumber = iApplicationEngine.getLevels().indexOf(iApplicationEngine.getCurrentLevel());
 		
 		final boolean firstLevel = levelNumber==0;
 		intro.setEnabled(!firstLevel);

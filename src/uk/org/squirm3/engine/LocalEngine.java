@@ -48,8 +48,6 @@ public class LocalEngine implements IApplicationEngine {
 	private final EulerCollider collider;
 	private Thread thread;
 	// simulation's attributes
-	private int simulationHeight;
-	private int simulationWidth;
 	public boolean resetNeeded;
 	private short sleepPeriod; // how many milliseconds to sleep for each iteration (user changeable)
 	// things to do with the dragging around of atoms
@@ -60,20 +58,14 @@ public class LocalEngine implements IApplicationEngine {
 	private final List levelList;
 	private int levelIndex;
 	
-	public LocalEngine(){	//TODO values should'nt be hardcoded, properties files ?
-		levelList = new ArrayList();
-		addLevels();
-		engineDispatcher = new EngineDispatcher();
-		simulationHeight = 550;
-		simulationWidth = 650;
-		resetNeeded = false;
-		sleepPeriod = 50;
-		collider = new EulerCollider(50, simulationWidth, simulationHeight);
-		goToLevel(0);
-	}
-	
-	private void addLevels() {
+	public LocalEngine() {
+		// TODO values should'nt be hardcoded, properties files ?
+		final int simulationWidth = 650;
+		final int simulationHeight = 550;
+		final int numberOfAtoms = 50;
 		final Configuration configuration = new Configuration(50, Level.TYPES, simulationWidth, simulationHeight);
+		// challenges
+		levelList = new ArrayList();
 		levelList.add(new Intro(configuration));
 		levelList.add(new Join_As(configuration));
 		levelList.add(new Make_ECs(configuration));
@@ -94,11 +86,14 @@ public class LocalEngine implements IApplicationEngine {
 		levelList.add(new Membrane_transport(configuration));
 		levelList.add(new Membrane_division(configuration));
 		levelList.add(new Cell_division(configuration));
-		Iterator it = levelList.iterator();
-		byte id = 0;
-		while(it.hasNext()) {
-			((Level)it.next()).setId(id++);
-		}
+		// manager of the listeners
+		engineDispatcher = new EngineDispatcher();
+		resetNeeded = false;
+		sleepPeriod = 50;
+		// manager of the collisions
+		collider = new EulerCollider(numberOfAtoms, simulationWidth, simulationHeight);
+		// start the challenge by the introduction
+		goToLevel(0, null);
 	}
 	
 	public void clearReactions() {
@@ -116,10 +111,6 @@ public class LocalEngine implements IApplicationEngine {
 			list.add(atoms[i]);
 		}
 		return list;
-	}
-	
-	public short getAtomsNumber() {
-		return (short)collider.getNumAtoms();
 	}
 	
 	public DraggingPoint getCurrentDraggingPoint() {
@@ -141,16 +132,8 @@ public class LocalEngine implements IApplicationEngine {
 		return list;
 	}
 	
-	public int getSimulationHeight() {
-		return simulationHeight;
-	}
-	
 	public short getSimulationSpeed() {
 		return sleepPeriod;
-	}
-	
-	public int getSimulationWidth() {
-		return simulationWidth;
 	}
 	
 	public void pauseSimulation() {
@@ -182,13 +165,13 @@ public class LocalEngine implements IApplicationEngine {
 		runSimulation();
 	}
 	
-	public void restartLevel() {
+	public void restartLevel(Configuration configuration) {
 		pauseSimulation();
-		int nAtoms = collider.getNumAtoms();
-		//TODO the user interface should send the configuration isntance directly
-		final Configuration configuration = new Configuration(nAtoms, Level.TYPES, simulationWidth, simulationHeight);
 		Atom[] newAtoms = currentLevel.createAtoms(configuration);
-		collider.setAtoms(newAtoms, simulationWidth, simulationHeight);
+		collider.setNAtoms(currentLevel.getConfiguration().getNumberOfAtoms());
+		collider.setAtoms(newAtoms, (int)currentLevel.getConfiguration().getWidth(),
+				(int)currentLevel.getConfiguration().getHeight());
+		if(configuration!=null) engineDispatcher.configurationHasChanged();
 		engineDispatcher.atomsHaveChanged();
 		needToRestartLevel(false);
 	}
@@ -205,7 +188,8 @@ public class LocalEngine implements IApplicationEngine {
 					public void run()  {
 						while (thread == Thread.currentThread()) {
 							lastUsedDraggingPoint = draggingPoint;
-							collider.doTimeStep(simulationWidth, simulationHeight, draggingPoint);
+							collider.doTimeStep((int)currentLevel.getConfiguration().getWidth(),
+									(int)currentLevel.getConfiguration().getHeight(), draggingPoint);
 							engineDispatcher.atomsHaveChanged();
 							try {
 								Thread.sleep(sleepPeriod);
@@ -216,15 +200,6 @@ public class LocalEngine implements IApplicationEngine {
 		thread.setPriority(Thread.MIN_PRIORITY);
 		thread.start();
 		engineDispatcher.simulationStateHasChanged();
-	}
-	
-	
-	
-	public void setAtomsNumber(short newAtomsNumber) {
-		needToRestartLevel(true);
-		pauseSimulation();
-		collider.setNAtoms(newAtomsNumber);
-		engineDispatcher.atomsNumberHasChanged();
 	}
 	
 	public void setDraggingPoint(DraggingPoint newDraggingPoint) {
@@ -249,12 +224,6 @@ public class LocalEngine implements IApplicationEngine {
 		runSimulation();
 	}
 	
-	public void setSimulationSize(int width, int height) {
-		simulationWidth = width;
-		simulationHeight = height;
-		engineDispatcher.simulationSizeHasChanged();
-	}
-	
 	public void setSimulationSpeed(short newSleepPeriod) {
 		sleepPeriod = newSleepPeriod;
 		engineDispatcher.simulationSpeedHasChanged();
@@ -272,38 +241,37 @@ public class LocalEngine implements IApplicationEngine {
 		return engineDispatcher;
 	}
 	
-	public void goToLevel(int levelIndex) {
+	public void goToLevel(int levelIndex, Configuration configuration) {
 		this.levelIndex = levelIndex;
 		currentLevel = (Level)levelList.get(levelIndex);
 		pauseSimulation();
 		collider.setReactions(new Reaction[0]);
 		engineDispatcher.reactionsHaveChanged();
-		int nAtoms = collider.getNumAtoms();
-		//TODO the user interface should send the configuration isntance directly
-		final Configuration configuration = new Configuration(nAtoms, Level.TYPES, simulationWidth, simulationHeight);
 		Atom[] newAtoms = currentLevel.createAtoms(configuration);
-		collider.setAtoms(newAtoms, simulationWidth, simulationHeight);
+		collider.setNAtoms(currentLevel.getConfiguration().getNumberOfAtoms());
+		collider.setAtoms(newAtoms, (int)currentLevel.getConfiguration().getWidth(),
+				(int)currentLevel.getConfiguration().getHeight());
 		engineDispatcher.atomsHaveChanged();
 		engineDispatcher.levelHasChanged();
 		runSimulation();
 	}
 	
 	public void goToFirstLevel() {
-		goToLevel(0);
+		goToLevel(0, null);
 	}
 	
 	public void goToLastLevel() {
-		goToLevel(levelList.size()-1);
+		goToLevel(levelList.size()-1, null);
 	}
 	
 	public void goToNextLevel() {
 		if(levelIndex+1<levelList.size())
-			goToLevel(levelIndex+1);
+			goToLevel(levelIndex+1, null);
 	}
 	
 	public void goToPreviousLevel() {
 		if(levelIndex-1>=0)
-			goToLevel(levelIndex-1);
+			goToLevel(levelIndex-1, null);
 	}
 	
 	public List getLevels() {

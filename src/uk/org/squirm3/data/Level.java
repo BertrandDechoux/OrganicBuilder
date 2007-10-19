@@ -26,10 +26,6 @@ public abstract class Level {
 	private final String title, challenge, hint;
 	private Configuration configuration;
 	private final Configuration defaultConfiguration;
-
-	private byte id; // keep the number of this level
-	//TODO remove : should not be coded like that
-	// the element of the collection should not know where it is located
 	
 	public Level(String title, String challenge, String hint,
 			Configuration defaultConfiguration){
@@ -40,6 +36,9 @@ public abstract class Level {
 	}
 	
 	final public Atom[] createAtoms(Configuration configuration) {
+		if(configuration==null) {
+			return createAtoms_internal(getConfiguration());
+		}
 		Atom[] atoms = createAtoms_internal(configuration);
 		if(atoms!=null) setConfiguration(configuration);
 		return atoms;
@@ -89,13 +88,5 @@ public abstract class Level {
 				n++;
 			}
 		return true;
-	}
-
-	public byte getId() {
-		return id;
-	}
-
-	public void setId(byte id) {
-		this.id = id;
 	}
 }

@@ -54,16 +54,16 @@ public final class EngineDispatcher {
         return listeners.getListeners(ILevelListener.class);
     }
 
-    public void addPropertyListener(IPropertyListener listener) {
-        listeners.add(IPropertyListener.class, listener);
+    public void addSpeedListener(ISpeedListener listener) {
+        listeners.add(ISpeedListener.class, listener);
     }
     
-    public void removePropertyListener(IPropertyListener listener) {
-        listeners.remove(IPropertyListener.class, listener);
+    public void removeSpeedListener(ISpeedListener listener) {
+        listeners.remove(ISpeedListener.class, listener);
     }
     
-    public EventListener[] getPropertyListeners() {
-        return listeners.getListeners(IPropertyListener.class);
+    public EventListener[] getSpeedListeners() {
+        return listeners.getListeners(ISpeedListener.class);
     }
     
     public void addReactionListener(IReactionListener listener) {
@@ -97,13 +97,6 @@ public final class EngineDispatcher {
 		}
 	}
 
-	public void atomsNumberHasChanged() {
-		EventListener[] propertyListeners = getPropertyListeners();
-		for(int i = 0; i < propertyListeners.length ; i++) {
-			((IPropertyListener)propertyListeners[i]).atomsNumberHasChanged();
-		}
-	}
-
 	public void draggingPointHasChanged() {
 		EventListener[] atomListeners = getAtomListeners();
 		for(int i = 0; i < atomListeners.length ; i++) {
@@ -117,6 +110,13 @@ public final class EngineDispatcher {
 			((ILevelListener)levelListeners[i]).levelHasChanged();
 		}
 	}
+	
+	public void configurationHasChanged() {
+		EventListener[] levelListeners = getLevelListeners();
+		for(int i = 0; i < levelListeners.length ; i++) {
+			((ILevelListener)levelListeners[i]).configurationHasChanged();
+		}
+	}
 
 	public void reactionsHaveChanged() {
 		EventListener[] reactionListeners = getReactionListeners();
@@ -125,17 +125,10 @@ public final class EngineDispatcher {
 		}
 	}
 
-	public void simulationSizeHasChanged() {
-		EventListener[] propertyListeners = getPropertyListeners();
-		for(int i = 0; i < propertyListeners.length ; i++) {
-			((IPropertyListener)propertyListeners[i]).simulationSizeHasChanged();
-		}
-	}
-
 	public void simulationSpeedHasChanged() {
-		EventListener[] propertyListeners = getPropertyListeners();
+		EventListener[] propertyListeners = getSpeedListeners();
 		for(int i = 0; i < propertyListeners.length ; i++) {
-			((IPropertyListener)propertyListeners[i]).simulationSpeedHasChanged();
+			((ISpeedListener)propertyListeners[i]).simulationSpeedHasChanged();
 		}
 	}
 

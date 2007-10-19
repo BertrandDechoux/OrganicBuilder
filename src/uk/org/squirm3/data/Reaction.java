@@ -22,7 +22,7 @@ along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class Reaction {
+public final class Reaction {
 	private static final Pattern pattern = Pattern.compile("([a-f]|[xy])(\\d{1,2})" + "( ?\\+ ?| ?)" +
 			"([a-f]|[xy])(\\d{1,2})" + " ?=> ?" + "\\1(\\d{1,2})" +
 			"( ?\\+ ?| ?)" + "\\4(\\d{1,2})$");

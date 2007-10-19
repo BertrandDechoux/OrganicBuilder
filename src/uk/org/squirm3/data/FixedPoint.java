@@ -20,7 +20,7 @@ along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class FixedPoint implements IPhysicalPoint {
+public final class FixedPoint implements IPhysicalPoint {
 
 	private final float x, y;
 	
