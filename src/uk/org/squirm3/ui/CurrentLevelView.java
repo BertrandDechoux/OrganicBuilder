@@ -161,6 +161,8 @@ public class CurrentLevelView implements IView, ILevelListener {
 			evaluateButton.setEnabled(true);
 		}	
 	}
+	
+	public void configurationHasChanged() {}
 }
 
 // interface ILogger : write the reactions that solved a challenge

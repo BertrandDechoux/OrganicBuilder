@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
+import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.DraggingPoint;
 import uk.org.squirm3.data.FixedPoint;
 import uk.org.squirm3.data.IPhysicalPoint;
@@ -72,26 +73,27 @@ public class LocalEngine implements IApplicationEngine {
 	}
 	
 	private void addLevels() {
-		levelList.add(new Intro());
-		levelList.add(new Join_As());
-		levelList.add(new Make_ECs());
-		levelList.add(new Line_Cs());
-		levelList.add(new Join_all());
-		levelList.add(new Connect_corners());
-		levelList.add(new Abcdef_chains());
-		levelList.add(new Join_same());
-		levelList.add(new Match_template());
-		levelList.add(new Break_molecule());
-		levelList.add(new Bond_prisoner());
-		levelList.add(new Pass_message());
-		levelList.add(new Split_ladder());
-		levelList.add(new Insert_atom());
-		levelList.add(new Make_ladder());
-		levelList.add(new Selfrep());
-		levelList.add(new Grow_membrane());
-		levelList.add(new Membrane_transport());
-		levelList.add(new Membrane_division());
-		levelList.add(new Cell_division());
+		final Configuration configuration = new Configuration(50, Level.TYPES, simulationWidth, simulationHeight);
+		levelList.add(new Intro(configuration));
+		levelList.add(new Join_As(configuration));
+		levelList.add(new Make_ECs(configuration));
+		levelList.add(new Line_Cs(configuration));
+		levelList.add(new Join_all(configuration));
+		levelList.add(new Connect_corners(configuration));
+		levelList.add(new Abcdef_chains(configuration));
+		levelList.add(new Join_same(configuration));
+		levelList.add(new Match_template(configuration));
+		levelList.add(new Break_molecule(configuration));
+		levelList.add(new Bond_prisoner(configuration));
+		levelList.add(new Pass_message(configuration));
+		levelList.add(new Split_ladder(configuration));
+		levelList.add(new Insert_atom(configuration));
+		levelList.add(new Make_ladder(configuration));
+		levelList.add(new Selfrep(configuration));
+		levelList.add(new Grow_membrane(configuration));
+		levelList.add(new Membrane_transport(configuration));
+		levelList.add(new Membrane_division(configuration));
+		levelList.add(new Cell_division(configuration));
 		Iterator it = levelList.iterator();
 		byte id = 0;
 		while(it.hasNext()) {
@@ -183,7 +185,9 @@ public class LocalEngine implements IApplicationEngine {
 	public void restartLevel() {
 		pauseSimulation();
 		int nAtoms = collider.getNumAtoms();
-		Atom[] newAtoms = currentLevel.resetAtoms(nAtoms, simulationWidth, simulationHeight);
+		//TODO the user interface should send the configuration isntance directly
+		final Configuration configuration = new Configuration(nAtoms, Level.TYPES, simulationWidth, simulationHeight);
+		Atom[] newAtoms = currentLevel.createAtoms(configuration);
 		collider.setAtoms(newAtoms, simulationWidth, simulationHeight);
 		engineDispatcher.atomsHaveChanged();
 		needToRestartLevel(false);
@@ -275,7 +279,9 @@ public class LocalEngine implements IApplicationEngine {
 		collider.setReactions(new Reaction[0]);
 		engineDispatcher.reactionsHaveChanged();
 		int nAtoms = collider.getNumAtoms();
-		Atom[] newAtoms = currentLevel.resetAtoms(nAtoms, simulationWidth, simulationHeight);
+		//TODO the user interface should send the configuration isntance directly
+		final Configuration configuration = new Configuration(nAtoms, Level.TYPES, simulationWidth, simulationHeight);
+		Atom[] newAtoms = currentLevel.createAtoms(configuration);
 		collider.setAtoms(newAtoms, simulationWidth, simulationHeight);
 		engineDispatcher.atomsHaveChanged();
 		engineDispatcher.levelHasChanged();
@@ -311,15 +317,16 @@ public class LocalEngine implements IApplicationEngine {
 class Intro extends Level //0
 {
 	
-	public Intro() {
+	public Intro(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","intro","title" }),
 				Application.localize(new String[] {"levels","intro","challenge" }),
-				Application.localize(new String[] {"levels","intro","title" }));
+				Application.localize(new String[] {"levels","intro","title" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
-		if(createAtoms(numberOfAtoms, TYPES, 0, width, 0, height, atoms)) return atoms;
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
+		if(createAtoms(configuration.getNumberOfAtoms(), configuration.getTypes(), 0, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		else return null;
 	}
 	
@@ -332,15 +339,16 @@ class Intro extends Level //0
 class Join_As extends Level //1
 {
 	
-	public Join_As() {
+	public Join_As(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","joinas","title" }),
 				Application.localize(new String[] {"levels","joinas","challenge" }),
-				Application.localize(new String[] {"levels","joinas","hint" }));
+				Application.localize(new String[] {"levels","joinas","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
-		if(createAtoms(numberOfAtoms, TYPES, 0, width, 0, height, atoms)) return atoms;
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
+		if(createAtoms(configuration.getNumberOfAtoms(), configuration.getTypes(), 0, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		else return null;
 	}
 	
@@ -370,15 +378,16 @@ class Join_As extends Level //1
 class Make_ECs extends Level //2
 {
 	
-	public Make_ECs() {
+	public Make_ECs(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","makeecs","title" }),
 				Application.localize(new String[] {"levels","makeecs","challenge" }),
-				Application.localize(new String[] {"levels","makeecs","hint" }));
+				Application.localize(new String[] {"levels","makeecs","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
-		if(createAtoms(numberOfAtoms, TYPES, 0, width, 0, height, atoms)) return atoms;
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
+		if(createAtoms(configuration.getNumberOfAtoms(), configuration.getTypes(), 0, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		else return null;
 	}
 	
@@ -409,15 +418,16 @@ class Line_Cs extends Level //3
 {
 	private Atom seed;
 	
-	public Line_Cs() {
+	public Line_Cs(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","linecs","title" }),
 				Application.localize(new String[] {"levels","linecs","challenge" }),
-				Application.localize(new String[] {"levels","linecs","hint" }));
+				Application.localize(new String[] {"levels","linecs","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
-		if(createAtoms(numberOfAtoms, TYPES, 0, width, 0, height, atoms)) {
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
+		if(createAtoms(configuration.getNumberOfAtoms(), configuration.getTypes(), 0, configuration.getWidth(), 0, configuration.getHeight(), atoms)) {
 			for(int i = 0; i < atoms.length; i++) {
 				if(atoms[i].getType()==2) {
 					seed = atoms[i];
@@ -425,8 +435,8 @@ class Line_Cs extends Level //3
 					return atoms;
 				}
 			}
-			return null;
-		} else return null;
+		}
+		return null;
 	}
 	
 	public String evaluate(Atom[] atoms) {
@@ -463,15 +473,16 @@ class Line_Cs extends Level //3
 class Join_all extends Level //4
 {
 	
-	public Join_all() {
+	public Join_all(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","joinall","title" }),
 				Application.localize(new String[] {"levels","joinall","challenge" }),
-				Application.localize(new String[] {"levels","joinall","hint" }));
+				Application.localize(new String[] {"levels","joinall","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
-		if(createAtoms(numberOfAtoms, TYPES, 0, width, 0, height, atoms)) return atoms;
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
+		if(createAtoms(configuration.getNumberOfAtoms(), configuration.getTypes(), 0, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		else return null;
 	}
 	
@@ -490,18 +501,19 @@ class Join_all extends Level //4
 class Connect_corners extends Level //5
 {
 	
-	public Connect_corners() {
+	public Connect_corners(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","connectcorners","title" }),
 				Application.localize(new String[] {"levels","connectcorners","challenge" }),
-				Application.localize(new String[] {"levels","connectcorners","hint" }));
+				Application.localize(new String[] {"levels","connectcorners","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		atoms[0] = new Atom(new FixedPoint(size*1.5f, size*1.5f),5,1);
-		atoms[1] = new Atom(new FixedPoint(width-size*1.5f, height-size*1.5f),3,1);
-		if(createAtoms(numberOfAtoms-2 , TYPES, 0, width, 2*size, height-2*size, atoms)) return atoms;
+		atoms[1] = new Atom(new FixedPoint(configuration.getWidth()-size*1.5f, configuration.getHeight()-size*1.5f),3,1);
+		if(createAtoms(configuration.getNumberOfAtoms()-2 , configuration.getTypes(), 0, configuration.getWidth(), 2*size, configuration.getHeight()-2*size, atoms)) return atoms;
 		return null;
 	}
 	
@@ -519,15 +531,16 @@ class Connect_corners extends Level //5
 class Abcdef_chains extends Level //6
 {
 	
-	public Abcdef_chains() {
+	public Abcdef_chains(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","abcdefchains","title" }),
 				Application.localize(new String[] {"levels","abcdefchains","challenge" }),
-				Application.localize(new String[] {"levels","abcdefchains","hint" }));
+				Application.localize(new String[] {"levels","abcdefchains","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
-		if(createAtoms(numberOfAtoms, TYPES, 0, width, 0, height, atoms)) return atoms;
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
+		if(createAtoms(configuration.getNumberOfAtoms(), configuration.getTypes(), 0, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		else return null;
 	}
 	
@@ -562,15 +575,16 @@ class Abcdef_chains extends Level //6
 class Join_same extends Level //7
 {
 	
-	public Join_same() {
+	public Join_same(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","joinsame","title" }),
 				Application.localize(new String[] {"levels","joinsame","challenge" }),
-				Application.localize(new String[] {"levels","joinsame","hint" }));
+				Application.localize(new String[] {"levels","joinsame","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
-		if(createAtoms(numberOfAtoms, TYPES, 0, width, 0, height, atoms)) return atoms;
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
+		if(createAtoms(configuration.getNumberOfAtoms(), configuration.getTypes(), 0, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		else return null;
 	}
 	
@@ -601,14 +615,15 @@ class Join_same extends Level //7
 class Match_template extends Level //8
 {
 	
-	public Match_template() {
+	public Match_template(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","matchtemplate","title" }),
 				Application.localize(new String[] {"levels","matchtemplate","challenge" }),
-				Application.localize(new String[] {"levels","matchtemplate","hint" }));
+				Application.localize(new String[] {"levels","matchtemplate","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		Random PRNG = new Random(); // a prng for use when resetting atoms
 		// place and bond six random atoms to form a template
@@ -617,7 +632,7 @@ class Match_template extends Level //8
 			if(i>0)
 				atoms[i].bondWith(atoms[i-1]);
 		}
-		if(createAtoms(numberOfAtoms-6 , TYPES, 2.5f*size, width, 0, height, atoms)) return atoms;
+		if(createAtoms(configuration.getNumberOfAtoms()-6 , configuration.getTypes(), 2.5f*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		return null;
 	}
 	
@@ -638,14 +653,15 @@ class Match_template extends Level //8
 class Break_molecule extends Level //9
 {
 	
-	public Break_molecule() {
+	public Break_molecule(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","breakmolecule","title" }),
 				Application.localize(new String[] {"levels","breakmolecule","challenge" }),
-				Application.localize(new String[] {"levels","breakmolecule","hint" }));
+				Application.localize(new String[] {"levels","breakmolecule","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		// place and bond 10 atoms to form a template
 		IPhysicalPoint mobilePoint = new MobilePoint();
@@ -653,11 +669,12 @@ class Break_molecule extends Level //9
 			final int type = (i<5)?0:3;
 			mobilePoint.setPositionX(size*1.5f);
 			mobilePoint.setPositionY(size*1.5f+i*size*2.1f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, type, 1);
 			if(i>0)
 				atoms[i].bondWith(atoms[i-1]);
 		}
-		if(createAtoms(numberOfAtoms-10 , TYPES, 2.5f*size, width, 0, height, atoms)) return atoms;
+		if(createAtoms(configuration.getNumberOfAtoms()-10 , configuration.getTypes(), 2.5f*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		return null;
 	}
 	
@@ -675,15 +692,16 @@ class Bond_prisoner extends Level //10
 {
 	private Atom prisoner;
 	
-	public Bond_prisoner() {
+	public Bond_prisoner(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","bondprisoner","title" }),
 				Application.localize(new String[] {"levels","bondprisoner","challenge" }),
-				Application.localize(new String[] {"levels","bondprisoner","hint" }));
+				Application.localize(new String[] {"levels","bondprisoner","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
+	protected Atom[] createAtoms_internal(Configuration configuration){
 		prisoner = null;
-		Atom[] atoms = new Atom[numberOfAtoms];
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		// place and bond 8 atoms to form a loop
 		IPhysicalPoint mobilePoint = new MobilePoint();
@@ -696,6 +714,7 @@ class Bond_prisoner extends Level //10
 			else state = 2;
 			mobilePoint.setPositionX(size*4.0f + pos_x[i]*size*2.0f);
 			mobilePoint.setPositionY(size*7.0f + pos_y[i]*size*2.0f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, 0, state);
 		}
 		for(int i=0;i<8;i++) atoms[i].bondWith(atoms[(i+1)%8]);
@@ -704,7 +723,7 @@ class Bond_prisoner extends Level //10
 		mobilePoint.setPositionY(size*7.0f);
 		atoms[8] = new Atom(mobilePoint, 5, 1);
 		// create the others atoms
-		if(createAtoms(numberOfAtoms-9 , TYPES, 7*size, width, 0, height, atoms)) {
+		if(createAtoms(configuration.getNumberOfAtoms()-9 , configuration.getTypes(), 7*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) {
 			for(int i = 0; i < atoms.length; i++) {
 				if(atoms[i].getType()==5) {
 					prisoner = atoms[i];
@@ -729,14 +748,15 @@ class Bond_prisoner extends Level //10
 class Pass_message extends Level //11
 {
 	
-	public Pass_message() {
+	public Pass_message(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","passmessage","title" }),
 				Application.localize(new String[] {"levels","passmessage","challenge" }),
-				Application.localize(new String[] {"levels","passmessage","hint" }));
+				Application.localize(new String[] {"levels","passmessage","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		// place and bond 10 atoms to form a template
 		Random PRNG = new Random(); // a prng for use when resetting atoms
@@ -745,11 +765,12 @@ class Pass_message extends Level //11
 			final int state = (i==0)?2:1;
 			mobilePoint.setPositionX(size*1.5f);
 			mobilePoint.setPositionY(size*1.5f+i*size*2.1f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, PRNG.nextInt(6), state);
 			if(i>0)
 				atoms[i].bondWith(atoms[i-1]);
 		}
-		if(createAtoms(numberOfAtoms-10 , TYPES, 2.5f*size, width, 0, height, atoms)) return atoms;
+		if(createAtoms(configuration.getNumberOfAtoms()-10 , configuration.getTypes(), 2.5f*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		return null;
 	}
 	
@@ -768,14 +789,15 @@ class Pass_message extends Level //11
 class Split_ladder extends Level //12
 {
 	
-	public Split_ladder() {
+	public Split_ladder(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","splitladder","title" }),
 				Application.localize(new String[] {"levels","splitladder","challenge" }),
-				Application.localize(new String[] {"levels","splitladder","hint" }));
+				Application.localize(new String[] {"levels","splitladder","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		// place and bond 20 atoms to form a template
 		Random PRNG = new Random(); // a prng for use when resetting atoms
@@ -787,13 +809,14 @@ class Split_ladder extends Level //12
 			final float y = (i<10)?(size*3+i*size*2.1f):(size*3+(i-10)*size*2.1f);
 			mobilePoint.setPositionX(x);
 			mobilePoint.setPositionY(y);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, type, state);
 			if(i!=0 && i!=10)
 				atoms[i].bondWith(atoms[i-1]);
 			if(i>=10)
 				atoms[i].bondWith(atoms[i-10]);
 		}
-		if(createAtoms(numberOfAtoms-20 , TYPES, 4.5f*size, width, 0, height, atoms)) return atoms;
+		if(createAtoms(configuration.getNumberOfAtoms()-20 , configuration.getTypes(), 4.5f*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		return null;
 	}
 	
@@ -810,14 +833,15 @@ class Split_ladder extends Level //12
 class Insert_atom extends Level //13
 {
 	
-	public Insert_atom() {
+	public Insert_atom(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","insertatom","title" }),
 				Application.localize(new String[] {"levels","insertatom","challenge" }),
-				Application.localize(new String[] {"levels","insertatom","hint" }));
+				Application.localize(new String[] {"levels","insertatom","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		// place and bond 10 atoms to form a template
 		IPhysicalPoint mobilePoint = new MobilePoint();
@@ -828,11 +852,12 @@ class Insert_atom extends Level //13
 			else state =1;
 			mobilePoint.setPositionX(size*1.5f);
 			mobilePoint.setPositionY(size*3.0f+i*size*2.1f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, 4, state);
 			if(i>0)
 				atoms[i].bondWith(atoms[i-1]);
 		}
-		if(createAtoms(numberOfAtoms-10 , TYPES, 2.5f*size, width, 0, height, atoms)) return atoms;
+		if(createAtoms(configuration.getNumberOfAtoms()-10 , configuration.getTypes(), 2.5f*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		return null;
 
 	}
@@ -862,14 +887,15 @@ class Insert_atom extends Level //13
 class Make_ladder extends Level //14
 {
 	
-	public Make_ladder() {
+	public Make_ladder(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","makeladder","title" }),
 				Application.localize(new String[] {"levels","makeladder","challenge" }),
-				Application.localize(new String[] {"levels","makeladder","hint" }));
+				Application.localize(new String[] {"levels","makeladder","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		// place and bond 6 atoms to form a template
 		Random PRNG = new Random(); // a prng for use when resetting atoms
@@ -881,11 +907,12 @@ class Make_ladder extends Level //14
 			else type = PRNG.nextInt(4); // 'a'-'d'
 			mobilePoint.setPositionX(size*1.5f);
 			mobilePoint.setPositionY(size*6.0f+i*size*2.1f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, type, 1);
 			if(i>0)
 				atoms[i].bondWith(atoms[i-1]);
 		}
-		if(createAtoms(numberOfAtoms-6 , TYPES, 2.5f*size, width, 0, height, atoms)) return atoms;
+		if(createAtoms(configuration.getNumberOfAtoms()-6 , configuration.getTypes(), 2.5f*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		return null;
 	}
 	
@@ -921,14 +948,15 @@ class Make_ladder extends Level //14
 class Selfrep extends Level //15
 {
 	
-	public Selfrep() {
+	public Selfrep(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","selfrep","title" }),
 				Application.localize(new String[] {"levels","selfrep","challenge" }),
-				Application.localize(new String[] {"levels","selfrep","hint" }));
+				Application.localize(new String[] {"levels","selfrep","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		Random PRNG = new Random(); // a prng for use when resetting atoms
 		// (ensure each type is used once (to allow multiple copies to be made))
@@ -942,11 +970,12 @@ class Selfrep extends Level //15
 			else type = genomes[which_genome][i-1];
 			mobilePoint.setPositionX(size*1.5f);
 			mobilePoint.setPositionY(size*6.0f+i*size*2.1f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, type, 1);
 			if(i>0)
 				atoms[i].bondWith(atoms[i-1]);
 		}
-		if(createAtoms(numberOfAtoms-6 , TYPES, 2.5f*size, width, 0, height, atoms)) return atoms;
+		if(createAtoms(configuration.getNumberOfAtoms()-6 , configuration.getTypes(), 2.5f*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) return atoms;
 		return null;
 	}
 	
@@ -997,14 +1026,15 @@ class Selfrep extends Level //15
 class Grow_membrane extends Level //16
 {
 	
-	public Grow_membrane() {
+	public Grow_membrane(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","growmembrane","title" }),
 				Application.localize(new String[] {"levels","growmembrane","challenge" }),
-				Application.localize(new String[] {"levels","growmembrane","hint" }));
+				Application.localize(new String[] {"levels","growmembrane","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		final IPhysicalPoint mobilePoint = new MobilePoint();
 		// place and bond 8 atoms to form a loop
@@ -1017,6 +1047,7 @@ class Grow_membrane extends Level //16
 			else state = 2;
 			mobilePoint.setPositionX(size*4.0f + pos_x[i]*size*2.0f);
 			mobilePoint.setPositionY(size*7.0f + pos_y[i]*size*2.0f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, 0, state);
 		}
 		for(int i=0;i<8;i++) atoms[i].bondWith(atoms[(i+1)%8]);
@@ -1025,7 +1056,7 @@ class Grow_membrane extends Level //16
 		mobilePoint.setPositionY(size*7.0f);
 		atoms[8] = new Atom(mobilePoint, 5, 1);
 		// create the others atoms
-		if(createAtoms(numberOfAtoms-9 , TYPES, 7*size, width, 0, height, atoms)) {
+		if(createAtoms(configuration.getNumberOfAtoms()-9 , configuration.getTypes(), 7*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) {
 			for(int i = 0; i < atoms.length; i++)
 				if(atoms[i].getType()==5) return atoms;
 		}
@@ -1067,14 +1098,15 @@ class Grow_membrane extends Level //16
 class Membrane_transport extends Level //17
 {
 	
-	public Membrane_transport() {
+	public Membrane_transport(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","membranetransport","title" }),
 				Application.localize(new String[] {"levels","membranetransport","challenge" }),
-				Application.localize(new String[] {"levels","membranetransport","hint" }));
+				Application.localize(new String[] {"levels","membranetransport","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		final IPhysicalPoint mobilePoint = new MobilePoint();
 		// place and bond N atoms to form a loop
@@ -1089,6 +1121,7 @@ class Membrane_transport extends Level //17
 			else state = 2;
 			mobilePoint.setPositionX(size*4.0f + pos_x[i]*size*2.0f);
 			mobilePoint.setPositionY(size*7.0f + pos_y[i]*size*2.0f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, 0, state);
 		}
 		for(int j=0;j<N;j++) atoms[j].bondWith(atoms[(j+1)%N]);
@@ -1097,10 +1130,11 @@ class Membrane_transport extends Level //17
 		for(;i<so_far+3;i++) {
 			mobilePoint.setPositionY(size*(7.0f+(i-so_far)*2.0f));
 			mobilePoint.setPositionX(size*4.0f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, (i-so_far)==0?1:4, 1);
 		}
 		// create the others atoms
-		if(createAtoms(numberOfAtoms-(N+1) , TYPES, 7*size, width, 0, height, atoms)) 
+		if(createAtoms(configuration.getNumberOfAtoms()-(N+1) , configuration.getTypes(), 7*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) 
 			return atoms;
 		return null;
 
@@ -1143,14 +1177,15 @@ class Membrane_transport extends Level //17
 class Membrane_division extends Level //18
 {
 	
-	public Membrane_division() {
+	public Membrane_division(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","membranedivision","title" }),
 				Application.localize(new String[] {"levels","membranedivision","challenge" }),
-				Application.localize(new String[] {"levels","membranedivision","hint" }));
+				Application.localize(new String[] {"levels","membranedivision","hint" }),
+				configuration);
 	}
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		final IPhysicalPoint mobilePoint = new MobilePoint();
 		// place and bond N atoms to form a loop
@@ -1164,11 +1199,12 @@ class Membrane_division extends Level //18
 			else state = 2;
 			mobilePoint.setPositionX(size*4.0f + pos_x[i]*size*2.0f);
 			mobilePoint.setPositionY(size*7.0f + pos_y[i]*size*2.0f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, 0, state);
 		}
 		for(int j=0;j<N;j++) atoms[j].bondWith(atoms[(j+1)%N]);
 		// create the others atoms
-		if(createAtoms(numberOfAtoms-N , TYPES, 7*size, width, 0, height, atoms)) 
+		if(createAtoms(configuration.getNumberOfAtoms()-N , configuration.getTypes(), 7*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) 
 			return atoms;
 		return null;
 	}
@@ -1204,15 +1240,16 @@ class Membrane_division extends Level //18
 class Cell_division extends Level //19
 {
 	
-	public Cell_division() {
+	public Cell_division(Configuration configuration) {
 		super(Application.localize(new String[] {"levels","celldivision","title" }),
 				Application.localize(new String[] {"levels","celldivision","challenge" }),
-				Application.localize(new String[] {"levels","celldivision","hint" }));
+				Application.localize(new String[] {"levels","celldivision","hint" }),
+				configuration);
 	}
 	
 	
-	public Atom[] resetAtoms(int numberOfAtoms, int width, int height){
-		Atom[] atoms = new Atom[numberOfAtoms];
+	protected Atom[] createAtoms_internal(Configuration configuration){
+		Atom[] atoms = new Atom[configuration.getNumberOfAtoms()];
 		final float size = Atom.getAtomSize();
 		Random PRNG = new Random(); // a prng for use when resetting atoms
 		// place and bond N atoms to form a loop
@@ -1225,6 +1262,7 @@ class Cell_division extends Level //19
 			final int state = (i==N-1 || i==N/2-1)?3:2;
 			mobilePoint.setPositionX(size*4.0f + pos_x[i]*size*2.0f);
 			mobilePoint.setPositionY(size*7.0f + pos_y[i]*size*2.0f);
+			Level.setRandomSpeed(mobilePoint);
 			atoms[i] = new Atom(mobilePoint, 0, state);
 
 		}
@@ -1253,7 +1291,7 @@ class Cell_division extends Level //19
 		}
 		// set one of the free-floating atoms to be a killer enzyme we must exclude from the cell
 		
-		if(createAtoms(numberOfAtoms-(N+6) , new int[] {0, 1, 2, 0, 3, 4, 0, 5}, 6*size, width, 0, height, atoms)) {
+		if(createAtoms(configuration.getNumberOfAtoms()-(N+6) , new int[] {0, 1, 2, 0, 3, 4, 0, 5}, 6*size, configuration.getWidth(), 0, configuration.getHeight(), atoms)) {
 			atoms[atoms.length-1] = new Atom(atoms[atoms.length-1].getPhysicalPoint(), Atom.KILLER_TYPE, 0);
 			return atoms;
 		}

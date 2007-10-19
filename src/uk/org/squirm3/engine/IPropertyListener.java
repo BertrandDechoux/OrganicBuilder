@@ -31,4 +31,5 @@ public interface IPropertyListener extends EventListener {
 	public void simulationSizeHasChanged();
 	
 	public void simulationSpeedHasChanged();
+
 }

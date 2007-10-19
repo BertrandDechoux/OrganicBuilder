@@ -18,7 +18,9 @@ import javax.swing.text.NumberFormatter;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.engine.IApplicationEngine;
+import uk.org.squirm3.engine.ILevelListener;
 import uk.org.squirm3.engine.IPropertyListener;
+import uk.org.squirm3.util.Analyzer;
 
 
 /**  
@@ -41,7 +43,7 @@ along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public class PropertyView implements IView, IPropertyListener {
+public class PropertyView implements IView, IPropertyListener, ILevelListener {
 
 	// components reflecting simulation's parameters
 	private /*final*/ JSlider speedSelector, atomNumberSelector, heightSelector, widthSelector;
@@ -219,6 +221,14 @@ public class PropertyView implements IView, IPropertyListener {
 		gbc.gridx = x;
 		gbc.gridy = y;
 		return gbc;
+	}
+
+	public void levelHasChanged() { }
+
+	public void configurationHasChanged() {
+		// TODO Auto-generated method stub
+		System.out.println(Analyzer.analyzeObject(
+				iApplicationEngine.getCurrentLevel().getConfiguration()));
 	}
 
 }

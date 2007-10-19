@@ -157,4 +157,6 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	public void levelHasChanged() {
 		updateControls();
 	}
+	
+	public void configurationHasChanged() {}
 }
