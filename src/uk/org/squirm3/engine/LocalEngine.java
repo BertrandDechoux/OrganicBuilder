@@ -40,12 +40,10 @@ import uk.org.squirm3.data.Reaction;
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-//TODO synchronized ?
 public class LocalEngine implements IApplicationEngine {
 	
 	private final EngineDispatcher engineDispatcher;
-	
-	private final EulerCollider collider;
+	private Collider collider;
 	private Thread thread;
 	// simulation's attributes
 	public boolean resetNeeded;
@@ -63,7 +61,8 @@ public class LocalEngine implements IApplicationEngine {
 		final int simulationWidth = 650;
 		final int simulationHeight = 550;
 		final int numberOfAtoms = 50;
-		final Configuration configuration = new Configuration(50, Level.TYPES, simulationWidth, simulationHeight);
+		final Configuration configuration = new Configuration(numberOfAtoms, Level.TYPES, simulationWidth, simulationHeight);
+		collider = new Collider(new Atom[0],1,1); // quick fix to avoid null pointer exception
 		// challenges
 		levelList = new ArrayList();
 		levelList.add(new Intro(configuration));
@@ -90,10 +89,10 @@ public class LocalEngine implements IApplicationEngine {
 		engineDispatcher = new EngineDispatcher();
 		resetNeeded = false;
 		sleepPeriod = 50;
-		// manager of the collisions
-		collider = new EulerCollider(numberOfAtoms, simulationWidth, simulationHeight);
 		// start the challenge by the introduction
-		goToLevel(0, null);
+		try {
+			goToLevel(0, null);
+		} catch(Exception e) {}
 	}
 	
 	public void clearReactions() {
@@ -165,15 +164,16 @@ public class LocalEngine implements IApplicationEngine {
 		runSimulation();
 	}
 	
-	public void restartLevel(Configuration configuration) {
+	public boolean restartLevel(Configuration configuration) {
 		pauseSimulation();
-		Atom[] newAtoms = currentLevel.createAtoms(configuration);
-		collider.setNAtoms(currentLevel.getConfiguration().getNumberOfAtoms());
-		collider.setAtoms(newAtoms, (int)currentLevel.getConfiguration().getWidth(),
+		Atom[] atoms = currentLevel.createAtoms(configuration);
+		if(atoms==null) return false;
+		collider = new Collider(atoms, (int)currentLevel.getConfiguration().getWidth(),
 				(int)currentLevel.getConfiguration().getHeight());
 		if(configuration!=null) engineDispatcher.configurationHasChanged();
 		engineDispatcher.atomsHaveChanged();
 		needToRestartLevel(false);
+		return true;
 	}
 	
 	private void needToRestartLevel(boolean b) {
@@ -241,37 +241,40 @@ public class LocalEngine implements IApplicationEngine {
 		return engineDispatcher;
 	}
 	
-	public void goToLevel(int levelIndex, Configuration configuration) {
+	public boolean goToLevel(int levelIndex, Configuration configuration) {
 		this.levelIndex = levelIndex;
 		currentLevel = (Level)levelList.get(levelIndex);
 		pauseSimulation();
 		collider.setReactions(new Reaction[0]);
 		engineDispatcher.reactionsHaveChanged();
-		Atom[] newAtoms = currentLevel.createAtoms(configuration);
-		collider.setNAtoms(currentLevel.getConfiguration().getNumberOfAtoms());
-		collider.setAtoms(newAtoms, (int)currentLevel.getConfiguration().getWidth(),
+		Atom[] atoms = currentLevel.createAtoms(configuration);
+		if(atoms==null) return false;
+		collider = new Collider(atoms, (int)currentLevel.getConfiguration().getWidth(),
 				(int)currentLevel.getConfiguration().getHeight());
 		engineDispatcher.atomsHaveChanged();
 		engineDispatcher.levelHasChanged();
 		runSimulation();
+		return true;
 	}
 	
-	public void goToFirstLevel() {
-		goToLevel(0, null);
+	public boolean goToFirstLevel() {
+		return goToLevel(0, null);
 	}
 	
-	public void goToLastLevel() {
-		goToLevel(levelList.size()-1, null);
+	public boolean goToLastLevel() {
+		return goToLevel(levelList.size()-1, null);
 	}
 	
-	public void goToNextLevel() {
+	public boolean goToNextLevel() {
 		if(levelIndex+1<levelList.size())
-			goToLevel(levelIndex+1, null);
+			return goToLevel(levelIndex+1, null);
+		return false;
 	}
 	
-	public void goToPreviousLevel() {
+	public boolean goToPreviousLevel() {
 		if(levelIndex-1>=0)
-			goToLevel(levelIndex-1, null);
+			return goToLevel(levelIndex-1, null);
+		return false;
 	}
 	
 	public List getLevels() {

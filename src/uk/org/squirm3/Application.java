@@ -39,8 +39,8 @@ public final class Application
 	static final private Properties levelsProps = new Properties();
 	static final private Properties interfaceProps = new Properties();;
 	
-	public Application(final JApplet applet, String language) {
-		initTranslator(language);
+	public Application(final JApplet applet) {
+		initTranslator(GUI.selecteLanguage());
 		final IApplicationEngine iApplicationEngine = new LocalEngine();
 	    SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
@@ -49,8 +49,8 @@ public final class Application
 	    });
 	}
 	
-	public Application(String language) {
-		this(null,language);
+	public Application() {
+		this(null);
 	}
 	
 	static private void initTranslator(String language) {
@@ -89,7 +89,7 @@ public final class Application
 		System.out.println(horizontalBar);
 		if(argv==null || argv.length==0 || (argv[0].length()==2 && argv[0].charAt(0)!='-')) {
 			System.out.println("Starting the Organic Builder...");
-			new Application((argv==null || argv.length==0)?null:argv[0]);
+			new Application();
 			System.out.println("Organic Builder is running.");
 		} else {
 			String parameter = argv[0].toLowerCase();

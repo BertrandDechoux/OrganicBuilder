@@ -31,12 +31,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 public interface IApplicationEngine {
 	
-	public void goToLevel(int levelIndex, Configuration configuration);
-	public void goToFirstLevel();
-	public void goToLastLevel();
-	public void goToNextLevel();
-	public void goToPreviousLevel();
-	public void restartLevel(Configuration configuration);
+	public boolean goToLevel(int levelIndex, Configuration configuration);
+	public boolean goToFirstLevel();
+	public boolean goToLastLevel();
+	public boolean goToNextLevel();
+	public boolean goToPreviousLevel();
+	public boolean restartLevel(Configuration configuration) ;
 	public Level getCurrentLevel();
 	public List getLevels();
 	

@@ -15,6 +15,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -57,14 +59,24 @@ public class GUI {
 		new GUI(iApplicationEngine, applet);
 	}
 	
-	private boolean isDocked = true;
-	
+	private boolean isDocked = true; //TODO this variable is not used?
+
+	public static String selecteLanguage() {
+		Icon icon1 = Resource.getIcon("uk");
+		Icon icon2 = Resource.getIcon("fr");
+		Object[] options = {icon1, icon2};
+		int n = JOptionPane.showOptionDialog(null,
+		    "", "en / fr", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+		    null, options, null);
+		if(n==1) return "fr";
+		else return "en";
+	}
 	public GUI(final IApplicationEngine iApplicationEngine, final JApplet applet) {
 		Resource.loadPictures();
 		
 			//frame
 		JFrame frame = new JFrame(Application.localize(new String[] {"interface","application","title"}));
-		frame.setSize(1070,620);
+		frame.setSize(1080,630);
 		if(applet==null) {
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		} else {

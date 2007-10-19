@@ -23,10 +23,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 public class Applet extends JApplet {
-	private static final String language = "language";
 	
 	public void init() {
-		new Application(this,getParameter(language));
+		new Application(this);
 	}
 
 }
