@@ -1,5 +1,0 @@
-> To run this application type : java -jar OrganicBuilder.jar
-Currently, only english and french are available. You are welcome to translate the Organic Builder to any another language.
-> To display this help use : java -jar OrganicBuilder.jar -help
-> To display information about this application : java -jar OrganicBuilder.jar -about
-> To display the full license of this application : java -jar OrganicBuilder.jar -license

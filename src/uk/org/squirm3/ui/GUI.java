@@ -16,7 +16,6 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -58,18 +57,17 @@ public class GUI {
 	public static void createGUI(final IApplicationEngine iApplicationEngine, final JApplet applet) {
 		new GUI(iApplicationEngine, applet);
 	}
-	
-	private boolean isDocked = true; //TODO this variable is not used?
 
-	public static String selecteLanguage() {
-		Icon icon1 = Resource.getIcon("uk");
-		Icon icon2 = Resource.getIcon("fr");
-		Object[] options = {icon1, icon2};
-		int n = JOptionPane.showOptionDialog(null,
-		    "", "en / fr", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-		    null, options, null);
-		if(n==1) return "fr";
-		else return "en";
+	public static String selectLanguage(String[] languages) {
+		Icon[] icons = new Icon[languages.length];
+		for(int i = 0; i < icons.length; i++) {
+			icons[i] = Resource.getIcon(languages[i]);
+		}
+		final int choice = JOptionPane.showOptionDialog(null,
+		    "", "Organic Builder", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+		    null, icons, null);
+		if(choice==JOptionPane.CLOSED_OPTION) return null;
+		else return languages[choice];
 	}
 	public GUI(final IApplicationEngine iApplicationEngine, final JApplet applet) {
 		Resource.loadPictures();
@@ -85,7 +83,8 @@ public class GUI {
 
 			//view
 		AtomsView atomsView = new AtomsView(iApplicationEngine);
-		CurrentLevelView currentLevelView = new CurrentLevelView(iApplicationEngine);
+		CurrentLevelView currentLevelView = new CurrentLevelView(iApplicationEngine,
+					Application.getConfiguration(new String[] {"logger", "url"}));
 		ReactionListView reactionListView = new ReactionListView(iApplicationEngine);
 		ReactionEditorView reactionEditorView = new ReactionEditorView(iApplicationEngine);
 		StateView stateView = new StateView(iApplicationEngine);

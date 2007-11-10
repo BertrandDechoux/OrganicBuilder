@@ -55,9 +55,12 @@ public class CurrentLevelView implements IView, ILevelListener {
 	private Level currentLevel;
 	
 	private final JPanel currentLevelPanel;
+	
+	private final ILogger logger;
 
-	public CurrentLevelView(IApplicationEngine iApplicationEngine) {
+	public CurrentLevelView(IApplicationEngine iApplicationEngine, String loggerUrl) {
 		currentLevelPanel = createCurrentLevelPanel();
+		logger = new NetLogger(loggerUrl);
 		this.iApplicationEngine = iApplicationEngine;
 		levelHasChanged();
 		iApplicationEngine.getEngineDispatcher().addLevelListener(this);	
@@ -115,8 +118,6 @@ public class CurrentLevelView implements IView, ILevelListener {
 					//TODO keep always the same object
 					// TODO store the url into a configuration file
 					final int levelNumber = iApplicationEngine.getLevels().indexOf(currentLevel);
-					ILogger logger = new NetLogger("http://organicbuilder.sourceforge.net/log-solution");
-					// Old one http://www.sq3.org.uk/Evolution/Squirm3/OrganicBuilder/logger.pl
 					logger.writeSolution(levelNumber, iApplicationEngine.getReactions());
 					
 					result = Application.localize(new String[] {"interface","level","fullsuccess"});

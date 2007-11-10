@@ -51,9 +51,7 @@
 		<!-- Create the application jar file -->
 		<jar jarfile="${release}/OrganicBuilder.jar">
 			<fileset dir="media" includes="about.html"/>
-			<fileset dir="media" includes="about.txt"/>
-			<fileset dir="media" includes="gpl.txt"/>
-			<fileset dir="media" includes="help.txt"/>
+			<fileset dir="media" includes="configuration.properties"/>
 			<fileset dir="media" includes="license.html"/>
 			<zipfileset dir="media/icons" prefix="icons"/>
 			<zipfileset dir="media/pictures" prefix="pictures"/>

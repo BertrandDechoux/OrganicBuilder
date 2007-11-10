@@ -30,17 +30,64 @@ along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public final class Application 
-{
-	static private final String translationsDirectory = "/translations";
-	static private final String levelsTranslationFilePath = translationsDirectory+"/levels";
-	static private final String interfaceTranslationFilePath = translationsDirectory+"/interface";
+public final class Application  {
+
+	private static Application currentApplication;
 	
-	static final private Properties levelsProps = new Properties();
-	static final private Properties interfaceProps = new Properties();;
+	public static void runAsApplet(JApplet applet) {
+		if(currentApplication!=null) return;
+		new Application(applet);
+	}
 	
-	public Application(final JApplet applet) {
-		initTranslator(GUI.selecteLanguage());
+	public static void runAsStandaloneApplication() {
+		if(currentApplication!=null) return;
+		new Application();
+	}
+	
+	public static void main(String argv[]) {
+		runAsStandaloneApplication();
+	}
+	
+	// path to finds the files needed for the translations
+	private final String levelsTranslationFilePath;
+	private final String interfaceTranslationFilePath;
+	// instances to store the translations (key-value)
+	private final Properties levelsProps = new Properties();
+	private final Properties interfaceProps = new Properties();
+	
+	// path of the file needed for the configuration
+	private static final String configurationFilePath = "/configuration.properties";
+	// instance to store the configuration (key-value)
+	private final Properties configurationProps = new Properties();
+	// string returned if the value wasn't found for translation
+	public static final String translationError = "ERROR : STRING NOT FOUND!";
+
+	private Application(final JApplet applet) {
+		currentApplication = this;
+		// load configuration
+		try{ configurationProps.load(Resource.class.getResourceAsStream(configurationFilePath));
+		} catch(Exception e) {}
+		// choose a language
+		String chosenLanguage = Application.getConfiguration(new String[] {"languages", "choice"});
+		if(chosenLanguage==null) {
+			final String[] languagesArray = Application.getConfiguration(new String[] {"languages", "available"}).split(" ");
+			if(languagesArray.length==1) chosenLanguage = languagesArray[0];
+			else chosenLanguage = GUI.selectLanguage(languagesArray);
+		}
+		// load translation
+		levelsTranslationFilePath = Application.getConfiguration(new String[] {"translation", "levels"});
+		interfaceTranslationFilePath = Application.getConfiguration(new String[] {"translation", "interface"});
+			// use files in the specified language
+			// for more information, see http://www.loc.gov/standards/iso639-2/englangn.html
+		try {
+			levelsProps.load(Resource.class.getResourceAsStream(levelsTranslationFilePath+"_"+chosenLanguage+".properties"));
+		    interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+"_"+chosenLanguage+".properties"));
+		} catch(Exception e) {// use default files
+			try {
+				levelsProps.load(Resource.class.getResourceAsStream(levelsTranslationFilePath+".properties"));
+				interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+".properties"));
+			} catch(Exception ex) {;}
+		}
 		final IApplicationEngine iApplicationEngine = new LocalEngine();
 	    SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
@@ -49,67 +96,28 @@ public final class Application
 	    });
 	}
 	
-	public Application() {
-		this(null);
-	}
-	
-	static private void initTranslator(String language) {
-		// use files in the specified language
-		// for more information
-		// http://www.loc.gov/standards/iso639-2/englangn.html
-		try{
-			levelsProps.load(Resource.class.getResourceAsStream(levelsTranslationFilePath+"_"+language+".properties"));
-		    interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+"_"+language+".properties"));
-			
-		} catch(Exception e) {// use default files
-			try {
-				levelsProps.load(Resource.class.getResourceAsStream(levelsTranslationFilePath+".properties"));
-				interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+".properties"));
-			} catch(Exception ex) {;}
-		}
-	}
+	private Application() { this(null); }
 	
 	static public String localize(String[] code) {
+		if(currentApplication==null) return null;
 		final String bundle = code[0];
 		String key = code[1];
 		for( int i = 2 ; i<code.length ; i++) {
 			key += "."+code[i];
 		}
 		if(bundle.equals("levels")) {
-			return levelsProps.getProperty(key,"ERROR : STRING NOT FOUND!");
+			return currentApplication.levelsProps.getProperty(key,translationError);
 		} else if(bundle.equals("interface")) {
-			return interfaceProps.getProperty(key,"ERROR : STRING NOT FOUND!");
+			return currentApplication.interfaceProps.getProperty(key,translationError);
 		} else return bundle+"/"+key;
 	}
-	
-	// if you want to run the organic builder as an application
-	public static void main(String argv[]) {
-		String horizontalBar = "*********************************************";
-		System.out.println();
-		System.out.println(horizontalBar);
-		if(argv==null || argv.length==0 || (argv[0].length()==2 && argv[0].charAt(0)!='-')) {
-			System.out.println("Starting the Organic Builder...");
-			new Application();
-			System.out.println("Organic Builder is running.");
-		} else {
-			String parameter = argv[0].toLowerCase();
-			if(parameter.equals("-help") || parameter.equals("-h")) {
-				printOutFile("help.txt");
-			}else if(parameter.equals("-about")) {
-				printOutFile("about.txt");
-			}else if(parameter.equals("-license")) {
-				printOutFile("gpl.txt");
-			}else {
-				System.err.println("Wrong parameters!");
-				System.out.println("To display the help use : java -jar OrganicBuilder.jar -help");
-			}
+
+	static public String getConfiguration(String[] code) {
+		if(currentApplication==null) return null;
+		String key = code[0];
+		for( int i = 1 ; i<code.length ; i++) {
+			key += "."+code[i];
 		}
-		System.out.println(horizontalBar);
-		System.out.println();
-	}
-	
-	
-	private static void printOutFile(String name) {
-		System.out.print(Resource.getFileContent(name));
+		return currentApplication.configurationProps.getProperty(key, null);
 	}
 }

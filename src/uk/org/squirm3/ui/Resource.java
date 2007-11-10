@@ -97,7 +97,7 @@ public class Resource
 		URL url = Resource.class.getResource("/icons/"+name+".png");
 		return new ImageIcon( Toolkit.getDefaultToolkit().createImage(url));
 	}
-	
+
 	// return the content of the file
 	public static String getFileContent(String fileName) {
 		StringBuffer sb = new StringBuffer();
