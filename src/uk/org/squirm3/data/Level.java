@@ -24,14 +24,18 @@ public abstract class Level {
 	public static final int[] TYPES = {0, 1, 2, 3, 4, 5};
 	
 	private final String title, challenge, hint;
+	private final String[] errors;
 	private Configuration configuration;
 	private final Configuration defaultConfiguration;
-	
-	public Level(String title, String challenge, String hint,
+
+	public Level(String title, String challenge, String hint, String[] errors,
 			Configuration defaultConfiguration){
 		this.title = title;
 		this.challenge = challenge; 
 		this.hint = hint;
+		this.errors = new String[errors.length];
+		System.arraycopy(errors, 0,
+                this.errors, 0, this.errors.length);
 		this.defaultConfiguration = defaultConfiguration;
 	}
 	
@@ -54,6 +58,10 @@ public abstract class Level {
 	public Configuration getDefaultConfiguration() { return defaultConfiguration; }
 	public Configuration getConfiguration() {
 		return (configuration==null)?defaultConfiguration:configuration;
+	}
+	
+	protected String getError(int number) {
+		return errors[number];
 	}
 	
 	protected void setConfiguration(Configuration configuration) {

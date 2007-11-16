@@ -1,6 +1,7 @@
-package uk.org.squirm3.engine;
+package uk.org.squirm3.listener;
 
 import java.util.EventListener;
+
 
 /**  
 Copyright 2007 Bertrand Dechoux
@@ -22,8 +23,8 @@ along with Organic Builder; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-public interface ISpeedListener extends EventListener {
-	
-	public void simulationSpeedHasChanged();
 
+public interface IStateListener extends EventListener {
+
+	public void simulationStateHasChanged();
 }

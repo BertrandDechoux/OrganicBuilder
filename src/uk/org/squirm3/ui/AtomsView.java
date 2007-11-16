@@ -35,9 +35,9 @@ import javax.swing.event.ChangeListener;
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.DraggingPoint;
-import uk.org.squirm3.engine.IApplicationEngine;
-import uk.org.squirm3.engine.IAtomListener;
-import uk.org.squirm3.engine.ILevelListener;
+import uk.org.squirm3.engine.ApplicationEngine;
+import uk.org.squirm3.listener.IAtomListener;
+import uk.org.squirm3.listener.ILevelListener;
 
 import com.oreilly.java.awt.RoundGradientPaint;
 
@@ -63,7 +63,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 public class AtomsView implements IView, IAtomListener, ILevelListener {
-	private IApplicationEngine iApplicationEngine;
+	private ApplicationEngine applicationEngine;
 	
 	private DraggingPoint draggingPoint;
 	private Atom[] latestAtomsCopy;
@@ -89,17 +89,17 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
 	private static final BufferedImage[] atomsImages = new BufferedImage[atomsColors.length];
 	
 
-	public AtomsView(IApplicationEngine iApplicationEngine) {
+	public AtomsView(ApplicationEngine applicationEngine) {
 		createAtomsImages();
 		needRepaint = true;
 		scale = 100;
 		collisionsPanel = createCollisionsPanel();
-		this.iApplicationEngine = iApplicationEngine;
+		this.applicationEngine = applicationEngine;
 		simulationSizeHasChanged();
 		atomsHaveChanged();
 		draggingPointHasChanged();
-		iApplicationEngine.getEngineDispatcher().addAtomListener(this);
-		iApplicationEngine.getEngineDispatcher().addLevelListener(this);
+		applicationEngine.getEngineDispatcher().addAtomListener(this);
+		applicationEngine.getEngineDispatcher().addLevelListener(this);
 	}
 	
 	private static void createAtomsImages() {
@@ -176,7 +176,7 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
 	}
 	
 	public void atomsHaveChanged() {
-		Collection c = iApplicationEngine.getAtoms();
+		Collection c = applicationEngine.getAtoms();
 		Iterator it = c.iterator();
 		latestAtomsCopy = new Atom[c.size()];
 		int i = 0;
@@ -188,13 +188,13 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
 	}
 
 	public void draggingPointHasChanged() {
-		draggingPoint = iApplicationEngine.getCurrentDraggingPoint();
+		draggingPoint = applicationEngine.getCurrentDraggingPoint();
 		imageHasChanged();
 	}
 
 	public void simulationSizeHasChanged() {
-		simulationHeight = (int)iApplicationEngine.getCurrentLevel().getConfiguration().getHeight();
-		simulationWidth = (int)iApplicationEngine.getCurrentLevel().getConfiguration().getWidth();
+		simulationHeight = (int)applicationEngine.getCurrentLevel().getConfiguration().getHeight();
+		simulationWidth = (int)applicationEngine.getCurrentLevel().getConfiguration().getWidth();
 		imageSizeHasChanged();
 	}
 	
@@ -303,8 +303,8 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
 		}
 		
 		// draw the dragging point used
-		if(iApplicationEngine.getLastUsedDraggingPoint()!=null) {
-			DraggingPoint lastUsedDraggingPoint = iApplicationEngine.getLastUsedDraggingPoint();
+		if(applicationEngine.getLastUsedDraggingPoint()!=null) {
+			DraggingPoint lastUsedDraggingPoint = applicationEngine.getLastUsedDraggingPoint();
 			g2.setStroke(new BasicStroke(1));
 			g2.setPaint(new Color(200,0,0,100));
 			g2.drawLine((int)lastUsedDraggingPoint.getX(),(int)lastUsedDraggingPoint.getY(),
@@ -339,7 +339,7 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
 								p1.x = latestAtomsCopy[i].getPhysicalPoint().getPositionX();
 								p1.y = latestAtomsCopy[i].getPhysicalPoint().getPositionY();
 								if(p2.distanceSq(p1)<R*R) {
-									iApplicationEngine.setDraggingPoint(
+									applicationEngine.setDraggingPoint(
 											new DraggingPoint((long)p2.x,
 													(long)p2.y, i));
 									break;
@@ -347,7 +347,7 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
 							}
 						}
 						public void mouseReleased(MouseEvent event) {
-							iApplicationEngine.setDraggingPoint(null);
+							applicationEngine.setDraggingPoint(null);
 						}
 					});
 			addMouseMotionListener(
@@ -355,7 +355,7 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
 						public void mouseDragged(MouseEvent event) {
 							if(draggingPoint!=null) {
 								float zoom = ((float)scale)/100;
-								iApplicationEngine.setDraggingPoint(
+								applicationEngine.setDraggingPoint(
 										new DraggingPoint((long)(event.getPoint().x/zoom),
 												(long)(event.getPoint().y/zoom), 
 												draggingPoint.getWhichBeingDragging()));
@@ -364,7 +364,7 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
 						public void mouseMoved(MouseEvent event) {
 							if(draggingPoint!=null) {
 								float zoom = ((float)scale)/100;
-								iApplicationEngine.setDraggingPoint(
+								applicationEngine.setDraggingPoint(
 										new DraggingPoint((long)(event.getPoint().x/zoom),
 												(long)(event.getPoint().y/zoom), 
 												draggingPoint.getWhichBeingDragging()));

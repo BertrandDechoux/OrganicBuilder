@@ -30,7 +30,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import uk.org.squirm3.Application;
-import uk.org.squirm3.engine.IApplicationEngine;
+import uk.org.squirm3.engine.ApplicationEngine;
 
 /**  
 Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
@@ -54,8 +54,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 public class GUI {
 	
-	public static void createGUI(final IApplicationEngine iApplicationEngine, final JApplet applet) {
-		new GUI(iApplicationEngine, applet);
+	public static void createGUI(final ApplicationEngine applicationEngine, final JApplet applet) {
+		new GUI(applicationEngine, applet);
 	}
 
 	public static String selectLanguage(String[] languages) {
@@ -69,7 +69,8 @@ public class GUI {
 		if(choice==JOptionPane.CLOSED_OPTION) return null;
 		else return languages[choice];
 	}
-	public GUI(final IApplicationEngine iApplicationEngine, final JApplet applet) {
+
+	public GUI(final ApplicationEngine applicationEngine, final JApplet applet) {
 		Resource.loadPictures();
 		
 			//frame
@@ -82,15 +83,15 @@ public class GUI {
 		}
 
 			//view
-		AtomsView atomsView = new AtomsView(iApplicationEngine);
-		CurrentLevelView currentLevelView = new CurrentLevelView(iApplicationEngine,
+		AtomsView atomsView = new AtomsView(applicationEngine);
+		CurrentLevelView currentLevelView = new CurrentLevelView(applicationEngine,
 					Application.getConfiguration(new String[] {"logger", "url"}));
-		ReactionListView reactionListView = new ReactionListView(iApplicationEngine);
-		ReactionEditorView reactionEditorView = new ReactionEditorView(iApplicationEngine);
-		StateView stateView = new StateView(iApplicationEngine);
-		LevelNavigatorView levelNavigatorView = new LevelNavigatorView(iApplicationEngine);
-		CustomResetView customResetView = new CustomResetView(iApplicationEngine);
-		SpeedView speedView = new SpeedView(iApplicationEngine);
+		ReactionListView reactionListView = new ReactionListView(applicationEngine);
+		ReactionEditorView reactionEditorView = new ReactionEditorView(applicationEngine);
+		StateView stateView = new StateView(applicationEngine);
+		LevelNavigatorView levelNavigatorView = new LevelNavigatorView(applicationEngine);
+		CustomResetView customResetView = new CustomResetView(applicationEngine);
+		SpeedView speedView = new SpeedView(applicationEngine);
 		
 			//main panels
 		JComponent collisionsPanel 	= atomsView.getCollisionsPanel();

@@ -11,8 +11,8 @@ import javax.swing.JComboBox;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Level;
-import uk.org.squirm3.engine.IApplicationEngine;
-import uk.org.squirm3.engine.ILevelListener;
+import uk.org.squirm3.engine.ApplicationEngine;
+import uk.org.squirm3.listener.ILevelListener;
 
 
 /**  
@@ -36,20 +36,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 public class LevelNavigatorView implements IView, ILevelListener {
-	private IApplicationEngine iApplicationEngine;
+	private ApplicationEngine applicationEngine;
 	
 	private final Action intro, previous, next, last;
 	private final JComboBox levelComboBox;
 	
 	
-	public LevelNavigatorView(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
+	public LevelNavigatorView(ApplicationEngine applicationEngine) {
+		this.applicationEngine = applicationEngine;
 		intro = createIntroAction();
 		previous = createPreviousAction();
 		levelComboBox = createLevelComboBox();
 		next = createNextAction();
 		last = createLastAction();
-		iApplicationEngine.getEngineDispatcher().addLevelListener(this);
+		applicationEngine.getEngineDispatcher().addLevelListener(this);
 		levelHasChanged();
 	}
 	
@@ -74,7 +74,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	}
 	
 	private JComboBox createLevelComboBox() {
-		List levelList = iApplicationEngine.getLevels();
+		List levelList = applicationEngine.getLevels();
 		String[] levelsLabels = new String[levelList.size()];
 		Iterator it = levelList.iterator();
 		int i = 0;
@@ -88,7 +88,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 		cb.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						iApplicationEngine.goToLevel(levelComboBox.getSelectedIndex(),null);
+						applicationEngine.goToLevel(levelComboBox.getSelectedIndex(),null);
 					}
 				});
 		cb.setToolTipText(Application.localize(new String[] {"interface","navigation","selected"}));
@@ -98,7 +98,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	private Action createIntroAction() {
 		final Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.goToFirstLevel();
+				applicationEngine.goToFirstLevel();
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","first"}));
@@ -109,7 +109,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	private Action createPreviousAction() {
 		final Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.goToPreviousLevel();
+				applicationEngine.goToPreviousLevel();
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","previous"}));
@@ -120,7 +120,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	private Action createNextAction() {
 		final Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.goToNextLevel();
+				applicationEngine.goToNextLevel();
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","next"}));
@@ -131,7 +131,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	private Action createLastAction() {
 		final Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.goToLastLevel();
+				applicationEngine.goToLastLevel();
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","last"}));
@@ -140,8 +140,8 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	}
 
 	private void updateControls() {
-		final List levelList = iApplicationEngine.getLevels();
-		final int levelNumber = iApplicationEngine.getLevels().indexOf(iApplicationEngine.getCurrentLevel());
+		final List levelList = applicationEngine.getLevels();
+		final int levelNumber = applicationEngine.getLevels().indexOf(applicationEngine.getCurrentLevel());
 		
 		final boolean firstLevel = levelNumber==0;
 		intro.setEnabled(!firstLevel);

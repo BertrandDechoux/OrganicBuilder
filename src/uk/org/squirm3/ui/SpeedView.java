@@ -15,8 +15,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import uk.org.squirm3.Application;
-import uk.org.squirm3.engine.IApplicationEngine;
-import uk.org.squirm3.engine.ISpeedListener;
+import uk.org.squirm3.engine.ApplicationEngine;
+import uk.org.squirm3.listener.ISpeedListener;
 
 
 /**  
@@ -46,10 +46,10 @@ public class SpeedView implements IView, ISpeedListener {
 	private final JFormattedTextField speedTF;
 	private final JPanel panel;
 	// use to communicate
-	private IApplicationEngine iApplicationEngine;
+	private ApplicationEngine applicationEngine;
 
-	public SpeedView(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
+	public SpeedView(ApplicationEngine applicationEngine) {
+		this.applicationEngine = applicationEngine;
 		panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
 			// speed
@@ -58,13 +58,13 @@ public class SpeedView implements IView, ISpeedListener {
 		gbc = createCustomGBC(1,0);
 		gbc.weightx = 80;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		speedSelector = new JSlider(1,100,iApplicationEngine.getSimulationSpeed());
+		speedSelector = new JSlider(1,100,applicationEngine.getSimulationSpeed());
 		speedSelector.setInverted(true);
 		speedSelector.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 			    JSlider source = (JSlider)e.getSource();
 			    if (!source.getValueIsAdjusting()) {
-			        SpeedView.this.iApplicationEngine.setSimulationSpeed((short)source.getValue());
+			        SpeedView.this.applicationEngine.setSimulationSpeed((short)source.getValue());
 			    }
 			}
 		});
@@ -72,17 +72,17 @@ public class SpeedView implements IView, ISpeedListener {
 		gbc = createCustomGBC(2,0);
 		gbc.weightx = 5;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		speedTF = createCustomTF(1, 100, iApplicationEngine.getSimulationSpeed());
+		speedTF = createCustomTF(1, 100, applicationEngine.getSimulationSpeed());
 		speedTF.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e) {
 				if ("value".equals(e.getPropertyName())) {
-					SpeedView.this.iApplicationEngine.setSimulationSpeed(((Number)e.getNewValue()).shortValue());
+					SpeedView.this.applicationEngine.setSimulationSpeed(((Number)e.getNewValue()).shortValue());
 				}
 			}
 		});
 		
 		panel.add(speedTF,gbc);
-		iApplicationEngine.getEngineDispatcher().addSpeedListener(this);
+		applicationEngine.getEngineDispatcher().addSpeedListener(this);
 	}
 	
 	public JPanel getPanel() {
@@ -90,7 +90,7 @@ public class SpeedView implements IView, ISpeedListener {
 	}
 
 	public void simulationSpeedHasChanged() {
-		int speed = iApplicationEngine.getSimulationSpeed();
+		int speed = applicationEngine.getSimulationSpeed();
 		speedTF.setValue(new Integer(speed));
 		speedSelector.setValue(speed);
 	}

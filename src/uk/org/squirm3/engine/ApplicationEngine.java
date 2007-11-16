@@ -2,6 +2,7 @@ package uk.org.squirm3.engine;
 
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import uk.org.squirm3.data.IPhysicalPoint;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.data.MobilePoint;
 import uk.org.squirm3.data.Reaction;
+import uk.org.squirm3.listener.EngineDispatcher;
 
 /**  
  Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
@@ -40,7 +42,7 @@ import uk.org.squirm3.data.Reaction;
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-public class LocalEngine implements IApplicationEngine {
+public class ApplicationEngine {
 	
 	private final EngineDispatcher engineDispatcher;
 	private Collider collider;
@@ -56,51 +58,68 @@ public class LocalEngine implements IApplicationEngine {
 	private final List levelList;
 	private int levelIndex;
 	
-	public LocalEngine() {
-		// TODO values should'nt be hardcoded, properties files ?
-		final int simulationWidth = 650;
-		final int simulationHeight = 550;
-		final int numberOfAtoms = 50;
+	public ApplicationEngine() {
+		final int simulationWidth = Integer.parseInt(Application.getConfiguration(new String[] {"simulation","width"}));
+		final int simulationHeight = Integer.parseInt(Application.getConfiguration(new String[] {"simulation","height"}));
+		final int numberOfAtoms = Integer.parseInt(Application.getConfiguration(new String[] {"simulation","atom","number"}));
+		
 		final Configuration configuration = new Configuration(numberOfAtoms, Level.TYPES, simulationWidth, simulationHeight);
-		collider = new Collider(new Atom[0],1,1); // quick fix to avoid null pointer exception
-		// challenges
+
+		// load levels
 		levelList = new ArrayList();
-		levelList.add(new Intro(configuration));
-		levelList.add(new Join_As(configuration));
-		levelList.add(new Make_ECs(configuration));
-		levelList.add(new Line_Cs(configuration));
-		levelList.add(new Join_all(configuration));
-		levelList.add(new Connect_corners(configuration));
-		levelList.add(new Abcdef_chains(configuration));
-		levelList.add(new Join_same(configuration));
-		levelList.add(new Match_template(configuration));
-		levelList.add(new Break_molecule(configuration));
-		levelList.add(new Bond_prisoner(configuration));
-		levelList.add(new Pass_message(configuration));
-		levelList.add(new Split_ladder(configuration));
-		levelList.add(new Insert_atom(configuration));
-		levelList.add(new Make_ladder(configuration));
-		levelList.add(new Selfrep(configuration));
-		levelList.add(new Grow_membrane(configuration));
-		levelList.add(new Membrane_transport(configuration));
-		levelList.add(new Membrane_division(configuration));
-		levelList.add(new Cell_division(configuration));
+		int i = 0;
+		while(true) {
+			String className = Application.getConfiguration(new String[] {"levels",new Integer(i).toString(),"class"});
+			if(className==null) break;
+			Class c = null;
+			try {
+				c = Class.forName(className);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			String key = Application.getConfiguration(new String[] {"levels",new Integer(i).toString(),"key"});
+			if(key==null) break;
+			Constructor[] cs = c.getConstructors();
+			final String title = Application.localize(new String[] {"levels",key,"title"});
+			final String texte = Application.localize(new String[] {"levels",key,"challenge"});
+			final String hint = Application.localize(new String[] {"levels",key,"hint"});
+			ArrayList errors = new ArrayList();
+			int j = 1;
+			while(true) {
+				String error = Application.localize(new String[] {"levels",key,"error",new Integer(j).toString()});
+				if(error==Application.TRANSLATION_ERROR) break;
+				else errors.add(error);
+				j++;
+			}
+			Object[] os = new Object[] {title,texte,hint,errors.toArray(new String[0]),configuration};
+			try {
+				Level l = (Level) cs[0].newInstance(os);
+				levelList.add(l);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			i++;
+		}
 		// manager of the listeners
 		engineDispatcher = new EngineDispatcher();
 		resetNeeded = false;
 		sleepPeriod = 50;
+		collider = new Collider(new Atom[0],1,1); // quick fix to avoid null pointer exception TODO change
 		// start the challenge by the introduction
 		try {
 			goToLevel(0, null);
 		} catch(Exception e) {}
 	}
-	
 	public void clearReactions() {
-		pauseSimulation();
-		Vector reactions = collider.getReactions();
-		reactions.clear();
-		engineDispatcher.reactionsHaveChanged();
-		runSimulation();
+		addCommand(new ICommand() {
+			public void execute() {
+				pauseSimulation();
+				Vector reactions = collider.getReactions();
+				reactions.clear();
+				engineDispatcher.reactionsHaveChanged();
+				runSimulation();
+			}
+		});
 	}
 	
 	public Collection getAtoms() {
@@ -136,44 +155,59 @@ public class LocalEngine implements IApplicationEngine {
 	}
 	
 	public void pauseSimulation() {
-		Thread target = thread;
-		thread = null;
-		if(target!=null) {
-			try {
-				target.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		addCommand(new ICommand() {
+			public void execute() {
+				Thread target = thread;
+				thread = null;
+				if(target!=null) {
+					try {
+						target.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				engineDispatcher.simulationStateHasChanged();
 			}
-		}
-		engineDispatcher.simulationStateHasChanged();
+		});
 	}
 	
-	public void addReactions(Collection reactions) {
-		pauseSimulation();
-		Vector colliderReactions = collider.getReactions();
-		colliderReactions.addAll(reactions);
-		engineDispatcher.reactionsHaveChanged();
-		runSimulation();	
+	public void addReactions(final Collection reactions) {
+		addCommand(new ICommand() {
+			public void execute() {
+				pauseSimulation();
+				Vector colliderReactions = collider.getReactions();
+				colliderReactions.addAll(reactions);
+				engineDispatcher.reactionsHaveChanged();
+				runSimulation();
+			}
+		});
 	}
 	
-	public void removeReactions(Collection reactions) {
-		pauseSimulation();
-		Vector colliderReactions = collider.getReactions();
-		colliderReactions.removeAll(reactions);
-		engineDispatcher.reactionsHaveChanged();
-		runSimulation();
+	public void removeReactions(final Collection reactions) {
+		addCommand(new ICommand() {
+			public void execute() {
+				pauseSimulation();
+				Vector colliderReactions = collider.getReactions();
+				colliderReactions.removeAll(reactions);
+				engineDispatcher.reactionsHaveChanged();
+				runSimulation();
+			}
+		});
 	}
 	
-	public boolean restartLevel(Configuration configuration) {
-		pauseSimulation();
-		Atom[] atoms = currentLevel.createAtoms(configuration);
-		if(atoms==null) return false;
-		collider = new Collider(atoms, (int)currentLevel.getConfiguration().getWidth(),
-				(int)currentLevel.getConfiguration().getHeight());
-		if(configuration!=null) engineDispatcher.configurationHasChanged();
-		engineDispatcher.atomsHaveChanged();
-		needToRestartLevel(false);
-		return true;
+	public void restartLevel(final Configuration configuration) {
+		addCommand(new ICommand() {
+			public void execute() {
+				pauseSimulation();
+				Atom[] atoms = currentLevel.createAtoms(configuration);
+				if(atoms==null) return;
+				collider = new Collider(atoms, (int)currentLevel.getConfiguration().getWidth(),
+						(int)currentLevel.getConfiguration().getHeight());
+				if(configuration!=null) engineDispatcher.configurationHasChanged();
+				engineDispatcher.atomsHaveChanged();
+				needToRestartLevel(false);
+			}
+		});
 	}
 	
 	private void needToRestartLevel(boolean b) {
@@ -182,24 +216,28 @@ public class LocalEngine implements IApplicationEngine {
 	}
 	
 	public void runSimulation() {
-		if(thread!=null || resetNeeded) return; // security check to avoid starting if already started
-		thread = new Thread(
-				new Runnable(){
-					public void run()  {
-						while (thread == Thread.currentThread()) {
-							lastUsedDraggingPoint = draggingPoint;
-							collider.doTimeStep((int)currentLevel.getConfiguration().getWidth(),
-									(int)currentLevel.getConfiguration().getHeight(), draggingPoint);
-							engineDispatcher.atomsHaveChanged();
-							try {
-								Thread.sleep(sleepPeriod);
-							} catch (InterruptedException e) { break; }
-						}
-					}
-				});
-		thread.setPriority(Thread.MIN_PRIORITY);
-		thread.start();
-		engineDispatcher.simulationStateHasChanged();
+		addCommand(new ICommand() {
+			public void execute() {
+				if(thread!=null || resetNeeded) return; // security check to avoid starting if already started
+				thread = new Thread(
+						new Runnable(){
+							public void run()  {
+								while (thread == Thread.currentThread()) {
+									lastUsedDraggingPoint = draggingPoint;
+									collider.doTimeStep((int)currentLevel.getConfiguration().getWidth(),
+											(int)currentLevel.getConfiguration().getHeight(), draggingPoint);
+									engineDispatcher.atomsHaveChanged();
+									try {
+										Thread.sleep(sleepPeriod);
+									} catch (InterruptedException e) { break; }
+								}
+							}
+						});
+				thread.setPriority(Thread.MIN_PRIORITY);
+				thread.start();
+				engineDispatcher.simulationStateHasChanged();
+			}
+		});
 	}
 	
 	public void setDraggingPoint(DraggingPoint newDraggingPoint) {
@@ -215,20 +253,29 @@ public class LocalEngine implements IApplicationEngine {
 		engineDispatcher.draggingPointHasChanged();
 	}
 	
-	public void setReactions(Collection reactions) {
-		pauseSimulation();
-		Vector colliderReactions = collider.getReactions();
-		colliderReactions.clear();
-		colliderReactions.addAll(reactions);
-		engineDispatcher.reactionsHaveChanged();
-		runSimulation();
+	public void setReactions(final Collection reactions) {
+		addCommand(new ICommand() {
+			public void execute() {
+				pauseSimulation();
+				Vector colliderReactions = collider.getReactions();
+				colliderReactions.clear();
+				colliderReactions.addAll(reactions);
+				engineDispatcher.reactionsHaveChanged();
+				runSimulation();
+			}
+		});
 	}
 	
-	public void setSimulationSpeed(short newSleepPeriod) {
-		sleepPeriod = newSleepPeriod;
-		engineDispatcher.simulationSpeedHasChanged();
+	public void setSimulationSpeed(final short newSleepPeriod) {
+		addCommand(new ICommand() {
+			public void execute() {
+				sleepPeriod = newSleepPeriod;
+				engineDispatcher.simulationSpeedHasChanged();
+			}
+		});
 	}
 	
+	//TODO getState and state object
 	public boolean simulationIsRunning() {
 		return thread!=null;
 	}
@@ -241,44 +288,67 @@ public class LocalEngine implements IApplicationEngine {
 		return engineDispatcher;
 	}
 	
-	public boolean goToLevel(int levelIndex, Configuration configuration) {
+	private void setLevel(int levelIndex, Configuration configuration) {
 		this.levelIndex = levelIndex;
 		currentLevel = (Level)levelList.get(levelIndex);
 		pauseSimulation();
 		collider.setReactions(new Reaction[0]);
 		engineDispatcher.reactionsHaveChanged();
 		Atom[] atoms = currentLevel.createAtoms(configuration);
-		if(atoms==null) return false;
+		if(atoms==null) return;
 		collider = new Collider(atoms, (int)currentLevel.getConfiguration().getWidth(),
 				(int)currentLevel.getConfiguration().getHeight());
 		engineDispatcher.atomsHaveChanged();
 		engineDispatcher.levelHasChanged();
 		runSimulation();
-		return true;
+		return;
 	}
 	
-	public boolean goToFirstLevel() {
-		return goToLevel(0, null);
+	public void goToLevel(final int levelIndex, final Configuration configuration) {
+		addCommand(new ICommand() {
+			public void execute() {
+				setLevel(levelIndex, configuration);
+			}
+		});
 	}
 	
-	public boolean goToLastLevel() {
-		return goToLevel(levelList.size()-1, null);
+	public void goToFirstLevel() { goToLevel(0, null); }
+	
+	public void goToLastLevel() {
+		addCommand(new ICommand() {
+			public void execute() {
+				setLevel(levelList.size()-1, null);
+			}
+		});
 	}
 	
-	public boolean goToNextLevel() {
-		if(levelIndex+1<levelList.size())
-			return goToLevel(levelIndex+1, null);
-		return false;
+	public void goToNextLevel() {
+		addCommand(new ICommand() {
+			public void execute() {
+				if(levelIndex+1<levelList.size()) setLevel(levelIndex+1, null);
+			}
+		});
 	}
 	
-	public boolean goToPreviousLevel() {
-		if(levelIndex-1>=0)
-			return goToLevel(levelIndex-1, null);
-		return false;
+	public void goToPreviousLevel() {
+		addCommand(new ICommand() {
+			public void execute() {
+				if(levelIndex-1>=0) setLevel(levelIndex-1, null);
+			}
+		});
 	}
 	
 	public List getLevels() {
 		return levelList;
+	}
+	
+	private interface ICommand {
+		public void execute();
+	}
+	
+	private void addCommand(ICommand c) {
+		// TODO synchronisation
+		c.execute();
 	}
 	
 }
@@ -288,11 +358,9 @@ public class LocalEngine implements IApplicationEngine {
 class Intro extends Level //0
 {
 	
-	public Intro(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","intro","title" }),
-				Application.localize(new String[] {"levels","intro","challenge" }),
-				Application.localize(new String[] {"levels","intro","title" }),
-				configuration);
+	public Intro(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -304,17 +372,13 @@ class Intro extends Level //0
 	public String evaluate(Atom[] atoms) { return null; } // Is this one called even one time ???
 }
 
-
 //*******************************************************************
-
 class Join_As extends Level //1
 {
 	
-	public Join_As(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","joinas","title" }),
-				Application.localize(new String[] {"levels","joinas","challenge" }),
-				Application.localize(new String[] {"levels","joinas","hint" }),
-				configuration);
+	public Join_As(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -326,8 +390,7 @@ class Join_As extends Level //1
 	public String evaluate(Atom[] atoms) {
 		// is any non-'a' atom bonded with any other?
 		for(int i=0;i<atoms.length;i++)
-			if(atoms[i].getType()!=0 && atoms[i].getBonds().size()>0)
-				return Application.localize(new String[] {"levels","joinas","error","1" });
+			if(atoms[i].getType()!=0 && atoms[i].getBonds().size()>0) return getError(1);
 		// is every 'a' atom bonded together in a big clump?
 		LinkedList a_atoms = new LinkedList();
 		for(int i=0;i<atoms.length;i++) {
@@ -338,8 +401,7 @@ class Join_As extends Level //1
 			}
 		}
 		for(int i=0;i<atoms.length;i++) 
-			if(atoms[i].getType()==0 && !a_atoms.contains(atoms[i]))
-				return Application.localize(new String[] {"levels","joinas","error","2" });
+			if(atoms[i].getType()==0 && !a_atoms.contains(atoms[i])) return getError(2);
 		return null;
 	}
 }
@@ -349,11 +411,9 @@ class Join_As extends Level //1
 class Make_ECs extends Level //2
 {
 	
-	public Make_ECs(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","makeecs","title" }),
-				Application.localize(new String[] {"levels","makeecs","challenge" }),
-				Application.localize(new String[] {"levels","makeecs","hint" }),
-				configuration);
+	public Make_ECs(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -367,19 +427,16 @@ class Make_ECs extends Level //2
 		int ec_pairs_found=0,loose_e_atoms_found=0,loose_c_atoms_found=0;
 		for(int i=0;i<atoms.length;i++) {
 			Atom atom = atoms[i];
-			if(atom.getType()!=2 && atom.getType()!=4 && atom.getBonds().size()!=0)
-				return Application.localize(new String[] {"levels","makeecs","error","1" });
+			if(atom.getType()!=2 && atom.getType()!=4 && atom.getBonds().size()!=0) return getError(1);
 			if(atom.getType()==2 || atom.getType()==4) {
-				if(atom.getBonds().size()>1)
-					return Application.localize(new String[] {"levels","makeecs","error","2" });
+				if(atom.getBonds().size()>1) return getError(2);
 				if(atom.getBonds().size()==0) {
 					if(atom.getType()==2) loose_c_atoms_found++;
 					else loose_e_atoms_found++;
 				}
 			}
 		}
-		if(Math.min(loose_c_atoms_found,loose_e_atoms_found)>0)
-			return Application.localize(new String[] {"levels","makeecs","error","3" });
+		if(Math.min(loose_c_atoms_found,loose_e_atoms_found)>0) return getError(3);
 		return null; }
 }
 
@@ -389,11 +446,9 @@ class Line_Cs extends Level //3
 {
 	private Atom seed;
 	
-	public Line_Cs(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","linecs","title" }),
-				Application.localize(new String[] {"levels","linecs","challenge" }),
-				Application.localize(new String[] {"levels","linecs","hint" }),
-				configuration);
+	public Line_Cs(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -419,22 +474,17 @@ class Line_Cs extends Level //3
 		for(int i=0;i<atoms.length;i++) {
 			Atom atom = atoms[i];
 			if(atom.getType()!=2) {
-				if(atom.getBonds().size()!=0) 
-					return Application.localize(new String[] {"levels","linecs","error","1" });;
+				if(atom.getBonds().size()!=0) return getError(1);
 					continue; // no other tests for non-'c' atoms
 			}
 			if(atom.getBonds().size()==1) single_bonded_atoms_found++;
 			else if(atom.getBonds().size()==2) double_bonded_atoms_found++;
-			else if(atom.getBonds().size()==0)
-				return Application.localize(new String[] {"levels","linecs","error","2" });
-			else
-				return Application.localize(new String[] {"levels","linecs","error","3" });
-			if(!joined.contains(atom))
-				return Application.localize(new String[] {"levels","linecs","error","4" });
+			else if(atom.getBonds().size()==0) return getError(2);
+			else return getError(3);
+			if(!joined.contains(atom)) return getError(4);
 		}
 		// one final check on chain configuration
-		if(single_bonded_atoms_found!=2)
-			return Application.localize(new String[] {"levels","linecs","error","5" });
+		if(single_bonded_atoms_found!=2) return getError(5);
 		return null;
 	}
 }
@@ -444,11 +494,9 @@ class Line_Cs extends Level //3
 class Join_all extends Level //4
 {
 	
-	public Join_all(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","joinall","title" }),
-				Application.localize(new String[] {"levels","joinall","challenge" }),
-				Application.localize(new String[] {"levels","joinall","hint" }),
-				configuration);
+	public Join_all(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -461,8 +509,7 @@ class Join_all extends Level //4
 		// all joined?
 		LinkedList joined = new LinkedList();
 		atoms[0].getAllConnectedAtoms(joined);
-		if(joined.size()!=atoms.length)
-			return Application.localize(new String[] {"levels","joinall","error","1" });
+		if(joined.size()!=atoms.length) return getError(1);
 		return null;
 	}
 }
@@ -472,11 +519,9 @@ class Join_all extends Level //4
 class Connect_corners extends Level //5
 {
 	
-	public Connect_corners(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","connectcorners","title" }),
-				Application.localize(new String[] {"levels","connectcorners","challenge" }),
-				Application.localize(new String[] {"levels","connectcorners","hint" }),
-				configuration);
+	public Connect_corners(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -492,9 +537,9 @@ class Connect_corners extends Level //5
 		// 0 joined to 1?
 		LinkedList joined = new LinkedList();
 		atoms[0].getAllConnectedAtoms(joined);
-		if(!joined.contains(atoms[1]))
-			return Application.localize(new String[] {"levels","connectcorners","error","1" });
-		return null; }
+		if(!joined.contains(atoms[1])) return getError(1);
+		return null;
+	}
 }
 
 //*******************************************************************
@@ -502,11 +547,9 @@ class Connect_corners extends Level //5
 class Abcdef_chains extends Level //6
 {
 	
-	public Abcdef_chains(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","abcdefchains","title" }),
-				Application.localize(new String[] {"levels","abcdefchains","challenge" }),
-				Application.localize(new String[] {"levels","abcdefchains","hint" }),
-				configuration);
+	public Abcdef_chains(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -533,10 +576,8 @@ class Abcdef_chains extends Level //6
 				// (this isn't a perfect test but hopefully close enough)
 			}
 		}
-		if(num_abcdef_chains_found==0)
-			return Application.localize(new String[] {"levels","abcdefchains","error","1" });
-		else if(num_abcdef_chains_found==1)
-			return Application.localize(new String[] {"levels","abcdefchains","error","1" });
+		if(num_abcdef_chains_found==0) return getError(1);
+		else if(num_abcdef_chains_found==1) return getError(2);
 		return null;
 	}
 }
@@ -546,11 +587,9 @@ class Abcdef_chains extends Level //6
 class Join_same extends Level //7
 {
 	
-	public Join_same(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","joinsame","title" }),
-				Application.localize(new String[] {"levels","joinsame","challenge" }),
-				Application.localize(new String[] {"levels","joinsame","hint" }),
-				configuration);
+	public Join_same(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -569,13 +608,12 @@ class Join_same extends Level //7
 			Iterator it = joined.iterator();
 			while(it.hasNext()) {
 				Atom other = (Atom)it.next();
-				if(other.getType() != atom.getType())
-					return Application.localize(new String[] {"levels","joinsame","error","1" });
+				if(other.getType() != atom.getType()) return getError(1);
 			}
 			// are there any atoms of the same type not on this list?
 			for(int j=0;j<atoms.length;j++)
 				if(atoms[j].getType() == atom.getType() && !joined.contains(atoms[j]))
-					return Application.localize(new String[] {"levels","joinsame","error","1" });
+					return getError(2);
 		}
 		return null;
 	}
@@ -586,11 +624,9 @@ class Join_same extends Level //7
 class Match_template extends Level //8
 {
 	
-	public Match_template(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","matchtemplate","title" }),
-				Application.localize(new String[] {"levels","matchtemplate","challenge" }),
-				Application.localize(new String[] {"levels","matchtemplate","hint" }),
-				configuration);
+	public Match_template(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -612,11 +648,11 @@ class Match_template extends Level //8
 		for(int i=0;i<6;i++) {
 			Atom a = atoms[i];
 			Atom b = (Atom)a.getBonds().getLast();
-			if(b.getType()!=a.getType() || b.getBonds().size()!=1)
-				return Application.localize(new String[] {"levels","matchtemplate","error","1" });
+			if(b.getType()!=a.getType() || b.getBonds().size()!=1) return getError(1);
 			// (not a complete test, but hopefully ok)
 		}
-		return null; }
+		return null;
+	}
 }
 
 //*******************************************************************
@@ -624,11 +660,9 @@ class Match_template extends Level //8
 class Break_molecule extends Level //9
 {
 	
-	public Break_molecule(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","breakmolecule","title" }),
-				Application.localize(new String[] {"levels","breakmolecule","challenge" }),
-				Application.localize(new String[] {"levels","breakmolecule","hint" }),
-				configuration);
+	public Break_molecule(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -652,9 +686,9 @@ class Break_molecule extends Level //9
 	public String evaluate(Atom[] atoms) {
 		int n_bonds[]={1,2,2,2,1,1,2,2,2,1};
 		for(int i=0;i<10;i++)
-			if(atoms[i].getBonds().size() != n_bonds[i])
-				return Application.localize(new String[] {"levels","breakmolecule","error","1" });
-		return null; }
+			if(atoms[i].getBonds().size() != n_bonds[i]) return getError(1);
+		return null;
+	}
 }
 
 //*******************************************************************
@@ -663,11 +697,9 @@ class Bond_prisoner extends Level //10
 {
 	private Atom prisoner;
 	
-	public Bond_prisoner(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","bondprisoner","title" }),
-				Application.localize(new String[] {"levels","bondprisoner","challenge" }),
-				Application.localize(new String[] {"levels","bondprisoner","hint" }),
-				configuration);
+	public Bond_prisoner(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -707,10 +739,8 @@ class Bond_prisoner extends Level //10
 	
 	public String evaluate(Atom[] atoms) {
 		// is the 'prisoner' atom bonded with an f?
-		if(prisoner.getBonds().size()==0)
-			return Application.localize(new String[] {"levels","bondprisonner","error","1" });
-		if(((Atom)atoms[8].getBonds().getFirst()).getType()!=5)
-			return Application.localize(new String[] {"levels","bondprisonner","error","2" });
+		if(prisoner.getBonds().size()==0) return getError(1);
+		if(((Atom)atoms[8].getBonds().getFirst()).getType()!=5) return getError(2);
 		return null; }
 }
 
@@ -719,11 +749,9 @@ class Bond_prisoner extends Level //10
 class Pass_message extends Level //11
 {
 	
-	public Pass_message(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","passmessage","title" }),
-				Application.localize(new String[] {"levels","passmessage","challenge" }),
-				Application.localize(new String[] {"levels","passmessage","hint" }),
-				configuration);
+	public Pass_message(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -748,11 +776,10 @@ class Pass_message extends Level //11
 	public String evaluate(Atom[] atoms) {
 		int n_bonds[]={1,2,2,2,2,2,2,2,2,1};
 		for(int i=0;i<10;i++)
-			if(atoms[i].getBonds().size() != n_bonds[i])
-				return Application.localize(new String[] {"levels","passmessage","error","1" });
-			else if(atoms[i].getState() != 2)
-				return Application.localize(new String[] {"levels","passmessage","error","2" });
-		return null; }
+			if(atoms[i].getBonds().size() != n_bonds[i]) return getError(1);
+			else if(atoms[i].getState() != 2) return getError(2);
+		return null;
+	}
 }
 
 //*******************************************************************
@@ -760,11 +787,9 @@ class Pass_message extends Level //11
 class Split_ladder extends Level //12
 {
 	
-	public Split_ladder(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","splitladder","title" }),
-				Application.localize(new String[] {"levels","splitladder","challenge" }),
-				Application.localize(new String[] {"levels","splitladder","hint" }),
-				configuration);
+	public Split_ladder(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -794,8 +819,7 @@ class Split_ladder extends Level //12
 	public String evaluate(Atom[] atoms) {
 		int n_bonds[]={1,2,2,2,2,2,2,2,2,1};
 		for(int i=0;i<20;i++)
-			if(atoms[i].getBonds().size() != n_bonds[i%10])
-				return Application.localize(new String[] {"levels","splitladder","error","1" });
+			if(atoms[i].getBonds().size() != n_bonds[i%10]) return getError(1);
 		return null; }
 }
 
@@ -804,11 +828,9 @@ class Split_ladder extends Level //12
 class Insert_atom extends Level //13
 {
 	
-	public Insert_atom(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","insertatom","title" }),
-				Application.localize(new String[] {"levels","insertatom","challenge" }),
-				Application.localize(new String[] {"levels","insertatom","hint" }),
-				configuration);
+	public Insert_atom(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -836,18 +858,15 @@ class Insert_atom extends Level //13
 	public String evaluate(Atom[] atoms) {
 		LinkedList joined = new LinkedList();
 		atoms[0].getAllConnectedAtoms(joined);
-		if(joined.size()!=11)
-			return Application.localize(new String[] {"levels","insertatom","error","1" });
+		if(joined.size()!=11) return getError(1);
 		int n_bonds[]={1,2,2,2,2,2,2,2,2,2,1};
 		int types[]={4,4,4,4,4,1,4,4,4,4,4};
 		int i = 0;
 		Iterator it = joined.iterator();
 		while(it.hasNext()) {
 			Atom a = (Atom)it.next();
-			if(a.getBonds().size()!=n_bonds[i])
-				return Application.localize(new String[] {"levels","insertatom","error","2" });
-			if( a.getType()!=types[i])
-				return Application.localize(new String[] {"levels","insertatom","error","3" });
+			if(a.getBonds().size()!=n_bonds[i]) return getError(2);
+			if( a.getType()!=types[i]) return getError(3);
 			i++;
 		}
 		return null; }
@@ -858,11 +877,9 @@ class Insert_atom extends Level //13
 class Make_ladder extends Level //14
 {
 	
-	public Make_ladder(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","makeladder","title" }),
-				Application.localize(new String[] {"levels","makeladder","challenge" }),
-				Application.localize(new String[] {"levels","makeladder","hint" }),
-				configuration);
+	public Make_ladder(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -890,10 +907,8 @@ class Make_ladder extends Level //14
 	public String evaluate(Atom[] atoms) {
 		LinkedList joined = new LinkedList();
 		atoms[0].getAllConnectedAtoms(joined);
-		if(joined.size()>12)
-			return Application.localize(new String[] {"levels","makeladder","error","1" });
-		else if(joined.size()<12)
-			return Application.localize(new String[] {"levels","makeladder","error","2" });
+		if(joined.size()>12) return getError(1);
+		else if(joined.size()<12) return getError(2);
 		// are the types matching?
 		int original_type_count[] = {0,0,0,0,0,0},new_type_count[]={0,0,0,0,0,0};
 		for(int i=0;i<6;i++) original_type_count[atoms[i].getType()]++;
@@ -901,15 +916,13 @@ class Make_ladder extends Level //14
 		while(it.hasNext()) new_type_count[((Atom)it.next()).getType()]++;
 		for(int i=0;i<6;i++)
 			if(new_type_count[i] != original_type_count[i]*2) 
-				return Application.localize(new String[] {"levels","makeladder","error","3" });
+				return getError(3);
 		it = joined.iterator();
 		while(it.hasNext()) { 
 			Atom a = (Atom)it.next();
 			if(a.getType()==4 || a.getType()==5) // 'e' and 'f' 
-				if(a.getBonds().size()!=2) 
-					return Application.localize(new String[] {"levels","makeladder","error","4" });
-				else if(a.getBonds().size()!=3)  
-					return Application.localize(new String[] {"levels","makeladder","error","5" });
+				if(a.getBonds().size()!=2) return getError(4);
+				else if(a.getBonds().size()!=3) return getError(5);
 		}
 		return null; }
 }
@@ -919,11 +932,9 @@ class Make_ladder extends Level //14
 class Selfrep extends Level //15
 {
 	
-	public Selfrep(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","selfrep","title" }),
-				Application.localize(new String[] {"levels","selfrep","challenge" }),
-				Application.localize(new String[] {"levels","selfrep","hint" }),
-				configuration);
+	public Selfrep(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -965,18 +976,18 @@ class Selfrep extends Level //15
 					first.getAllConnectedAtoms(joined);
 					
 					if(joined.size()!=6)
-						return Application.localize(new String[] {"levels","selfrep","error","1" });
+						return getError(1);
 					
 					Atom last = (Atom)joined.getLast();
 					if (first.getBonds().size()!=1 || last.getBonds().size()!=1 || last.getType()!=5)
-						return Application.localize(new String[] {"levels","selfrep","error","2" });
+						return getError(2);
 					
 					for(int j=1;j<joined.size()-1;j++) {
 						Atom a = (Atom)joined.get(j);
 						if (a.getBonds().size()!=2)
-							return Application.localize(new String[] {"levels","selfrep","error","3" });				
+							return getError(3);			
 						if(a.getType() != atoms[j].getType())
-							return Application.localize(new String[] {"levels","selfrep","error","4" });
+							return getError(4);
 					}
 					n_found++;
 				}
@@ -984,11 +995,11 @@ class Selfrep extends Level //15
 		}
 		
 		if(n_found==0)
-			return Application.localize(new String[] {"levels","selfrep","error","5" });
+			return getError(5);
 		if(n_found<2)
-			return Application.localize(new String[] {"levels","selfrep","error","6" });
+			return getError(6);
 		if (bound_atoms!=6*n_found)
-			return Application.localize(new String[] {"levels","selfrep","error","7" });
+			return getError(7);
 		return null; }
 }
 
@@ -997,11 +1008,9 @@ class Selfrep extends Level //15
 class Grow_membrane extends Level //16
 {
 	
-	public Grow_membrane(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","growmembrane","title" }),
-				Application.localize(new String[] {"levels","growmembrane","challenge" }),
-				Application.localize(new String[] {"levels","growmembrane","hint" }),
-				configuration);
+	public Grow_membrane(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -1045,7 +1054,7 @@ class Grow_membrane extends Level //16
 		while(it.hasNext()) {
 			Atom a = (Atom)it.next();
 			if(a.getType()!=0 || a.getBonds().size()!=2)
-				return Application.localize(new String[] {"levels","growmembrane","error","1" });
+				return getError(1);
 			x_points[i] = (int)a.getPhysicalPoint().getPositionX(); // (need these for polygon check, below)
 			y_points[i] = (int)a.getPhysicalPoint().getPositionY();
 			i++;
@@ -1054,12 +1063,12 @@ class Grow_membrane extends Level //16
 		Atom f1 = atoms[8]; // see the setup code for this level
 		Polygon poly = new Polygon(x_points,y_points,joined.size());
 		if(!poly.contains(new Point2D.Float(f1.getPhysicalPoint().getPositionX(),f1.getPhysicalPoint().getPositionY())))
-			return Application.localize(new String[] {"levels","growmembrane","error","2" });
+			return getError(2);
 		// and no other 'a' atoms around
 		for(i=0;i<atoms.length;i++) {
 			Atom a = atoms[i];
 			if(!joined.contains(a) && a.getType()==0)
-				return Application.localize(new String[] {"levels","growmembrane","error","3" });
+				return getError(3);
 		}
 		return null; }
 }
@@ -1069,11 +1078,9 @@ class Grow_membrane extends Level //16
 class Membrane_transport extends Level //17
 {
 	
-	public Membrane_transport(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","membranetransport","title" }),
-				Application.localize(new String[] {"levels","membranetransport","challenge" }),
-				Application.localize(new String[] {"levels","membranetransport","hint" }),
-				configuration);
+	public Membrane_transport(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -1122,7 +1129,7 @@ class Membrane_transport extends Level //17
 		while(it.hasNext()) {
 			Atom a = (Atom)it.next();
 			if(a.getType()!=0 || a.getBonds().size()!=2)
-				return Application.localize(new String[] {"levels","membranetransport","error","1" });
+				return getError(1);
 			x_points[i] = (int)a.getPhysicalPoint().getPositionX(); // (need these for polygon check, below)
 			y_points[i] = (int)a.getPhysicalPoint().getPositionY();
 			i++;
@@ -1131,14 +1138,14 @@ class Membrane_transport extends Level //17
 		Atom b1 = atoms[12]; // see the setup code for this level
 		Polygon poly = new Polygon(x_points,y_points,joined.size());
 		if(!poly.contains(new Point2D.Float(b1.getPhysicalPoint().getPositionX(),b1.getPhysicalPoint().getPositionY())))
-			return Application.localize(new String[] {"levels","membranetransport","error","2" });
+			return getError(2);
 		// check the other atoms (want: f's inside, other's outside)
 		for(i=joined.size()+1;i<atoms.length;i++) {
 			Atom a = atoms[i];
 			if(a.getType()==5 && !poly.contains(new Point2D.Float(a.getPhysicalPoint().getPositionX(),a.getPhysicalPoint().getPositionY())))
-				return Application.localize(new String[] {"levels","membranetransport","error","3" });
+				return getError(3);
 			else if(a.getType()!=5 && poly.contains(new Point2D.Float(a.getPhysicalPoint().getPositionX(),a.getPhysicalPoint().getPositionY())))
-				return Application.localize(new String[] {"levels","membranetransport","error","4" });
+				return getError(4);
 		}
 		return null; }
 }
@@ -1148,11 +1155,9 @@ class Membrane_transport extends Level //17
 class Membrane_division extends Level //18
 {
 	
-	public Membrane_division(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","membranedivision","title" }),
-				Application.localize(new String[] {"levels","membranedivision","challenge" }),
-				Application.localize(new String[] {"levels","membranedivision","hint" }),
-				configuration);
+	public Membrane_division(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	protected Atom[] createAtoms_internal(Configuration configuration){
@@ -1187,20 +1192,20 @@ class Membrane_division extends Level //18
 		LinkedList loop[] = {new LinkedList(),new LinkedList()};
 		atoms[0].getAllConnectedAtoms(loop[0]);
 		if(loop[0].size()>=N)
-			return Application.localize(new String[] {"levels","membranedivision","error","1" });
+			return getError(1);
 		// and there should be a second loop of 'a' atoms made of the same atoms
 		for(int i=0;i<N;i++) {
 			Atom a = atoms[i];
 			if(!loop[0].contains(a)) a.getAllConnectedAtoms(loop[1]);
 		}
 		if(loop[0].size()+loop[1].size()!=N)
-			return Application.localize(new String[] {"levels","membranedivision","error","2" });
+			return getError(2);
 		// each atom in each group should of type 'a' and have exactly two bonds (hence a neat loop)
 		for(int iLoop=0;iLoop<2;iLoop++) {
 			for(int i=0;i<loop[iLoop].size();i++) {
 				Atom a = (Atom)loop[iLoop].get(i);
 				if(a.getType()!=0 || a.getBonds().size()!=2)
-					return Application.localize(new String[] {"levels","membranedivision","error","3" });
+					return getError(3);
 			}
 		}
 		return null; }
@@ -1211,11 +1216,9 @@ class Membrane_division extends Level //18
 class Cell_division extends Level //19
 {
 	
-	public Cell_division(Configuration configuration) {
-		super(Application.localize(new String[] {"levels","celldivision","title" }),
-				Application.localize(new String[] {"levels","celldivision","challenge" }),
-				Application.localize(new String[] {"levels","celldivision","hint" }),
-				configuration);
+	public Cell_division(String title, String challenge, String hint, String[] errors,
+			Configuration defaultConfiguration) {
+		super(title, challenge, hint, errors, defaultConfiguration);
 	}
 	
 	
@@ -1296,7 +1299,7 @@ class Cell_division extends Level //19
 		}
 		
 		if(components.size()!=2)  // lets enforce that there should be exactly two large components
-			return Application.localize(new String[] {"levels","celldivision","error","1" });
+			return getError(1);
 		// neither component should be inside the other
 		{
 			Polygon poly[] = new Polygon[2];
@@ -1322,7 +1325,7 @@ class Cell_division extends Level //19
 					Atom a = (Atom)c.get(i);
 					// is this point inside the other polygon?
 					if(poly[1-iComp].contains(new Point2D.Float(a.getPhysicalPoint().getPositionX(),a.getPhysicalPoint().getPositionY())))
-						return Application.localize(new String[] {"levels","celldivision","error","2" });
+						return getError(2);
 				}
 			}
 		}
@@ -1336,11 +1339,11 @@ class Cell_division extends Level //19
 			if(a.getType()==4 && a.getState()!=0 && a.getBonds().size()==2) heads[n_found++]=a;
 		}
 		if(n_found<2)
-			return Application.localize(new String[] {"levels","celldivision","error","3" });
+			return getError(3);
 		// each head should be in a separate component
 		LinkedList c1 = (LinkedList)components.get(0),c2=(LinkedList)components.get(1);
 		if( (c1.contains(heads[0]) && !c2.contains(heads[1])) || (c2.contains(heads[0]) && !c1.contains(heads[1])) )
-			return Application.localize(new String[] {"levels","celldivision","error","4" });
+			return getError(4);
 		// work down each template, adding the type of each 2-connected atom to sequence[i]
 		String sequence[] = {new String(),new String()};
 		for(int iCell=0;iCell<2;iCell++) {
@@ -1368,10 +1371,9 @@ class Cell_division extends Level //19
 			//System.out.println(sequence[iCell]);
 			if(sequence[iCell].length()!=6 || sequence[iCell].charAt(0)!='e' ||
 					sequence[iCell].charAt(5)!='f')	//TODO add the parameter : "Incorrect template sequence detected: "+sequence[iCell];
-				return Application.localize(new String[] {"levels","celldivivion","error","5" });
+				return getError(5);
 		}
-		if(sequence[0].compareTo(sequence[1])!=0)
-			return Application.localize(new String[] {"levels","celldivision","error","6" });
+		if(sequence[0].compareTo(sequence[1])!=0) return getError(6);
 		
 		return null;
 	}

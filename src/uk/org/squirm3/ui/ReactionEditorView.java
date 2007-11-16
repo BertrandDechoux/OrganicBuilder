@@ -19,7 +19,7 @@ import javax.swing.border.EtchedBorder;
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Reaction;
-import uk.org.squirm3.engine.IApplicationEngine;
+import uk.org.squirm3.engine.ApplicationEngine;
 
 
 /**  
@@ -43,15 +43,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 public class ReactionEditorView implements IView {
-	private IApplicationEngine iApplicationEngine;
+	private ApplicationEngine applicationEngine;
 	private JCheckBox bondedBefore, bondedAfter;
 	private JComboBox aType, aState, bType, bState, futureAState, futureBState;
 	private JLabel futureAType, futureBType;
 	private JButton addReaction;
 	private final JPanel editorPanel;
 
-	public ReactionEditorView(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
+	public ReactionEditorView(ApplicationEngine applicationEngine) {
+		this.applicationEngine = applicationEngine;
 		editorPanel = createEditorPanel();
 	}
 	
@@ -109,7 +109,7 @@ public class ReactionEditorView implements IView {
 			public void actionPerformed(ActionEvent e) {
 				Collection c = new ArrayList(1);
 				c.add(createReactionFromEditor());
-				iApplicationEngine.addReactions(c);
+				applicationEngine.addReactions(c);
 			}
 		});
 		jPanel.add(addReaction);

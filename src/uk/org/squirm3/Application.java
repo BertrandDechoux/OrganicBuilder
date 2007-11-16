@@ -5,8 +5,7 @@ import java.util.Properties;
 import javax.swing.JApplet;
 import javax.swing.SwingUtilities;
 
-import uk.org.squirm3.engine.IApplicationEngine;
-import uk.org.squirm3.engine.LocalEngine;
+import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.ui.GUI;
 import uk.org.squirm3.ui.Resource;
 
@@ -60,7 +59,7 @@ public final class Application  {
 	// instance to store the configuration (key-value)
 	private final Properties configurationProps = new Properties();
 	// string returned if the value wasn't found for translation
-	public static final String translationError = "ERROR : STRING NOT FOUND!";
+	public static final String TRANSLATION_ERROR = "ERROR : STRING NOT FOUND!";
 
 	private Application(final JApplet applet) {
 		currentApplication = this;
@@ -88,10 +87,9 @@ public final class Application  {
 				interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+".properties"));
 			} catch(Exception ex) {;}
 		}
-		final IApplicationEngine iApplicationEngine = new LocalEngine();
 	    SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
-	        	GUI.createGUI(iApplicationEngine, applet);
+	        	GUI.createGUI(new ApplicationEngine(), applet);
 	        }
 	    });
 	}
@@ -106,9 +104,9 @@ public final class Application  {
 			key += "."+code[i];
 		}
 		if(bundle.equals("levels")) {
-			return currentApplication.levelsProps.getProperty(key,translationError);
+			return currentApplication.levelsProps.getProperty(key,TRANSLATION_ERROR);
 		} else if(bundle.equals("interface")) {
-			return currentApplication.interfaceProps.getProperty(key,translationError);
+			return currentApplication.interfaceProps.getProperty(key,TRANSLATION_ERROR);
 		} else return bundle+"/"+key;
 	}
 

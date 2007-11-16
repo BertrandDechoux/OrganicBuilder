@@ -24,8 +24,8 @@ import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.data.Reaction;
-import uk.org.squirm3.engine.IApplicationEngine;
-import uk.org.squirm3.engine.ILevelListener;
+import uk.org.squirm3.engine.ApplicationEngine;
+import uk.org.squirm3.listener.ILevelListener;
 
 
 /**  
@@ -49,7 +49,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 public class CurrentLevelView implements IView, ILevelListener {
-	private IApplicationEngine iApplicationEngine;
+	private ApplicationEngine applicationEngine;
 	private JEditorPane description;
 	private JButton hintButton, evaluateButton;
 	private Level currentLevel;
@@ -58,12 +58,12 @@ public class CurrentLevelView implements IView, ILevelListener {
 	
 	private final ILogger logger;
 
-	public CurrentLevelView(IApplicationEngine iApplicationEngine, String loggerUrl) {
+	public CurrentLevelView(ApplicationEngine applicationEngine, String loggerUrl) {
 		currentLevelPanel = createCurrentLevelPanel();
 		logger = new NetLogger(loggerUrl);
-		this.iApplicationEngine = iApplicationEngine;
+		this.applicationEngine = applicationEngine;
 		levelHasChanged();
-		iApplicationEngine.getEngineDispatcher().addLevelListener(this);	
+		applicationEngine.getEngineDispatcher().addLevelListener(this);	
 	}
 
 	private JPanel createCurrentLevelPanel() {
@@ -97,7 +97,7 @@ public class CurrentLevelView implements IView, ILevelListener {
 		evaluateButton = new JButton(Application.localize(new String[] {"interface","level","evaluate"}));
 		evaluateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Collection c = iApplicationEngine.getAtoms();
+				Collection c = applicationEngine.getAtoms();
 				Iterator it = c.iterator();
 				Atom[] atoms = new Atom[c.size()];
 				int i = 0;
@@ -117,11 +117,11 @@ public class CurrentLevelView implements IView, ILevelListener {
 				if(success) {
 					//TODO keep always the same object
 					// TODO store the url into a configuration file
-					final int levelNumber = iApplicationEngine.getLevels().indexOf(currentLevel);
-					logger.writeSolution(levelNumber, iApplicationEngine.getReactions());
+					final int levelNumber = applicationEngine.getLevels().indexOf(currentLevel);
+					logger.writeSolution(levelNumber, applicationEngine.getReactions());
 					
 					result = Application.localize(new String[] {"interface","level","fullsuccess"});
-					if(levelNumber+1>iApplicationEngine.getLevels().size()-1) {
+					if(levelNumber+1>applicationEngine.getLevels().size()-1) {
 						JOptionPane.showMessageDialog(currentLevelPanel, result,
 							Application.localize(new String[] {"interface","level","success","title"}),
 							JOptionPane.INFORMATION_MESSAGE);
@@ -135,7 +135,7 @@ public class CurrentLevelView implements IView, ILevelListener {
 						    null,     
 						    options,  
 						    options[0]);
-						if(n==JOptionPane.YES_OPTION) iApplicationEngine.goToNextLevel();
+						if(n==JOptionPane.YES_OPTION) applicationEngine.goToNextLevel();
 					}
 				} else {
 					JOptionPane.showMessageDialog(currentLevelPanel, result,
@@ -148,7 +148,7 @@ public class CurrentLevelView implements IView, ILevelListener {
 	}
 	
 	public void levelHasChanged() {
-		currentLevel = iApplicationEngine.getCurrentLevel();
+		currentLevel = applicationEngine.getCurrentLevel();
 		if(currentLevel==null) {
 			description.setText(Application.localize(new String[] {"interface","level","description","none"}));
 			hintButton.setEnabled(false);

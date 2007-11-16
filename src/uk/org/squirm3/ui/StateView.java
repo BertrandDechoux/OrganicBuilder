@@ -6,8 +6,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import uk.org.squirm3.Application;
-import uk.org.squirm3.engine.IApplicationEngine;
-import uk.org.squirm3.engine.IStateListener;
+import uk.org.squirm3.engine.ApplicationEngine;
+import uk.org.squirm3.listener.IStateListener;
 
 
 /**  
@@ -35,15 +35,15 @@ public class StateView implements IView, IStateListener {
 	// Actions controlling the simulation
 	private final Action stop, run, reset;
 	// use to communicate
-	private IApplicationEngine iApplicationEngine;
+	private ApplicationEngine applicationEngine;
 
-	public StateView(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
+	public StateView(ApplicationEngine applicationEngine) {
+		this.applicationEngine = applicationEngine;
 		stop = createStopAction();
 		run = createRunAction();
 		reset = createResetAction();
 		simulationStateHasChanged();
-		iApplicationEngine.getEngineDispatcher().addStateListener(this);
+		applicationEngine.getEngineDispatcher().addStateListener(this);
 	}
 	
 	public Action getRunAction() {
@@ -61,7 +61,7 @@ public class StateView implements IView, IStateListener {
 	private Action createRunAction() {
 		final Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.runSimulation();
+				applicationEngine.runSimulation();
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","run"}));
@@ -74,7 +74,7 @@ public class StateView implements IView, IStateListener {
 	private Action createStopAction() {
 		final Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.pauseSimulation();
+				applicationEngine.pauseSimulation();
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","stop"}));
@@ -85,7 +85,7 @@ public class StateView implements IView, IStateListener {
 	private Action createResetAction() {
 		final Action action = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				iApplicationEngine.restartLevel(null);
+				applicationEngine.restartLevel(null);
 			}
 	    };
 	    action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","reset"}));
@@ -94,8 +94,8 @@ public class StateView implements IView, IStateListener {
 	}
 	
 	public void simulationStateHasChanged() {
-		boolean isRunning = iApplicationEngine.simulationIsRunning();
-		boolean resetNeeded = iApplicationEngine.simulationNeedReset();
+		boolean isRunning = applicationEngine.simulationIsRunning();
+		boolean resetNeeded = applicationEngine.simulationNeedReset();
 		stop.setEnabled(!resetNeeded && isRunning);
 		run.setEnabled(!resetNeeded && !isRunning);
 	}

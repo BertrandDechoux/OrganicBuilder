@@ -22,8 +22,8 @@ import javax.swing.text.NumberFormatter;
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.Level;
-import uk.org.squirm3.engine.IApplicationEngine;
-import uk.org.squirm3.engine.ILevelListener;
+import uk.org.squirm3.engine.ApplicationEngine;
+import uk.org.squirm3.listener.ILevelListener;
 
 
 /**  
@@ -53,12 +53,12 @@ public class CustomResetView implements IView, ILevelListener {
 	private /*final*/ JFormattedTextField atomNumberTF, heightTF, widthTF;
 	private final JPanel panel;
 	// use to communicate
-	private IApplicationEngine iApplicationEngine;
+	private ApplicationEngine applicationEngine;
 
-	public CustomResetView(IApplicationEngine iApplicationEngine) {
-		this.iApplicationEngine = iApplicationEngine;
+	public CustomResetView(ApplicationEngine applicationEngine) {
+		this.applicationEngine = applicationEngine;
 		panel = createParametersPanel();
-		iApplicationEngine.getEngineDispatcher().addLevelListener(this);
+		applicationEngine.getEngineDispatcher().addLevelListener(this);
 		configurationHasChanged();
 	}
 	
@@ -163,7 +163,7 @@ public class CustomResetView implements IView, ILevelListener {
 			public void actionPerformed(ActionEvent arg0) {
 				Configuration configuration = new Configuration(atomNumberSelector.getValue(),
 						Level.TYPES, widthSelector.getValue(), heightSelector.getValue());
-				iApplicationEngine.restartLevel(configuration);
+				applicationEngine.restartLevel(configuration);
 			}});
 		parametersPanel.add(resetButton,gbc);
 		return parametersPanel;
@@ -206,7 +206,7 @@ public class CustomResetView implements IView, ILevelListener {
 	}
 
 	public void configurationHasChanged() {
-		Configuration configuration = iApplicationEngine.getCurrentLevel().getConfiguration();
+		Configuration configuration = applicationEngine.getCurrentLevel().getConfiguration();
 		updateNumberOfAtoms(configuration.getNumberOfAtoms());
 		updateWidth((int)configuration.getWidth());
 		updateHeight((int)configuration.getHeight());

@@ -1,6 +1,7 @@
-package uk.org.squirm3.engine;
+package uk.org.squirm3.listener;
 
 import java.util.EventListener;
+
 
 /**  
 Copyright 2007 Bertrand Dechoux
@@ -23,10 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-public interface ILevelListener extends EventListener {
+public interface IReactionListener extends EventListener {
 
-	public void levelHasChanged();
-	
-	public void configurationHasChanged();
-
+	public void reactionsHaveChanged();
 }
