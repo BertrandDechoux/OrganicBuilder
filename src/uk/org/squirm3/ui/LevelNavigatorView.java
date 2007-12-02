@@ -16,7 +16,7 @@ import uk.org.squirm3.listener.ILevelListener;
 
 
 /**  
-Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
+Copyright 2007 Bertrand Dechoux
 
 This file is part of Organic Builder.
 
@@ -41,6 +41,8 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	private final Action intro, previous, next, last;
 	private final JComboBox levelComboBox;
 	
+	private boolean update;
+	
 	
 	public LevelNavigatorView(ApplicationEngine applicationEngine) {
 		this.applicationEngine = applicationEngine;
@@ -50,6 +52,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 		next = createNextAction();
 		last = createLastAction();
 		applicationEngine.getEngineDispatcher().addLevelListener(this);
+		update = true;
 		levelHasChanged();
 	}
 	
@@ -74,7 +77,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	}
 	
 	private JComboBox createLevelComboBox() {
-		List levelList = applicationEngine.getLevels();
+		List levelList = applicationEngine.getLevelManager().getLevels();
 		String[] levelsLabels = new String[levelList.size()];
 		Iterator it = levelList.iterator();
 		int i = 0;
@@ -88,7 +91,8 @@ public class LevelNavigatorView implements IView, ILevelListener {
 		cb.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						applicationEngine.goToLevel(levelComboBox.getSelectedIndex(),null);
+						if(!update) applicationEngine.goToLevel(levelComboBox.getSelectedIndex(),null);
+						update = false;
 					}
 				});
 		cb.setToolTipText(Application.localize(new String[] {"interface","navigation","selected"}));
@@ -140,8 +144,8 @@ public class LevelNavigatorView implements IView, ILevelListener {
 	}
 
 	private void updateControls() {
-		final List levelList = applicationEngine.getLevels();
-		final int levelNumber = applicationEngine.getLevels().indexOf(applicationEngine.getCurrentLevel());
+		final List levelList = applicationEngine.getLevelManager().getLevels();
+		final int levelNumber = levelList.indexOf(applicationEngine.getLevelManager().getCurrentLevel());
 		
 		final boolean firstLevel = levelNumber==0;
 		intro.setEnabled(!firstLevel);
@@ -151,6 +155,8 @@ public class LevelNavigatorView implements IView, ILevelListener {
 		last.setEnabled(!lastLevel);
 		next.setEnabled(!lastLevel);
 
+		// quick fix TODO chang
+		update = true;
 		levelComboBox.setSelectedIndex(levelNumber);
 	}
 

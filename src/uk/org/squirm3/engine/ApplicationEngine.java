@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
@@ -19,8 +18,6 @@ import uk.org.squirm3.data.FixedPoint;
 import uk.org.squirm3.data.IPhysicalPoint;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.data.MobilePoint;
-import uk.org.squirm3.data.Reaction;
-import uk.org.squirm3.listener.EngineDispatcher;
 
 /**  
  Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
@@ -44,19 +41,20 @@ import uk.org.squirm3.listener.EngineDispatcher;
 
 public class ApplicationEngine {
 	
-	private final EngineDispatcher engineDispatcher;
+	// things to run the collider and the commands
 	private Collider collider;
-	private Thread thread;
-	// simulation's attributes
-	public boolean resetNeeded;
-	private short sleepPeriod; // how many milliseconds to sleep for each iteration (user changeable)
+	private Thread applicationThread;
+	private final Object colliderExecution;
+	private boolean isRunning;
+	private short sleepPeriod;
+	private LinkedList commands;
 	// things to do with the dragging around of atoms
 	private DraggingPoint draggingPoint;
 	private DraggingPoint lastUsedDraggingPoint;
-	// level
-	private Level currentLevel;
-	private final List levelList;
-	private int levelIndex;
+	// composition
+	private LevelManager levelManager;
+	private ReactionManager reactionManager;
+	private final EngineDispatcher engineDispatcher;
 	
 	public ApplicationEngine() {
 		final int simulationWidth = Integer.parseInt(Application.getConfiguration(new String[] {"simulation","width"}));
@@ -66,7 +64,7 @@ public class ApplicationEngine {
 		final Configuration configuration = new Configuration(numberOfAtoms, Level.TYPES, simulationWidth, simulationHeight);
 
 		// load levels
-		levelList = new ArrayList();
+		levelManager = new LevelManager();
 		int i = 0;
 		while(true) {
 			String className = Application.getConfiguration(new String[] {"levels",new Integer(i).toString(),"class"});
@@ -94,49 +92,88 @@ public class ApplicationEngine {
 			Object[] os = new Object[] {title,texte,hint,errors.toArray(new String[0]),configuration};
 			try {
 				Level l = (Level) cs[0].newInstance(os);
-				levelList.add(l);
+				levelManager.addLevel(l);
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
 			i++;
 		}
+		reactionManager = new ReactionManager();
 		// manager of the listeners
 		engineDispatcher = new EngineDispatcher();
-		resetNeeded = false;
 		sleepPeriod = 50;
-		collider = new Collider(new Atom[0],1,1); // quick fix to avoid null pointer exception TODO change
 		// start the challenge by the introduction
 		try {
-			goToLevel(0, null);
+			setLevel(0, null);
 		} catch(Exception e) {}
+		commands = new LinkedList();
+		colliderExecution = new Object();
+		isRunning = true;
+		// create and run the thread of this application
+		applicationThread = new Thread(
+				new Runnable(){
+					public void run()  {
+						while (applicationThread == Thread.currentThread()) {
+							// execute commands
+							synchronized(commands) {
+								while(!commands.isEmpty()) {
+									ICommand command = (ICommand) commands.removeFirst();
+									command.execute();
+								}
+							}
+							// compute one step of the simulation
+							synchronized(colliderExecution) {
+								if(isRunning) {
+									lastUsedDraggingPoint = draggingPoint;
+									collider.doTimeStep(draggingPoint, new LinkedList(reactionManager.getReactions()));
+									engineDispatcher.atomsHaveChanged();
+									try {
+										Thread.sleep(sleepPeriod);
+									} catch (InterruptedException e) { break; }
+								} else {
+									try {
+										Thread.sleep(5);
+									} catch (InterruptedException e) { break; }
+								}
+								
+							}
+							
+						}
+					}
+				});
+		applicationThread.setPriority(Thread.MIN_PRIORITY);
+		applicationThread.start();
 	}
+
 	public void clearReactions() {
 		addCommand(new ICommand() {
 			public void execute() {
-				pauseSimulation();
-				Vector reactions = collider.getReactions();
-				reactions.clear();
-				engineDispatcher.reactionsHaveChanged();
-				runSimulation();
+				if(!reactionManager.getReactions().isEmpty()) {
+					reactionManager.clearReactions();
+					engineDispatcher.reactionsHaveChanged();
+				}
 			}
 		});
 	}
 	
+	//TODO avoid to create a copy per call
 	public Collection getAtoms() {
-		Atom[] atoms = collider.getAtoms();
-		List list = new LinkedList();
-		for(int i = 0 ; i < atoms.length ; i++) {
-			list.add(atoms[i]);
+		synchronized(colliderExecution) {
+			Atom[] atoms = collider.getAtoms();
+			List list = new LinkedList();
+			for(int i = 0 ; i < atoms.length ; i++) {
+				list.add(atoms[i]);
+			}
+			return list;
 		}
-		return list;
 	}
 	
 	public DraggingPoint getCurrentDraggingPoint() {
 		return draggingPoint;
 	}
 	
-	public Level getCurrentLevel() {
-		return currentLevel;
+	public LevelManager getLevelManager() {
+		return levelManager;
 	}
 	
 	public DraggingPoint getLastUsedDraggingPoint() {
@@ -144,10 +181,7 @@ public class ApplicationEngine {
 	}
 	
 	public Collection getReactions() {
-		Vector reactions = collider.getReactions();
-		List list = new LinkedList();
-		list.addAll(reactions);
-		return list;
+		return reactionManager.getReactions();
 	}
 	
 	public short getSimulationSpeed() {
@@ -157,16 +191,12 @@ public class ApplicationEngine {
 	public void pauseSimulation() {
 		addCommand(new ICommand() {
 			public void execute() {
-				Thread target = thread;
-				thread = null;
-				if(target!=null) {
-					try {
-						target.join();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+				synchronized(colliderExecution) {
+					if(isRunning) {
+						isRunning = false;
+						engineDispatcher.simulationStateHasChanged();
 					}
 				}
-				engineDispatcher.simulationStateHasChanged();
 			}
 		});
 	}
@@ -174,11 +204,8 @@ public class ApplicationEngine {
 	public void addReactions(final Collection reactions) {
 		addCommand(new ICommand() {
 			public void execute() {
-				pauseSimulation();
-				Vector colliderReactions = collider.getReactions();
-				colliderReactions.addAll(reactions);
+				reactionManager.addReactions(reactions);
 				engineDispatcher.reactionsHaveChanged();
-				runSimulation();
 			}
 		});
 	}
@@ -186,11 +213,8 @@ public class ApplicationEngine {
 	public void removeReactions(final Collection reactions) {
 		addCommand(new ICommand() {
 			public void execute() {
-				pauseSimulation();
-				Vector colliderReactions = collider.getReactions();
-				colliderReactions.removeAll(reactions);
+				reactionManager.removeReactions(reactions);
 				engineDispatcher.reactionsHaveChanged();
-				runSimulation();
 			}
 		});
 	}
@@ -198,44 +222,32 @@ public class ApplicationEngine {
 	public void restartLevel(final Configuration configuration) {
 		addCommand(new ICommand() {
 			public void execute() {
-				pauseSimulation();
+				Level currentLevel = levelManager.getCurrentLevel();
 				Atom[] atoms = currentLevel.createAtoms(configuration);
 				if(atoms==null) return;
 				collider = new Collider(atoms, (int)currentLevel.getConfiguration().getWidth(),
 						(int)currentLevel.getConfiguration().getHeight());
 				if(configuration!=null) engineDispatcher.configurationHasChanged();
 				engineDispatcher.atomsHaveChanged();
-				needToRestartLevel(false);
+				synchronized(colliderExecution) {
+					if(!isRunning) {
+						isRunning = true;
+						engineDispatcher.simulationStateHasChanged();
+					}
+				}
 			}
 		});
-	}
-	
-	private void needToRestartLevel(boolean b) {
-		resetNeeded = b;
-		engineDispatcher.simulationStateHasChanged();
 	}
 	
 	public void runSimulation() {
 		addCommand(new ICommand() {
 			public void execute() {
-				if(thread!=null || resetNeeded) return; // security check to avoid starting if already started
-				thread = new Thread(
-						new Runnable(){
-							public void run()  {
-								while (thread == Thread.currentThread()) {
-									lastUsedDraggingPoint = draggingPoint;
-									collider.doTimeStep((int)currentLevel.getConfiguration().getWidth(),
-											(int)currentLevel.getConfiguration().getHeight(), draggingPoint);
-									engineDispatcher.atomsHaveChanged();
-									try {
-										Thread.sleep(sleepPeriod);
-									} catch (InterruptedException e) { break; }
-								}
-							}
-						});
-				thread.setPriority(Thread.MIN_PRIORITY);
-				thread.start();
-				engineDispatcher.simulationStateHasChanged();
+				synchronized(colliderExecution) {
+					if(!isRunning) {
+						isRunning = true;
+						engineDispatcher.simulationStateHasChanged();
+					}
+				}
 			}
 		});
 	}
@@ -256,12 +268,9 @@ public class ApplicationEngine {
 	public void setReactions(final Collection reactions) {
 		addCommand(new ICommand() {
 			public void execute() {
-				pauseSimulation();
-				Vector colliderReactions = collider.getReactions();
-				colliderReactions.clear();
-				colliderReactions.addAll(reactions);
+				reactionManager.clearReactions();
+				reactionManager.addReactions(reactions);
 				engineDispatcher.reactionsHaveChanged();
-				runSimulation();
 			}
 		});
 	}
@@ -275,13 +284,8 @@ public class ApplicationEngine {
 		});
 	}
 	
-	//TODO getState and state object
 	public boolean simulationIsRunning() {
-		return thread!=null;
-	}
-	
-	public boolean simulationNeedReset() {
-		return resetNeeded;
+		return isRunning;
 	}
 	
 	public EngineDispatcher getEngineDispatcher() {
@@ -289,18 +293,18 @@ public class ApplicationEngine {
 	}
 	
 	private void setLevel(int levelIndex, Configuration configuration) {
-		this.levelIndex = levelIndex;
-		currentLevel = (Level)levelList.get(levelIndex);
-		pauseSimulation();
-		collider.setReactions(new Reaction[0]);
-		engineDispatcher.reactionsHaveChanged();
+		levelManager.setLevel(levelIndex);
+		if(collider!=null) {
+			reactionManager.clearReactions();
+			engineDispatcher.reactionsHaveChanged();
+		}
+		Level currentLevel = levelManager.getCurrentLevel();
 		Atom[] atoms = currentLevel.createAtoms(configuration);
 		if(atoms==null) return;
 		collider = new Collider(atoms, (int)currentLevel.getConfiguration().getWidth(),
 				(int)currentLevel.getConfiguration().getHeight());
 		engineDispatcher.atomsHaveChanged();
 		engineDispatcher.levelHasChanged();
-		runSimulation();
 		return;
 	}
 	
@@ -317,7 +321,7 @@ public class ApplicationEngine {
 	public void goToLastLevel() {
 		addCommand(new ICommand() {
 			public void execute() {
-				setLevel(levelList.size()-1, null);
+				setLevel(levelManager.getNumberOfLevel()-1, null);
 			}
 		});
 	}
@@ -325,7 +329,8 @@ public class ApplicationEngine {
 	public void goToNextLevel() {
 		addCommand(new ICommand() {
 			public void execute() {
-				if(levelIndex+1<levelList.size()) setLevel(levelIndex+1, null);
+				int levelIndex = levelManager.getCurrentLevelIndex();
+				if(levelIndex+1<levelManager.getNumberOfLevel()) setLevel(levelIndex+1, null);
 			}
 		});
 	}
@@ -333,13 +338,10 @@ public class ApplicationEngine {
 	public void goToPreviousLevel() {
 		addCommand(new ICommand() {
 			public void execute() {
+				int levelIndex = levelManager.getCurrentLevelIndex();
 				if(levelIndex-1>=0) setLevel(levelIndex-1, null);
 			}
 		});
-	}
-	
-	public List getLevels() {
-		return levelList;
 	}
 	
 	private interface ICommand {
@@ -347,8 +349,9 @@ public class ApplicationEngine {
 	}
 	
 	private void addCommand(ICommand c) {
-		// TODO synchronisation
-		c.execute();
+		synchronized(commands) {
+			commands.add(c);
+		}
 	}
 	
 }

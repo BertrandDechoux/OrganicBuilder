@@ -1,5 +1,6 @@
 package uk.org.squirm3;
 
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.swing.JApplet;
@@ -35,16 +36,16 @@ public final class Application  {
 	
 	public static void runAsApplet(JApplet applet) {
 		if(currentApplication!=null) return;
-		new Application(applet);
+		new Application(applet, null);
 	}
 	
-	public static void runAsStandaloneApplication() {
+	public static void runAsStandaloneApplication(String argv[]) {
 		if(currentApplication!=null) return;
-		new Application();
+		new Application(null, argv);
 	}
 	
 	public static void main(String argv[]) {
-		runAsStandaloneApplication();
+		runAsStandaloneApplication(argv);
 	}
 	
 	// path to finds the files needed for the translations
@@ -61,18 +62,39 @@ public final class Application  {
 	// string returned if the value wasn't found for translation
 	public static final String TRANSLATION_ERROR = "ERROR : STRING NOT FOUND!";
 
-	private Application(final JApplet applet) {
+	private Application(final JApplet applet, String argv[]) {
 		currentApplication = this;
+		
 		// load configuration
 		try{ configurationProps.load(Resource.class.getResourceAsStream(configurationFilePath));
 		} catch(Exception e) {}
+		
+		// load call parameters
+		if(applet!=null) {
+			Iterator it = configurationProps.keySet().iterator();
+			while(it.hasNext()) {
+				String key = (String)it.next();
+				String value = applet.getParameter(key);
+				if(value!=null) configurationProps.setProperty(key,value);
+			}
+		} else {
+			for(int i = 0; i<argv.length; i++) {
+				String[] entry = argv[i].split("=");
+				if(entry.length==2 && configurationProps.containsKey(entry[0])) {
+					configurationProps.setProperty(entry[0], entry[1]);
+				}
+			}
+			
+		}
+		
 		// choose a language
 		String chosenLanguage = Application.getConfiguration(new String[] {"languages", "choice"});
-		if(chosenLanguage==null) {
+		if(chosenLanguage==null || chosenLanguage.isEmpty()) {
 			final String[] languagesArray = Application.getConfiguration(new String[] {"languages", "available"}).split(" ");
 			if(languagesArray.length==1) chosenLanguage = languagesArray[0];
 			else chosenLanguage = GUI.selectLanguage(languagesArray);
 		}
+		
 		// load translation
 		levelsTranslationFilePath = Application.getConfiguration(new String[] {"translation", "levels"});
 		interfaceTranslationFilePath = Application.getConfiguration(new String[] {"translation", "interface"});
@@ -86,7 +108,9 @@ public final class Application  {
 				levelsProps.load(Resource.class.getResourceAsStream(levelsTranslationFilePath+".properties"));
 				interfaceProps.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath+".properties"));
 			} catch(Exception ex) {;}
-		}
+		}	
+		
+		// create the graphical interface
 	    SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
 	        	GUI.createGUI(new ApplicationEngine(), applet);
@@ -94,9 +118,7 @@ public final class Application  {
 	    });
 	}
 	
-	private Application() { this(null); }
-	
-	static public String localize(String[] code) {
+	public static String localize(String[] code) {
 		if(currentApplication==null) return null;
 		final String bundle = code[0];
 		String key = code[1];
@@ -110,7 +132,7 @@ public final class Application  {
 		} else return bundle+"/"+key;
 	}
 
-	static public String getConfiguration(String[] code) {
+	public static String getConfiguration(String[] code) {
 		if(currentApplication==null) return null;
 		String key = code[0];
 		for( int i = 1 ; i<code.length ; i++) {

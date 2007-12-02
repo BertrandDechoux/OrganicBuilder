@@ -95,8 +95,7 @@ public class StateView implements IView, IStateListener {
 	
 	public void simulationStateHasChanged() {
 		boolean isRunning = applicationEngine.simulationIsRunning();
-		boolean resetNeeded = applicationEngine.simulationNeedReset();
-		stop.setEnabled(!resetNeeded && isRunning);
-		run.setEnabled(!resetNeeded && !isRunning);
+		stop.setEnabled(isRunning);
+		run.setEnabled(!isRunning);
 	}
 }

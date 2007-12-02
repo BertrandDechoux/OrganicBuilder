@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -117,11 +118,12 @@ public class CurrentLevelView implements IView, ILevelListener {
 				if(success) {
 					//TODO keep always the same object
 					// TODO store the url into a configuration file
-					final int levelNumber = applicationEngine.getLevels().indexOf(currentLevel);
+					List levelList = applicationEngine.getLevelManager().getLevels();
+					final int levelNumber = levelList.indexOf(currentLevel);
 					logger.writeSolution(levelNumber, applicationEngine.getReactions());
 					
 					result = Application.localize(new String[] {"interface","level","fullsuccess"});
-					if(levelNumber+1>applicationEngine.getLevels().size()-1) {
+					if(levelNumber+1>levelList.size()-1) {
 						JOptionPane.showMessageDialog(currentLevelPanel, result,
 							Application.localize(new String[] {"interface","level","success","title"}),
 							JOptionPane.INFORMATION_MESSAGE);
@@ -148,7 +150,7 @@ public class CurrentLevelView implements IView, ILevelListener {
 	}
 	
 	public void levelHasChanged() {
-		currentLevel = applicationEngine.getCurrentLevel();
+		currentLevel = applicationEngine.getLevelManager().getCurrentLevel();
 		if(currentLevel==null) {
 			description.setText(Application.localize(new String[] {"interface","level","description","none"}));
 			hintButton.setEnabled(false);

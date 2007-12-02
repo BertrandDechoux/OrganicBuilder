@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
-import java.util.Vector;
 
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.DraggingPoint;
@@ -39,14 +38,13 @@ final class Collider {
 
 	// ------- data ---------
 	private Atom atoms[];
-	private Vector reactions;
-	
+
 	// structures for space-division speed-up:
 	private final List buckets[][]; // each bucket has a list of the indices of the sq3Atoms contained within it
 	private final int n_buckets_x,n_buckets_y; // the horizontal and vertical dimensions are divided into this many buckets
 	private final int width, height;
 	// we store the size to ensure we access the right bucket (dimensions might change)
-	protected float bucket_width,bucket_height; //TODO remove ?
+	protected float bucket_width,bucket_height;
 	
 	private float MAX_SPEED=5.0f; // recomputed when R changes (thanks Ralph)
 	private Set reactedAtoms = new HashSet();
@@ -54,7 +52,6 @@ final class Collider {
 
 	// ------- methods ---------
 	public Collider(Atom[] atoms,int w,int h) {
-		reactions = new Vector();
 		this.atoms = atoms; //TODO copy or create them locally with a Level instance
 		// size the buckets structure so each bucket is approximately R in size (approx 1 atom per bucket)
 		final float R = Atom.getAtomSize();
@@ -85,18 +82,6 @@ final class Collider {
 		return atoms;
 	}
 	
-	// TODO protect the collection : copy or immutable view
-	public Vector getReactions() {
-		return reactions;
-	}
-	
-	public void setReactions(final Reaction[] newReactions) {
-		Vector reactions = new Vector(newReactions.length);
-		for(int i = 0 ; i < newReactions.length ; i++)
-			reactions.add(newReactions[i]);
-		this.reactions = reactions;
-	}
-	
 	private int whichBucketX(float x)
 	{
 		int w = (int)Math.floor(x/bucket_width);
@@ -125,7 +110,7 @@ final class Collider {
 	//   velocities as a result of the collision. might be promising to explore for OB - but how to include
 	//   bonds (and dragging)?
 	// - a lattice-based physics can run very fast indeed but doesn't look as satisfying
-	public void doTimeStep(int width, int height,DraggingPoint draggingPoint) {
+	public void doTimeStep(DraggingPoint draggingPoint, List reactions) {
 		// boolean is_dragging,int which_being_dragged, int mouse_x,int mouse_y
 		// COMPUTE AND REACT
 		// we shuffle the reactions list in order to prevent any reaction artefacts, since
@@ -136,6 +121,7 @@ final class Collider {
 		
 		// starting over for this iteration
 		reactedAtoms.clear();
+		//TODO the collider should not be responsible for the mangement of reactions
 		
 		float R = Atom.getAtomSize();
 		float diam = 2.0f*R;

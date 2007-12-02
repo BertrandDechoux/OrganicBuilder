@@ -34,6 +34,7 @@ import javax.swing.event.ChangeListener;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
+import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.DraggingPoint;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.IAtomListener;
@@ -193,8 +194,9 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
 	}
 
 	public void simulationSizeHasChanged() {
-		simulationHeight = (int)applicationEngine.getCurrentLevel().getConfiguration().getHeight();
-		simulationWidth = (int)applicationEngine.getCurrentLevel().getConfiguration().getWidth();
+		Configuration configuration = applicationEngine.getLevelManager().getCurrentLevel().getConfiguration();
+		simulationHeight = (int)configuration.getHeight();
+		simulationWidth = (int)configuration.getWidth();
 		imageSizeHasChanged();
 	}
 	

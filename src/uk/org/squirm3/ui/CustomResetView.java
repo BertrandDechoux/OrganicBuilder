@@ -206,7 +206,7 @@ public class CustomResetView implements IView, ILevelListener {
 	}
 
 	public void configurationHasChanged() {
-		Configuration configuration = applicationEngine.getCurrentLevel().getConfiguration();
+		Configuration configuration = applicationEngine.getLevelManager().getCurrentLevel().getConfiguration();
 		updateNumberOfAtoms(configuration.getNumberOfAtoms());
 		updateWidth((int)configuration.getWidth());
 		updateHeight((int)configuration.getHeight());
