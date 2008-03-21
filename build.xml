@@ -6,10 +6,7 @@
 	<!-- Set global properties for this build -->
 	<property name="src"		location="src"/>
 	<property name="release"	location="release"/>
-	<property name="build"		location="build"/>
-	
-	<property name="JUNIT_HOME"	location="/usr/share/eclipse/plugins/org.junit_3.8.1"/>
-	
+	<property name="build"		location="build"/>	
 
 	<target name="init">
 		<!-- Create the time stamp -->
@@ -27,21 +24,24 @@
 	</target>
 	
 	<!-- Compile and run the unit tests -->
-	<target name="compile_and_run_tests" depends="compile_application_source"
-			if="JUNIT_HOME">
+	<target name="compile_and_run_tests" depends="compile_application_source">
 		<!-- Compile the java code of unit tests from ${src} into ${build} -->
 		<javac debug="true" srcdir="${src}" destdir="${build}" 
 				source="1.4" target="1.4">
 			<include name="test/**/*.java"/>
 		</javac>
-        <java fork="yes" classname="junit.textui.TestRunner" 
-        		failonerror="true">
-            <arg value="test.uk.org.squirm3.AllJUnitTests"/>
-            <classpath>
-                <pathelement path="${build}" />
-                <pathelement path="${java.class.path}" />
-            </classpath>
-        </java>
+		<junit printsummary="yes" filtertrace="yes" fork="yes" haltonfailure="yes">
+			<classpath>
+				<pathelement location="${build}"/>
+			</classpath>
+			<batchtest >
+				<fileset dir="${src}">
+					<include name="**/*Test.java"/>
+					<exclude name="**/I**.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+
 		<!-- Stop the process if one test failed -->
 	</target>
 
