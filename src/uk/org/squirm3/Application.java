@@ -89,7 +89,7 @@ public final class Application  {
 		
 		// choose a language
 		String chosenLanguage = Application.getConfiguration(new String[] {"languages", "choice"});
-		if(chosenLanguage==null || chosenLanguage.isEmpty()) {
+		if(chosenLanguage==null || chosenLanguage.length()==0) {
 			final String[] languagesArray = Application.getConfiguration(new String[] {"languages", "available"}).split(" ");
 			if(languagesArray.length==1) chosenLanguage = languagesArray[0];
 			else chosenLanguage = GUI.selectLanguage(languagesArray);
