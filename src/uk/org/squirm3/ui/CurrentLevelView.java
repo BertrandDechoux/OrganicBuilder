@@ -74,7 +74,7 @@ public class CurrentLevelView implements IView, ILevelListener {
 		description.setContentType("text/html");
 		description.setEditable(false);
 		JScrollPane p = new JScrollPane(description);
-		p.setMinimumSize(new Dimension(50, 100));
+		p.setMinimumSize(new Dimension(50, 200));
 		jPanel.add(p, BorderLayout.CENTER);
 		jPanel.add(createButtonsPanel(),BorderLayout.SOUTH);
 		return jPanel;
@@ -191,6 +191,7 @@ class NetLogger implements ILogger {
 				  URL url = new URL(this.url);
 				  URLConnection connection = url.openConnection();
 				  connection.setDoOutput(true);
+				  connection.setConnectTimeout(100); // don't wait too long
 				  
 				  PrintWriter out = new PrintWriter(connection.getOutputStream());
 				  // chalenge number
