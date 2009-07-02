@@ -23,9 +23,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 public final class Reaction {
-	private static final Pattern pattern = Pattern.compile("([a-f]|[xy])(\\d{1,2})" + "( ?\\+ ?| ?)" +
-			"([a-f]|[xy])(\\d{1,2})" + " ?=> ?" + "\\1(\\d{1,2})" +
-			"( ?\\+ ?| ?)" + "\\4(\\d{1,2})$");
+    private static final String types = "abcdefxy";
+	private static final Pattern pattern = Pattern.compile("(["+types+"])(\\d{1,})" + 
+	    "(\\s*\\+\\s*|\\s*)" + "(["+types+"])(\\d{1,})" + "\\s*[=\\-]>\\s*" + 
+	    "\\1(\\d{1,})" + "(\\s*\\+\\s*|\\s*)" + "\\4(\\d{1,})$");
 	private final int a_type,b_type,a_state,b_state; // for type: 0=a..5=f,6=x,7=y
 	private final boolean bonded_before,bonded_after;
 	private final int future_a_state,future_b_state;
@@ -64,10 +65,10 @@ public final class Reaction {
 		Matcher m = pattern.matcher(description);
 		boolean b = m.matches();
 		if(!b) return null;
-		final int a_type = m.group(1).charAt(0)-'a';
+		final int a_type = types.indexOf(m.group(1).charAt(0));
 		final int a_state = Integer.parseInt(m.group(2));
 		final boolean bonded_before = !m.group(3).contains("+");
-		final int b_type = m.group(4).charAt(0)-'a';
+		final int b_type = types.indexOf(m.group(4).charAt(0));
 		final int b_state = Integer.parseInt(m.group(5));
 		final int future_a_state = Integer.parseInt(m.group(6));
 		final boolean bonded_after = !m.group(7).contains("+");

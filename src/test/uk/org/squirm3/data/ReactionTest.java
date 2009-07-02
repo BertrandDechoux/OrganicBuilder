@@ -46,18 +46,11 @@ public class ReactionTest extends TestCase {
 
 	/** Test of the 'parse' method. **/
 	public void testParse() {
-		int a_type = 1;
-		int a_state = 2;
-		boolean bonded_before = false;
-		int b_type = 3;
-		int b_state = 4;
-		int future_a_state = 5;
-		boolean bonded_after = true;
-		int future_b_state = 6;
-		Reaction r = new Reaction(a_type, a_state, bonded_before,
-				b_type, b_state, future_a_state,
-				bonded_after, future_b_state);
+		Reaction r = new Reaction(1, 2, false, 3, 4, 5, true, 6);
 		Reaction parsedReaction = Reaction.parse(r.toString());
+		assertTrue(r.toString().equals(parsedReaction.toString()));
+		r = new Reaction(6, 20345, true, 7, 4234, 5, false, 6);
+		parsedReaction = Reaction.parse("x20345y4234-> \tx5   +  y6");
 		assertTrue(r.toString().equals(parsedReaction.toString()));
 	}
 
