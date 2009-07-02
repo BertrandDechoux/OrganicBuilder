@@ -122,12 +122,13 @@ public class CurrentLevelView implements IView, ILevelListener {
 					final int levelNumber = levelList.indexOf(currentLevel);
 					logger.writeSolution(levelNumber, applicationEngine.getReactions());
 					
-					result = Application.localize(new String[] {"interface","level","fullsuccess"});
 					if(levelNumber+1>levelList.size()-1) {
+						result = Application.localize(new String[] {"interface","level","fullsuccess"});
 						JOptionPane.showMessageDialog(currentLevelPanel, result,
 							Application.localize(new String[] {"interface","level","success","title"}),
 							JOptionPane.INFORMATION_MESSAGE);
 					} else {
+						result = Application.localize(new String[] {"interface","level","success"});
 						Object[] options = {Application.localize(new String[] {"interface","level","yes"}),
 								Application.localize(new String[] {"interface","level","no"})};
 						int n = JOptionPane.showOptionDialog(currentLevelPanel,

@@ -61,7 +61,7 @@ public abstract class Level {
 	}
 	
 	protected String getError(int number) {
-		return errors[number];
+		return errors[number-1]; // indices in level*.properties are one-based
 	}
 	
 	protected void setConfiguration(Configuration configuration) {
