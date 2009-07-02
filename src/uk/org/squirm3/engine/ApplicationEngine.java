@@ -923,9 +923,12 @@ class Make_ladder extends Level //14
 		it = joined.iterator();
 		while(it.hasNext()) { 
 			Atom a = (Atom)it.next();
-			if(a.getType()==4 || a.getType()==5) // 'e' and 'f' 
+			if(a.getType()==4 || a.getType()==5) { 
+				// 'e' and 'f' 
 				if(a.getBonds().size()!=2) return getError(4);
-				else if(a.getBonds().size()!=3) return getError(5);
+			} else {
+				if(a.getBonds().size()!=3) return getError(5);
+			}
 		}
 		return null; }
 }
