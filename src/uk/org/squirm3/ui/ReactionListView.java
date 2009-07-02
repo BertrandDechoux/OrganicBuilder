@@ -64,8 +64,6 @@ public class ReactionListView implements IView, IReactionListener {
 	private TitledBorder border;
 	private final JPanel listPanel;
 	
-	boolean isBeingEdited = false;
-
 	public ReactionListView(ApplicationEngine applicationEngine) {
 		this.applicationEngine = applicationEngine;
 		listPanel = createListPanel();
@@ -124,8 +122,6 @@ public class ReactionListView implements IView, IReactionListener {
 	}
 	
 	public void editReactions() {
-		if(isBeingEdited==true) return;
-		else isBeingEdited = true;
 		buttonParentPanel.remove(listButtonsPanel);
 		buttonParentPanel.add(updateButton, BorderLayout.NORTH);
 		buttonParentPanel.updateUI();
@@ -139,9 +135,6 @@ public class ReactionListView implements IView, IReactionListener {
 	}
 	
 	public void updateReactions() {
-		if(isBeingEdited==false) return;
-		else isBeingEdited = false;
-		
 		String result = null;
 		Vector v = new Vector();	
 		// System.out.println("Input: "+text); // DEBUG
