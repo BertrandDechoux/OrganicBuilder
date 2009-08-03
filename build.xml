@@ -1,13 +1,16 @@
 <project name="Organic Builder" default="release" basedir=".">
 	<description>
-		build file to compile, test and package the application
+		build-file used to compile, test and package the application
 	</description>
 	
 	<!-- Set global properties for this build -->
-	<property name="src"		location="src"/>
-	<property name="release"	location="release"/>
-	<property name="build"		location="build"/>	
-
+	<property name="src"		location="${basedir}/src"/>
+	<property name="release"	location="${basedir}/release"/>
+	<property name="build"		location="${basedir}/build"/>	
+	
+	<property name="release.sdk" value="1.6"/>
+	<property name="junit.path" value="${basedir}/tools/junit-4.6.jar"/>
+	
 	<target name="init">
 		<!-- Create the time stamp -->
 		<tstamp/>
@@ -18,21 +21,25 @@
 
 	<!-- Compile the source files for the application -->
 	<target name="compile_application_source" depends="init">
-	    <!-- Compile the java code from ${src} into ${build} -->
-		<javac srcdir="${src}" destdir="${build}" excludes="test/**"
-			source="1.4" target="1.4"/>
+		<javac debug="on" debuglevel="source,line,vars"
+			srcdir="${src}" destdir="${build}" excludes="test/**"
+			source="${release.sdk}" target="${release.sdk}"/>
 	</target>
 	
-	<!-- Compile and run the unit tests -->
-	<target name="compile_and_run_tests" depends="compile_application_source">
-		<!-- Compile the java code of unit tests from ${src} into ${build} -->
-		<javac debug="true" srcdir="${src}" destdir="${build}" 
-				source="1.4" target="1.4">
-			<include name="test/**/*.java"/>
-		</javac>
-		<junit printsummary="yes" filtertrace="yes" fork="yes" haltonfailure="yes">
+	<!-- Compile the source files for testing the application -->
+	<target name="compile_test_source" depends="compile_application_source">
+		<javac debug="on" debuglevel="source,line,vars"
+			srcdir="${src}" destdir="${build}" includes="test/**/*.java"
+			source="${release.sdk}" target="${release.sdk}"
+			classpath="${junit.path}"/>
+	</target>
+	
+	<!-- run the unit tests -->
+	<target name="run_test" depends="compile_test_source">
+		<junit fork="yes" haltonfailure="yes">
 			<classpath>
 				<pathelement location="${build}"/>
+				<pathelement location="${junit.path}"/>
 			</classpath>
 			<batchtest >
 				<fileset dir="${src}">
@@ -41,12 +48,10 @@
 				</fileset>
 			</batchtest>
 		</junit>
-
-		<!-- Stop the process if one test failed -->
 	</target>
 
 	<!-- Generate a release : jar and zip files -->
-	<target name="release" depends="compile_and_run_tests"
+	<target name="release" depends="run_test"
 			description="generate the release " >
 		<!-- Create the application jar file -->
 		<jar jarfile="${release}/OrganicBuilder.jar">
@@ -76,6 +81,8 @@
 	<!-- Clean all : delete the release directory -->
  	<target name="clean" description="clean up " >
 		<!-- Delete all -->
+ 		<delete dir="${build}"/>
 		<delete dir="${release}"/>
 	</target>
+
 </project>

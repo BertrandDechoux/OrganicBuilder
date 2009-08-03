@@ -55,7 +55,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 public class GUI {
 	
 	public static void createGUI(final ApplicationEngine applicationEngine, final JApplet applet) {
-		new GUI(applicationEngine, applet);
+		// create the graphical interface
+	    SwingUtilities.invokeLater(new Runnable() {
+	        public void run() {
+	        	new GUI(applicationEngine, applet);
+	        }
+	    });
 	}
 
 	public static String selectLanguage(String[] languages) {
@@ -85,7 +90,7 @@ public class GUI {
 			//view
 		AtomsView atomsView = new AtomsView(applicationEngine);
 		CurrentLevelView currentLevelView = new CurrentLevelView(applicationEngine,
-					Application.getConfiguration(new String[] {"logger", "url"}));
+					Application.getProperty("configuration.logger.url"));
 		ReactionListView reactionListView = new ReactionListView(applicationEngine);
 		ReactionEditorView reactionEditorView = new ReactionEditorView(applicationEngine);
 		StateView stateView = new StateView(applicationEngine);

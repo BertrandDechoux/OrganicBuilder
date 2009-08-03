@@ -3,7 +3,6 @@ package uk.org.squirm3.engine;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,7 +19,7 @@ import uk.org.squirm3.data.Level;
 import uk.org.squirm3.data.MobilePoint;
 
 /**  
- Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
+ Copyright 2009 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
  
  This file is part of Organic Builder.
  
@@ -56,10 +55,10 @@ public class ApplicationEngine {
 	private ReactionManager reactionManager;
 	private final EngineDispatcher engineDispatcher;
 	
-	public ApplicationEngine() {
-		final int simulationWidth = Integer.parseInt(Application.getConfiguration(new String[] {"simulation","width"}));
-		final int simulationHeight = Integer.parseInt(Application.getConfiguration(new String[] {"simulation","height"}));
-		final int numberOfAtoms = Integer.parseInt(Application.getConfiguration(new String[] {"simulation","atom","number"}));
+	public ApplicationEngine() throws Exception {
+		final int simulationWidth = Integer.parseInt(Application.getProperty("configuration.simulation.width"));
+		final int simulationHeight = Integer.parseInt(Application.getProperty("configuration.simulation.height"));
+		final int numberOfAtoms = Integer.parseInt(Application.getProperty("configuration.simulation.atom.number"));
 		
 		final Configuration configuration = new Configuration(numberOfAtoms, Level.TYPES, simulationWidth, simulationHeight);
 
@@ -67,35 +66,23 @@ public class ApplicationEngine {
 		levelManager = new LevelManager();
 		int i = 0;
 		while(true) {
-			String className = Application.getConfiguration(new String[] {"levels",new Integer(i).toString(),"class"});
-			if(className==null) break;
-			Class c = null;
-			try {
-				c = Class.forName(className);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-			String key = Application.getConfiguration(new String[] {"levels",new Integer(i).toString(),"key"});
-			if(key==null) break;
+			String className = Application.getProperty("configuration.levels."+new Integer(i)+".class");
+			if(className.equals("configuration.levels."+new Integer(i)+".class")) break;
+			Class c = Class.forName(className);
+			String key = Application.getProperty("configuration.levels."+new Integer(i)+".key");
+			if(key.equals("configuration.levels."+new Integer(i)+".key")) break;
 			Constructor[] cs = c.getConstructors();
-			final String title = Application.localize(new String[] {"levels",key,"title"});
-			final String texte = Application.localize(new String[] {"levels",key,"challenge"});
-			final String hint = Application.localize(new String[] {"levels",key,"hint"});
-			ArrayList errors = new ArrayList();
-			int j = 1;
-			while(true) {
-				String error = Application.localize(new String[] {"levels",key,"error",new Integer(j).toString()});
-				if(error==Application.TRANSLATION_ERROR) break;
-				else errors.add(error);
-				j++;
+			final String title = Application.getProperty("levels."+key+".title");
+			final String texte = Application.getProperty("levels."+key+".challenge");
+			final String hint = Application.getProperty("levels."+key+".hint");
+			int nErrors = Integer.parseInt(Application.getProperty("levels."+key+".errors"));
+			String[] errors = new String[nErrors];
+			for (int j = 1; j <= nErrors; j++) {
+				errors[j-1] = Application.getProperty("levels."+key+".error."+new Integer(j));
 			}
-			Object[] os = new Object[] {title,texte,hint,errors.toArray(new String[0]),configuration};
-			try {
-				Level l = (Level) cs[0].newInstance(os);
-				levelManager.addLevel(l);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
+			Object[] os = new Object[] {title,texte,hint,errors,configuration};
+			Level l = (Level) cs[0].newInstance(os);
+			levelManager.addLevel(l);
 			i++;
 		}
 		reactionManager = new ReactionManager();

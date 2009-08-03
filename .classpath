@@ -2,7 +2,5 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="**/.svn/|.classpath|.project|.svn/|build.xml|launchers/|media/|release/|src/" kind="src" path=""/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" sourcepath="ECLIPSE_HOME/plugins/org.eclipse.jdt.source_3.1.1/src/org.junit_3.8.1/junitsrc.zip" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

@@ -3,7 +3,7 @@ package uk.org.squirm3;
 import javax.swing.JApplet;
 
 /**  
-Copyright 2007 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
+Copyright 2009 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
 
 This file is part of Organic Builder.
 
@@ -22,10 +22,18 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+@SuppressWarnings("serial")
 public class Applet extends JApplet {
 	
+	@Override
 	public void init() {
-		Application.runAsApplet(this);
+		super.init();
+		try {
+			Application.runAsApplet(this);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
