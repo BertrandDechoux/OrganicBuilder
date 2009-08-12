@@ -73,6 +73,11 @@
                 <targetPath>./java-sources/main</targetPath>
             </resource>
             <resource>
+                <directory>launchers</directory>
+                <filtering>true</filtering>
+                <targetPath>..</targetPath>
+            </resource>
+            <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
             </resource>
