@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry excluding="**/.svn/|.classpath|.project|.svn/|build.xml|launchers/|media/|release/|src/" kind="src" path=""/>
-	<classpathentry kind="output" path="build"/>
-</classpath>
