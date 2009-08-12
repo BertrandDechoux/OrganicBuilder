@@ -1,16 +1,17 @@
 package uk.org.squirm3.data;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-/**  
-${my.copyright}
+/**
+ * ${my.copyright}
  */
 
 public class ReactionTest {
 
-    /** Test of the 'tostring' method. **/
+    /**
+     * Test of the 'tostring' method. *
+     */
     @Test
     public void testToString() {
         int a_type = 1;
@@ -27,7 +28,9 @@ public class ReactionTest {
         assertTrue(r.toString().equals("b2 + d4 => b5d6"));
     }
 
-    /** Test of the 'parse' method. **/
+    /**
+     * Test of the 'parse' method. *
+     */
     @Test
     public void testParse() {
         Reaction r = new Reaction(1, 2, false, 3, 4, 5, true, 6);
@@ -38,7 +41,9 @@ public class ReactionTest {
         assertTrue(r.toString().equals(parsedReaction.toString()));
     }
 
-    /** Test of the reaction process. **/
+    /**
+     * Test of the reaction process. *
+     */
     @Test
     public void testTryReaction() {
         // creation of the reaction
@@ -58,14 +63,14 @@ public class ReactionTest {
         Atom a2 = new Atom(new MobilePoint(), 1, 1);
         // test of the reaction
         r.tryOn(a1, a2);
-        assertTrue(a1.getType()==0 && a1.getState()==2
-                && a2.getType()==1 && a2.getState()==2
+        assertTrue(a1.getType() == 0 && a1.getState() == 2
+                && a2.getType() == 1 && a2.getState() == 2
                 && a1.hasBondWith(a2));
         // test when no reaction should occur
         a1.setState(0);
         r.tryOn(a1, a2);
-        assertTrue(a1.getType()==0 && a1.getState()==0
-                && a2.getType()==1 && a2.getState()==2
+        assertTrue(a1.getType() == 0 && a1.getState() == 0
+                && a2.getType() == 1 && a2.getState() == 2
                 && a1.hasBondWith(a2));
     }
 

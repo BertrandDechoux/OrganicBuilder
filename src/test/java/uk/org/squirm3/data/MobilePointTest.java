@@ -1,9 +1,7 @@
 package uk.org.squirm3.data;
 
-import uk.org.squirm3.data.MobilePoint;
-
-/**  
-${my.copyright}
+/**
+ * ${my.copyright}
  */
 
 public class MobilePointTest extends IPhysicalPointTest {

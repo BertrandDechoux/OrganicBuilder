@@ -1,39 +1,18 @@
 package uk.org.squirm3.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Insets;
+import uk.org.squirm3.Application;
+import uk.org.squirm3.engine.ApplicationEngine;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.JApplet;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
-
-import uk.org.squirm3.Application;
-import uk.org.squirm3.engine.ApplicationEngine;
-
-/**  
-${my.copyright}
+/**
+ * ${my.copyright}
  */
 
 public class GUI {
@@ -49,13 +28,13 @@ public class GUI {
 
     public static String selectLanguage(String[] languages) {
         Icon[] icons = new Icon[languages.length];
-        for(int i = 0; i < icons.length; i++) {
+        for (int i = 0; i < icons.length; i++) {
             icons[i] = Resource.getIcon(languages[i]);
         }
         final int choice = JOptionPane.showOptionDialog(null,
                 "", "Organic Builder", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                 null, icons, null);
-        if(choice==JOptionPane.CLOSED_OPTION) return null;
+        if (choice == JOptionPane.CLOSED_OPTION) return null;
         else return languages[choice];
     }
 
@@ -63,9 +42,9 @@ public class GUI {
         Resource.loadPictures();
 
         //frame
-        JFrame frame = new JFrame(Application.localize(new String[] {"interface","application","title"}));
-        frame.setSize(1080,630);
-        if(applet==null) {
+        JFrame frame = new JFrame(Application.localize(new String[]{"interface", "application", "title"}));
+        frame.setSize(1080, 630);
+        if (applet == null) {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         } else {
             frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -83,8 +62,8 @@ public class GUI {
         SpeedView speedView = new SpeedView(applicationEngine);
 
         //main panels
-        JComponent collisionsPanel 	= atomsView.getCollisionsPanel();
-        JPanel currentLevelPanel	= currentLevelView.getCurrentLevelPanel();
+        JComponent collisionsPanel = atomsView.getCollisionsPanel();
+        JPanel currentLevelPanel = currentLevelView.getCurrentLevelPanel();
         JPanel reactionEditorPanel = reactionEditorView.getEditorPanel();
         reactionEditorPanel.setMaximumSize(reactionEditorPanel.getMinimumSize());
 
@@ -92,47 +71,48 @@ public class GUI {
                 true, reactionEditorView.getEditorPanel(), reactionListView.getListPanel());
         reactionsPane.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent arg0) {
-                if(arg0.getPropertyName().equals("dividerLocation")
+                if (arg0.getPropertyName().equals("dividerLocation")
                         && !arg0.getNewValue().toString().equals("1")) {
                     reactionsPane.setDividerLocation(-1);
                 }
-            }});
+            }
+        });
         reactionsPane.setOneTouchExpandable(true);
 
         //toolbar
         JPanel toolBar = new JPanel();
-        toolBar.setLayout(new BoxLayout(toolBar,BoxLayout.X_AXIS));
-        Color bg = new Color(255,255,225);
+        toolBar.setLayout(new BoxLayout(toolBar, BoxLayout.X_AXIS));
+        Color bg = new Color(255, 255, 225);
         toolBar.setBackground(bg);
         // simulation controls
         JPanel simControlsPanel = new JPanel();
-        simControlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT,1,2));
+        simControlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 2));
         simControlsPanel.setBackground(bg);
-        simControlsPanel.add(createIconButton(stateView.getStopAction(),bg));
-        simControlsPanel.add(createIconButton(stateView.getRunAction(),bg));
-        simControlsPanel.add(createIconButton(stateView.getResetAction(),bg));
-        simControlsPanel.add(createIconButton(createParametersAction(customResetView.getPanel(), speedView.getPanel(),atomsView.getControlsPanel()),bg));
+        simControlsPanel.add(createIconButton(stateView.getStopAction(), bg));
+        simControlsPanel.add(createIconButton(stateView.getRunAction(), bg));
+        simControlsPanel.add(createIconButton(stateView.getResetAction(), bg));
+        simControlsPanel.add(createIconButton(createParametersAction(customResetView.getPanel(), speedView.getPanel(), atomsView.getControlsPanel()), bg));
         toolBar.add(simControlsPanel);
         toolBar.add(Box.createHorizontalGlue());
         // navigation controls
         JPanel navControlsPanel = new JPanel();
-        navControlsPanel.setLayout(new FlowLayout(FlowLayout.CENTER,1,2));
+        navControlsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 2));
         navControlsPanel.setBackground(bg);
-        navControlsPanel.add(createIconButton(levelNavigatorView.getIntroAction(),bg));
-        navControlsPanel.add(createIconButton(levelNavigatorView.getPreviousAction(),bg));
+        navControlsPanel.add(createIconButton(levelNavigatorView.getIntroAction(), bg));
+        navControlsPanel.add(createIconButton(levelNavigatorView.getPreviousAction(), bg));
         JComboBox cb = levelNavigatorView.getLevelComboBox();
-        cb.setMaximumSize(new Dimension(150,80));
+        cb.setMaximumSize(new Dimension(150, 80));
         navControlsPanel.add(cb);
-        navControlsPanel.add(createIconButton(levelNavigatorView.getNextAction(),bg));
-        navControlsPanel.add(createIconButton(levelNavigatorView.getLastAction(),bg));
+        navControlsPanel.add(createIconButton(levelNavigatorView.getNextAction(), bg));
+        navControlsPanel.add(createIconButton(levelNavigatorView.getLastAction(), bg));
         toolBar.add(navControlsPanel);
         toolBar.add(Box.createHorizontalGlue());
         //misc controls
         JPanel miscControlsPanel = new JPanel();
-        miscControlsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT,1,2));
+        miscControlsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 2));
         miscControlsPanel.setBackground(bg);
-        miscControlsPanel.add(createIconButton(createAboutAction(),bg));
-        if(applet!=null) miscControlsPanel.add(createIconButton(createAppletAction(frame,applet),bg));
+        miscControlsPanel.add(createIconButton(createAboutAction(), bg));
+        if (applet != null) miscControlsPanel.add(createIconButton(createAppletAction(frame, applet), bg));
         toolBar.add(miscControlsPanel);
 
         // rootComponent
@@ -146,7 +126,7 @@ public class GUI {
         contentPane.add(toolBar, BorderLayout.NORTH);
         contentPane.add(rootComponent, BorderLayout.CENTER);
 
-        if(applet==null) {
+        if (applet == null) {
             frame.setContentPane(contentPane);
             SwingUtilities.updateComponentTreeUI(frame);
             frame.setVisible(true);
@@ -158,10 +138,9 @@ public class GUI {
     }
 
 
-
     private static JButton createIconButton(Action action, Color bg) {
         final JButton button = new JButton(action);
-        button.setMargin(new Insets(-3,-3,-3,-3));
+        button.setMargin(new Insets(-3, -3, -3, -3));
         button.setBorderPainted(false);
         button.setBackground(bg);
         return button;
@@ -176,30 +155,30 @@ public class GUI {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, message,
-                        Application.localize(new String[] {"interface","application","parameters"}),
+                        Application.localize(new String[]{"interface", "application", "parameters"}),
                         JOptionPane.INFORMATION_MESSAGE);
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","parameters"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "application", "parameters"}));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("parameters"));
         return action;
     }
 
-    private static Action createAboutAction() {	//TODO mise en page des textes
+    private static Action createAboutAction() {    //TODO mise en page des textes
         final JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab(Application.localize(new String[] {"interface","application","about"}),
+        tabbedPane.addTab(Application.localize(new String[]{"interface", "application", "about"}),
                 null, createTextPane("about.html"), null);
-        tabbedPane.addTab(Application.localize(new String[] {"interface","application","license"}),
+        tabbedPane.addTab(Application.localize(new String[]{"interface", "application", "license"}),
                 null, createTextPane("license.html"), null);
 
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, tabbedPane,
-                        Application.localize(new String[] {"interface","application","about"}),
+                        Application.localize(new String[]{"interface", "application", "about"}),
                         JOptionPane.QUESTION_MESSAGE);
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","application","about"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "application", "about"}));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("about"));
         return action;
     }
@@ -207,13 +186,13 @@ public class GUI {
     private static Action createAppletAction(final JFrame frame, final JApplet applet) {
         final Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if(frame.isVisible()) {
+                if (frame.isVisible()) {
                     frame.setVisible(false);
-                    putValue(Action.NAME,Application.localize(new String[] {"interface","undock"}));
+                    putValue(Action.NAME, Application.localize(new String[]{"interface", "undock"}));
                     applet.setContentPane(frame.getContentPane());
                     SwingUtilities.updateComponentTreeUI(applet);
                 } else {
-                    putValue(Action.NAME,Application.localize(new String[] {"interface","dock"}));
+                    putValue(Action.NAME, Application.localize(new String[]{"interface", "dock"}));
                     frame.setContentPane(applet.getContentPane());
                     frame.setVisible(true);
                     SwingUtilities.updateComponentTreeUI(frame);
@@ -221,16 +200,20 @@ public class GUI {
                 }
             }
         };
-        action.putValue(Action.NAME,Application.localize(new String[] {"interface","undock"}));
+        action.putValue(Action.NAME, Application.localize(new String[]{"interface", "undock"}));
         frame.addWindowListener(
                 new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {
-                        action.putValue(Action.NAME,Application.localize(new String[] {"interface","undock"}));
+                        action.putValue(Action.NAME, Application.localize(new String[]{"interface", "undock"}));
                         applet.setContentPane(frame.getContentPane());
                         SwingUtilities.updateComponentTreeUI(applet);
                     }
-                    public void windowDeiconified(WindowEvent e) {}
-                    public void windowIconified(WindowEvent e) {}
+
+                    public void windowDeiconified(WindowEvent e) {
+                    }
+
+                    public void windowIconified(WindowEvent e) {
+                    }
                 });
         return action;
     }
@@ -241,7 +224,7 @@ public class GUI {
         textPane.setText(Resource.getFileContent(fileName));
         textPane.setEditable(false);
         JScrollPane sp = new JScrollPane(textPane);
-        sp.setPreferredSize(new Dimension(600,400));
+        sp.setPreferredSize(new Dimension(600, 400));
         return sp;
     }
 

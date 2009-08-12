@@ -3,8 +3,8 @@ package uk.org.squirm3.data;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-/**  
-${my.copyright}
+/**
+ * ${my.copyright}
  */
 
 public class Atom {
@@ -21,7 +21,7 @@ public class Atom {
     private static final char killer_char = 'K';
 
 
-    public Atom(IPhysicalPoint iPhysicalPoint,int t,int s) {
+    public Atom(IPhysicalPoint iPhysicalPoint, int t, int s) {
         this.iPhysicalPoint = iPhysicalPoint.copy();
         type = t;
         setState(s);
@@ -29,7 +29,7 @@ public class Atom {
     }
 
     public void bondWith(Atom other) {
-        if(!hasBondWith(other)) {
+        if (!hasBondWith(other)) {
             this.bonds.add(other);
             other.bonds.add(this);
         }
@@ -41,18 +41,18 @@ public class Atom {
 
     public void getAllConnectedAtoms(LinkedList list) {
         // is this a new atom for this list?
-        if(list.contains(this)) return;
+        if (list.contains(this)) return;
         // if no, add this one, and all connected atoms
         list.add(this);
         // recurse
         Iterator it = bonds.iterator();
-        while(it.hasNext()) {
-            ((Atom)it.next()).getAllConnectedAtoms(list);
+        while (it.hasNext()) {
+            ((Atom) it.next()).getAllConnectedAtoms(list);
         }
     }
 
     public void breakBondWith(Atom other) {
-        if(hasBondWith(other)) {
+        if (hasBondWith(other)) {
             this.bonds.remove(other);
             other.bonds.remove(this);
         }
@@ -62,8 +62,8 @@ public class Atom {
         // slower method but avoid the concurrent exception
         // TODO faster one, using synchronisation ?
         Object a[] = bonds.toArray();
-        for(int i = 0; i < a.length ; i++)
-            breakBondWith((Atom)a[i]);
+        for (int i = 0; i < a.length; i++)
+            breakBondWith((Atom) a[i]);
         /*
 		Iterator it = bonds.iterator();
 		while(it.hasNext()) {
@@ -72,7 +72,7 @@ public class Atom {
     }
 
     public String toString() {
-        if(type==KILLER_TYPE) return killer_char + String.valueOf(getState());
+        if (type == KILLER_TYPE) return killer_char + String.valueOf(getState());
         return type_code.charAt(getType()) + String.valueOf(getState());
     }
 
@@ -82,18 +82,32 @@ public class Atom {
     }
 
     //TODO the copy should not allow modifications
-    public LinkedList getBonds() { return bonds; }
+    public LinkedList getBonds() {
+        return bonds;
+    }
 
-    public boolean isKiller() { return type==KILLER_TYPE; }
+    public boolean isKiller() {
+        return type == KILLER_TYPE;
+    }
 
-    public void setState(int state) { this.state = state; }
+    public void setState(int state) {
+        this.state = state;
+    }
 
-    public int getState() { return state; }
+    public int getState() {
+        return state;
+    }
 
-    public int getType() { return type; }
+    public int getType() {
+        return type;
+    }
 
-    public IPhysicalPoint getPhysicalPoint() { return iPhysicalPoint; }
+    public IPhysicalPoint getPhysicalPoint() {
+        return iPhysicalPoint;
+    }
 
-    public static float getAtomSize(){ return R; }
+    public static float getAtomSize() {
+        return R;
+    }
 
 } // class sq3Atom

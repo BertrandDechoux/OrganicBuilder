@@ -1,16 +1,14 @@
 package uk.org.squirm3.ui;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
 import uk.org.squirm3.Application;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.IStateListener;
 
-/**  
-${my.copyright}
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
+/**
+ * ${my.copyright}
  */
 
 public class StateView implements IView, IStateListener {
@@ -47,11 +45,11 @@ public class StateView implements IView, IStateListener {
                 applicationEngine.runSimulation();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","run"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "simulation", "run"}));
         //action.putValue(Action.LONG_DESCRIPTION, "Context-Sensitive Help Text"); TODO and for the others actions too
         action.putValue(Action.SMALL_ICON, Resource.getIcon("play"));
         //action.putValue(Action.MNEMONIC_KEY, new Integer(java.awt.event.KeyEvent.VK_A)); TODO
-        return 	action;
+        return action;
     }
 
     private Action createStopAction() {
@@ -60,9 +58,9 @@ public class StateView implements IView, IStateListener {
                 applicationEngine.pauseSimulation();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","stop"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "simulation", "stop"}));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("pause"));
-        return 	action;
+        return action;
     }
 
     private Action createResetAction() {
@@ -71,9 +69,9 @@ public class StateView implements IView, IStateListener {
                 applicationEngine.restartLevel(null);
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","simulation","reset"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "simulation", "reset"}));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("reset"));
-        return 	action;
+        return action;
     }
 
     public void simulationStateHasChanged() {

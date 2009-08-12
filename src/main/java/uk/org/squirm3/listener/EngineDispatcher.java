@@ -1,11 +1,10 @@
 package uk.org.squirm3.listener;
 
+import javax.swing.event.EventListenerList;
 import java.util.EventListener;
 
-import javax.swing.event.EventListenerList;
-
-/**  
-${my.copyright}
+/**
+ * ${my.copyright}
  */
 
 public final class EngineDispatcher {
@@ -74,50 +73,50 @@ public final class EngineDispatcher {
 
     public void atomsHaveChanged() {
         EventListener[] atomListeners = getAtomListeners();
-        for(int i = 0; i < atomListeners.length ; i++) {
-            ((IAtomListener)atomListeners[i]).atomsHaveChanged();
+        for (int i = 0; i < atomListeners.length; i++) {
+            ((IAtomListener) atomListeners[i]).atomsHaveChanged();
         }
     }
 
     public void draggingPointHasChanged() {
         EventListener[] atomListeners = getAtomListeners();
-        for(int i = 0; i < atomListeners.length ; i++) {
-            ((IAtomListener)atomListeners[i]).draggingPointHasChanged();
+        for (int i = 0; i < atomListeners.length; i++) {
+            ((IAtomListener) atomListeners[i]).draggingPointHasChanged();
         }
     }
 
     public void levelHasChanged() {
         EventListener[] levelListeners = getLevelListeners();
-        for(int i = 0; i < levelListeners.length ; i++) {
-            ((ILevelListener)levelListeners[i]).levelHasChanged();
+        for (int i = 0; i < levelListeners.length; i++) {
+            ((ILevelListener) levelListeners[i]).levelHasChanged();
         }
     }
 
     public void configurationHasChanged() {
         EventListener[] levelListeners = getLevelListeners();
-        for(int i = 0; i < levelListeners.length ; i++) {
-            ((ILevelListener)levelListeners[i]).configurationHasChanged();
+        for (int i = 0; i < levelListeners.length; i++) {
+            ((ILevelListener) levelListeners[i]).configurationHasChanged();
         }
     }
 
     public void reactionsHaveChanged() {
         EventListener[] reactionListeners = getReactionListeners();
-        for(int i = 0; i < reactionListeners.length ; i++) {
-            ((IReactionListener)reactionListeners[i]).reactionsHaveChanged();
+        for (int i = 0; i < reactionListeners.length; i++) {
+            ((IReactionListener) reactionListeners[i]).reactionsHaveChanged();
         }
     }
 
     public void simulationSpeedHasChanged() {
         EventListener[] propertyListeners = getSpeedListeners();
-        for(int i = 0; i < propertyListeners.length ; i++) {
-            ((ISpeedListener)propertyListeners[i]).simulationSpeedHasChanged();
+        for (int i = 0; i < propertyListeners.length; i++) {
+            ((ISpeedListener) propertyListeners[i]).simulationSpeedHasChanged();
         }
     }
 
     public void simulationStateHasChanged() {
         EventListener[] stateListeners = getStateListeners();
-        for(int i = 0; i < stateListeners.length ; i++) {
-            ((IStateListener)stateListeners[i]).simulationStateHasChanged();
+        for (int i = 0; i < stateListeners.length; i++) {
+            ((IStateListener) stateListeners[i]).simulationStateHasChanged();
         }
     }
 }

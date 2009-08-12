@@ -1,21 +1,18 @@
 package uk.org.squirm3.ui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComboBox;
-
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.ILevelListener;
 
-/**  
-${my.copyright}
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * ${my.copyright}
  */
 
 public class LevelNavigatorView implements IView, ILevelListener {
@@ -64,21 +61,21 @@ public class LevelNavigatorView implements IView, ILevelListener {
         String[] levelsLabels = new String[levelList.size()];
         Iterator it = levelList.iterator();
         int i = 0;
-        while(it.hasNext()) {
-            String number = String.valueOf(i)+"  ";
-            if(i<10) number += "  ";
-            levelsLabels[i] = number+((Level)it.next()).getTitle();
+        while (it.hasNext()) {
+            String number = String.valueOf(i) + "  ";
+            if (i < 10) number += "  ";
+            levelsLabels[i] = number + ((Level) it.next()).getTitle();
             i++;
         }
         final JComboBox cb = new JComboBox(levelsLabels);
         cb.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if(!update) applicationEngine.goToLevel(levelComboBox.getSelectedIndex(),null);
+                        if (!update) applicationEngine.goToLevel(levelComboBox.getSelectedIndex(), null);
                         update = false;
                     }
                 });
-        cb.setToolTipText(Application.localize(new String[] {"interface","navigation","selected"}));
+        cb.setToolTipText(Application.localize(new String[]{"interface", "navigation", "selected"}));
         return cb;
     }
 
@@ -88,9 +85,9 @@ public class LevelNavigatorView implements IView, ILevelListener {
                 applicationEngine.goToFirstLevel();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","first"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "navigation", "first"}));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("first"));
-        return 	action;
+        return action;
     }
 
     private Action createPreviousAction() {
@@ -99,9 +96,9 @@ public class LevelNavigatorView implements IView, ILevelListener {
                 applicationEngine.goToPreviousLevel();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","previous"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "navigation", "previous"}));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("previous"));
-        return 	action;
+        return action;
     }
 
     private Action createNextAction() {
@@ -110,9 +107,9 @@ public class LevelNavigatorView implements IView, ILevelListener {
                 applicationEngine.goToNextLevel();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","next"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "navigation", "next"}));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("next"));
-        return 	action;
+        return action;
     }
 
     private Action createLastAction() {
@@ -121,20 +118,20 @@ public class LevelNavigatorView implements IView, ILevelListener {
                 applicationEngine.goToLastLevel();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[] {"interface","navigation","last"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "navigation", "last"}));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("last"));
-        return 	action;
+        return action;
     }
 
     private void updateControls() {
         final List levelList = applicationEngine.getLevelManager().getLevels();
         final int levelNumber = levelList.indexOf(applicationEngine.getLevelManager().getCurrentLevel());
 
-        final boolean firstLevel = levelNumber==0;
+        final boolean firstLevel = levelNumber == 0;
         intro.setEnabled(!firstLevel);
         previous.setEnabled(!firstLevel);
 
-        final boolean lastLevel = levelNumber==(levelList.size()-1);
+        final boolean lastLevel = levelNumber == (levelList.size() - 1);
         last.setEnabled(!lastLevel);
         next.setEnabled(!lastLevel);
 
@@ -147,5 +144,6 @@ public class LevelNavigatorView implements IView, ILevelListener {
         updateControls();
     }
 
-    public void configurationHasChanged() {}
+    public void configurationHasChanged() {
+    }
 }

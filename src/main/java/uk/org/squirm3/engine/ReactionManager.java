@@ -1,15 +1,11 @@
 package uk.org.squirm3.engine;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 import uk.org.squirm3.data.Reaction;
 
-/**  
-${my.copyright}
+import java.util.*;
+
+/**
+ * ${my.copyright}
  */
 
 public class ReactionManager {
@@ -22,10 +18,10 @@ public class ReactionManager {
 
     public void addReactions(Collection c) {
         Iterator it = c.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Object o = it.next();
-            if(o instanceof Reaction) {
-                Reaction r = (Reaction)o;
+            if (o instanceof Reaction) {
+                Reaction r = (Reaction) o;
                 reactions.add(r);
             }
         }
@@ -37,10 +33,10 @@ public class ReactionManager {
 
     public void removeReactions(Collection c) {
         Iterator it = c.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Object o = it.next();
-            if(o instanceof Reaction) {
-                Reaction r = (Reaction)o;
+            if (o instanceof Reaction) {
+                Reaction r = (Reaction) o;
                 reactions.remove(r);
             }
         }

@@ -1,25 +1,20 @@
 package uk.org.squirm3.ui;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.text.NumberFormat;
-
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.NumberFormatter;
-
 import uk.org.squirm3.Application;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.ISpeedListener;
 
-/**  
-${my.copyright}
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.NumberFormatter;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.NumberFormat;
+
+/**
+ * ${my.copyright}
  */
 
 public class SpeedView implements IView, ISpeedListener {
@@ -36,35 +31,35 @@ public class SpeedView implements IView, ISpeedListener {
         panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         // speed
-        GridBagConstraints gbc = createCustomGBC(0,0);
-        panel.add(new JLabel(Application.localize(new String[] {"interface","parameters","speed"})),gbc);
-        gbc = createCustomGBC(1,0);
+        GridBagConstraints gbc = createCustomGBC(0, 0);
+        panel.add(new JLabel(Application.localize(new String[]{"interface", "parameters", "speed"})), gbc);
+        gbc = createCustomGBC(1, 0);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        speedSelector = new JSlider(1,100,applicationEngine.getSimulationSpeed());
+        speedSelector = new JSlider(1, 100, applicationEngine.getSimulationSpeed());
         speedSelector.setInverted(true);
         speedSelector.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                JSlider source = (JSlider)e.getSource();
+                JSlider source = (JSlider) e.getSource();
                 if (!source.getValueIsAdjusting()) {
-                    SpeedView.this.applicationEngine.setSimulationSpeed((short)source.getValue());
+                    SpeedView.this.applicationEngine.setSimulationSpeed((short) source.getValue());
                 }
             }
         });
-        panel.add(speedSelector,gbc);
-        gbc = createCustomGBC(2,0);
+        panel.add(speedSelector, gbc);
+        gbc = createCustomGBC(2, 0);
         gbc.weightx = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         speedTF = createCustomTF(1, 100, applicationEngine.getSimulationSpeed());
         speedTF.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent e) {
                 if ("value".equals(e.getPropertyName())) {
-                    SpeedView.this.applicationEngine.setSimulationSpeed(((Number)e.getNewValue()).shortValue());
+                    SpeedView.this.applicationEngine.setSimulationSpeed(((Number) e.getNewValue()).shortValue());
                 }
             }
         });
 
-        panel.add(speedTF,gbc);
+        panel.add(speedTF, gbc);
         applicationEngine.getEngineDispatcher().addSpeedListener(this);
     }
 

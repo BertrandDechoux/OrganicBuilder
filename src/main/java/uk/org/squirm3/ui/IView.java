@@ -1,7 +1,7 @@
 package uk.org.squirm3.ui;
 
-/**  
-${my.copyright}
+/**
+ * ${my.copyright}
  */
 
 public interface IView {

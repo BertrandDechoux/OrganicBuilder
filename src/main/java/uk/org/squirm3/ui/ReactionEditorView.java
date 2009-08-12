@@ -1,28 +1,20 @@
 package uk.org.squirm3.ui;
 
-import java.awt.FlowLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.EtchedBorder;
-
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Reaction;
 import uk.org.squirm3.engine.ApplicationEngine;
 
-/**  
-${my.copyright}
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+
+/**
+ * ${my.copyright}
  */
 
 public class ReactionEditorView implements IView {
@@ -44,10 +36,10 @@ public class ReactionEditorView implements IView {
 
     private JPanel createEditorPanel() {
         final JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BoxLayout(jPanel,BoxLayout.PAGE_AXIS));
+        jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.PAGE_AXIS));
         jPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), 
-                Application.localize(new String[] {"interface","reactions","editor"})));
+                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+                Application.localize(new String[]{"interface", "reactions", "editor"})));
         final JPanel reactionPanel = new JPanel();
         reactionPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         ActionListener l = new ActionListener() {
@@ -86,8 +78,8 @@ public class ReactionEditorView implements IView {
         reactionPanel.add(futureBState);
         jPanel.add(reactionPanel);
         addReaction = new JButton(Resource.getIcon("add"));
-        addReaction.setMargin(new Insets(0,0,0,0));
-        addReaction.setToolTipText(Application.localize(new String[] {"interface","reactions","add","tooltip"}));
+        addReaction.setMargin(new Insets(0, 0, 0, 0));
+        addReaction.setToolTipText(Application.localize(new String[]{"interface", "reactions", "add", "tooltip"}));
         addReaction.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Collection c = new ArrayList(1);
@@ -101,14 +93,14 @@ public class ReactionEditorView implements IView {
     }
 
     private Reaction createReactionFromEditor() {
-        return new Reaction(aType.getSelectedIndex(),aState.getSelectedIndex(),bondedBefore.isSelected(),
-                bType.getSelectedIndex(),bState.getSelectedIndex(),futureAState.getSelectedIndex(),
-                bondedAfter.isSelected(),futureBState.getSelectedIndex());
+        return new Reaction(aType.getSelectedIndex(), aState.getSelectedIndex(), bondedBefore.isSelected(),
+                bType.getSelectedIndex(), bState.getSelectedIndex(), futureAState.getSelectedIndex(),
+                bondedAfter.isSelected(), futureBState.getSelectedIndex());
     }
 
     private JComboBox createTypeComboBox() {
         JComboBox jComboBox = new JComboBox();
-        for(int i=0;i<8;i++) {
+        for (int i = 0; i < 8; i++) {
             jComboBox.addItem(String.valueOf(Atom.type_code.charAt(i)));
         }
         return jComboBox;
@@ -116,7 +108,7 @@ public class ReactionEditorView implements IView {
 
     private JComboBox createStateComboBox() {
         JComboBox jComboBox = new JComboBox();
-        for(int i=0;i<50;i++) { //TODO no hardcoded value!
+        for (int i = 0; i < 50; i++) { //TODO no hardcoded value!
             jComboBox.addItem(String.valueOf(i));
         }
         return jComboBox;

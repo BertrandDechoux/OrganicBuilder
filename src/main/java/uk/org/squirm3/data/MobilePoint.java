@@ -1,7 +1,7 @@
 package uk.org.squirm3.data;
 
-/**  
-${my.copyright}
+/**
+ * ${my.copyright}
  */
 
 public class MobilePoint implements IPhysicalPoint {
@@ -13,7 +13,7 @@ public class MobilePoint implements IPhysicalPoint {
     }
 
     public MobilePoint(float x, float y,
-            float dx, float dy, float ddx, float ddy) {
+                       float dx, float dy, float ddx, float ddy) {
         setPositionX(x);
         setPositionY(y);
         setSpeedX(dx);
@@ -31,12 +31,29 @@ public class MobilePoint implements IPhysicalPoint {
         setAccelerationY(physicalPoint.getAccelerationY());
     }
 
-    public float getPositionX() { return x; }
-    public float getPositionY() { return y; }
-    public float getSpeedX() { return dx; }
-    public float getSpeedY() { return dy; }
-    public float getAccelerationX() { return ddx; }
-    public float getAccelerationY() { return ddy; }
+    public float getPositionX() {
+        return x;
+    }
+
+    public float getPositionY() {
+        return y;
+    }
+
+    public float getSpeedX() {
+        return dx;
+    }
+
+    public float getSpeedY() {
+        return dy;
+    }
+
+    public float getAccelerationX() {
+        return ddx;
+    }
+
+    public float getAccelerationY() {
+        return ddy;
+    }
 
     public boolean setPositionX(float x) {
         this.x = x;

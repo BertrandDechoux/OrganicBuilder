@@ -1,7 +1,7 @@
 package uk.org.squirm3.data;
 
-/**  
-${my.copyright}
+/**
+ * ${my.copyright}
  */
 
 public final class FixedPoint implements IPhysicalPoint {
@@ -18,19 +18,55 @@ public final class FixedPoint implements IPhysicalPoint {
         this.y = physicalPoint.getPositionY();
     }
 
-    public float getPositionX() { return x; }
-    public float getPositionY() { return y; }
-    public float getSpeedX() { return 0; }
-    public float getSpeedY() { return 0; }
-    public float getAccelerationX() { return 0; }
-    public float getAccelerationY() { return 0; }
+    public float getPositionX() {
+        return x;
+    }
 
-    public boolean setPositionX(float x) { return false; }
-    public boolean setPositionY(float y) { return false; }
-    public boolean setSpeedX(float dx) { return false; }
-    public boolean setSpeedY(float dy) { return false; }
-    public boolean setAccelerationX(float ddx) { return false; }
-    public boolean setAccelerationY(float ddy) { return false; }
+    public float getPositionY() {
+        return y;
+    }
 
-    public IPhysicalPoint copy() { return this; }
+    public float getSpeedX() {
+        return 0;
+    }
+
+    public float getSpeedY() {
+        return 0;
+    }
+
+    public float getAccelerationX() {
+        return 0;
+    }
+
+    public float getAccelerationY() {
+        return 0;
+    }
+
+    public boolean setPositionX(float x) {
+        return false;
+    }
+
+    public boolean setPositionY(float y) {
+        return false;
+    }
+
+    public boolean setSpeedX(float dx) {
+        return false;
+    }
+
+    public boolean setSpeedY(float dy) {
+        return false;
+    }
+
+    public boolean setAccelerationX(float ddx) {
+        return false;
+    }
+
+    public boolean setAccelerationY(float ddy) {
+        return false;
+    }
+
+    public IPhysicalPoint copy() {
+        return this;
+    }
 }

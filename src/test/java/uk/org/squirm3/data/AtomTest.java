@@ -2,19 +2,19 @@ package uk.org.squirm3.data;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.util.LinkedList;
-import uk.org.squirm3.data.Atom;
-
 import org.junit.Test;
 
-/**  
-${my.copyright}
+import java.util.LinkedList;
+
+/**
+ * ${my.copyright}
  */
 
 public class AtomTest {
 
-    /** Test of the constructor. **/
+    /**
+     * Test of the constructor. *
+     */
     @Test
     public void testAtom() {
         int t = 4;
@@ -24,27 +24,33 @@ public class AtomTest {
         assertTrue(a.getState() == s);
     }
 
-    /** Test de la propriete stuck. **/
+    /**
+     * Test de la propriete stuck. *
+     */
     @Test
     public void testStuck() {
         Atom a = new Atom(new MobilePoint(), 0, 0);
         assertFalse(a.isStuck());
 
-        a = new Atom(new FixedPoint(0,0), 0, 0);
+        a = new Atom(new FixedPoint(0, 0), 0, 0);
         assertTrue(a.isStuck());
     }
 
-    /** Test de la propriete killer. **/
+    /**
+     * Test de la propriete killer. *
+     */
     @Test
     public void testKiller() {
         Atom a = new Atom(new MobilePoint(), 0, 0);
         assertFalse(a.isKiller());
 
         a = new Atom(new MobilePoint(), Atom.KILLER_TYPE, 0);
-        assertTrue(a.isKiller());		
+        assertTrue(a.isKiller());
     }
 
-    /** Test of basic bonding and breaking. */
+    /**
+     * Test of basic bonding and breaking.
+     */
     @Test
     public void testBondingAndBreaking() {
         Atom a1 = new Atom(new MobilePoint(), 0, 1);
@@ -62,7 +68,9 @@ public class AtomTest {
         assertFalse(a2.hasBondWith(a1));
     }
 
-    /** Test of breakAllBonds() and getAllConnectedAtoms(). **/
+    /**
+     * Test of breakAllBonds() and getAllConnectedAtoms(). *
+     */
     @Test
     public void testGeneralMethods() {
         MobilePoint physicalPoint = new MobilePoint();
@@ -98,7 +106,9 @@ public class AtomTest {
         assertTrue(l.isEmpty());
     }
 
-    /** Test of the string representation. **/
+    /**
+     * Test of the string representation. *
+     */
     @Test
     public void testToString() {
         Atom a = new Atom(new MobilePoint(), 1, 1);

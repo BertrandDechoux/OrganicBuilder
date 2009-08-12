@@ -1,7 +1,7 @@
 package uk.org.squirm3.data;
 
-/**  
-${my.copyright}
+/**
+ * ${my.copyright}
  */
 
 public class DraggingPoint {
