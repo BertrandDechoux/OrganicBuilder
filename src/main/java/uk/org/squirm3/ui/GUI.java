@@ -1,6 +1,7 @@
 package uk.org.squirm3.ui;
 
 import uk.org.squirm3.Application;
+import uk.org.squirm3.Resource;
 import uk.org.squirm3.engine.ApplicationEngine;
 
 import javax.swing.*;

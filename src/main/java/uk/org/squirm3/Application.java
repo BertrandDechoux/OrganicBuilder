@@ -2,7 +2,7 @@ package uk.org.squirm3;
 
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.ui.GUI;
-import uk.org.squirm3.ui.Resource;
+import uk.org.squirm3.Resource;
 import uk.org.squirm3.data.*;
 
 import javax.swing.*;
@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.lang.reflect.Constructor;
-import java.awt.*;
-import java.awt.geom.Point2D;
 
 /**
  * ${my.copyright}
@@ -46,7 +44,7 @@ public final class Application {
                     entry[i] = entry[i].trim();
                 }
                 if (entry[0].equals(USER_LANGUAGE)) userLanguage = entry[1];
-                else if (entry[1].equals(USER_REGION)) userRegion = entry[1];
+                else if (entry[0].equals(USER_REGION)) userRegion = entry[1];
             }
             Locale userLocale = (userLanguage == null) ? null :
                     new Locale(userLanguage, userRegion);

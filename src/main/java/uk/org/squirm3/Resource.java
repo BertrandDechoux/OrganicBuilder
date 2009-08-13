@@ -1,4 +1,4 @@
-package uk.org.squirm3.ui;
+package uk.org.squirm3;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,11 +18,11 @@ import java.net.URL;
 //*********************************************************
 public class Resource {
 
-    private static final String spikyImageName = "spiky.gif";
+    private static final String spikyImageName = "spiky.png";
     private static Image spikyImage;
 
     private static BufferedImage loadCompatibleImage(String name) throws IOException {
-        URL url = Resource.class.getResource("/pictures/" + name);
+        URL url = Resource.class.getResource("/graphics/" + name);
         BufferedImage image = ImageIO.read(url);
         GraphicsConfiguration configuration = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
         BufferedImage compatibleImage = configuration.createCompatibleImage(image.getWidth(), image.getHeight(), Transparency.BITMASK);
@@ -44,7 +44,7 @@ public class Resource {
         boolean old_version = true;
         if (old_version) { //TODO make a benchmark or something
             // in order to chose the most efficent method
-            URL url = Resource.class.getResource("/pictures/" + name);
+            URL url = Resource.class.getResource("/graphics/" + name);
             Image img = c.getToolkit().createImage(url);
             try {
                 MediaTracker tracker = new MediaTracker(c);
@@ -68,7 +68,7 @@ public class Resource {
     }
 
     public static Icon getIcon(String name) {
-        URL url = Resource.class.getResource("/icons/" + name + ".png");
+        URL url = Resource.class.getResource("/graphics/" + name + ".png");
         return new ImageIcon(Toolkit.getDefaultToolkit().createImage(url));
     }
 
