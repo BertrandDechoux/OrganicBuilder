@@ -4,7 +4,8 @@ import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.ILevelListener;
+import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.listener.EventDispatcher;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -22,20 +23,31 @@ import java.text.NumberFormat;
  * ${my.copyright}
  */
 
-public class CustomResetView implements IView, ILevelListener {
+public class CustomResetView extends AView {
 
     // components reflecting simulation's parameters
     private /*final*/ JSlider atomNumberSelector, heightSelector, widthSelector;
     private /*final*/ JFormattedTextField atomNumberTF, heightTF, widthTF;
     private final JPanel panel;
-    // use to communicate
-    private ApplicationEngine applicationEngine;
+
 
     public CustomResetView(ApplicationEngine applicationEngine) {
-        this.applicationEngine = applicationEngine;
+        super(applicationEngine);
         panel = createParametersPanel();
-        applicationEngine.getEngineDispatcher().addLevelListener(this);
-        configurationHasChanged();
+
+        IListener levelListener = new IListener() {
+            public void propertyHasChanged() {
+                Configuration configuration = getApplicationEngine().getLevelManager().getCurrentLevel().getConfiguration();
+                updateNumberOfAtoms(configuration.getNumberOfAtoms());
+                updateWidth((int) configuration.getWidth());
+                updateHeight((int) configuration.getHeight());
+            }
+        };
+        levelListener.propertyHasChanged();
+        applicationEngine.getEventDispatcher().addListener(levelListener,
+                EventDispatcher.Event.LEVEL);
+        applicationEngine.getEventDispatcher().addListener(levelListener,
+                EventDispatcher.Event.CONFIGURATION);
     }
 
     public JPanel getPanel() {
@@ -139,7 +151,7 @@ public class CustomResetView implements IView, ILevelListener {
             public void actionPerformed(ActionEvent arg0) {
                 Configuration configuration = new Configuration(atomNumberSelector.getValue(),
                         Level.TYPES, widthSelector.getValue(), heightSelector.getValue());
-                applicationEngine.restartLevel(configuration);
+                getApplicationEngine().restartLevel(configuration);
             }
         });
         parametersPanel.add(resetButton, gbc);
@@ -176,17 +188,6 @@ public class CustomResetView implements IView, ILevelListener {
         gbc.gridx = x;
         gbc.gridy = y;
         return gbc;
-    }
-
-    public void levelHasChanged() {
-        configurationHasChanged();
-    }
-
-    public void configurationHasChanged() {
-        Configuration configuration = applicationEngine.getLevelManager().getCurrentLevel().getConfiguration();
-        updateNumberOfAtoms(configuration.getNumberOfAtoms());
-        updateWidth((int) configuration.getWidth());
-        updateHeight((int) configuration.getHeight());
     }
 
 }

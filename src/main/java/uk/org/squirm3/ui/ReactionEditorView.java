@@ -18,8 +18,7 @@ import java.util.Collection;
  * ${my.copyright}
  */
 
-public class ReactionEditorView implements IView {
-    private ApplicationEngine applicationEngine;
+public class ReactionEditorView extends AView {
     private JCheckBox bondedBefore, bondedAfter;
     private JComboBox aType, aState, bType, bState, futureAState, futureBState;
     private JLabel futureAType, futureBType;
@@ -27,7 +26,7 @@ public class ReactionEditorView implements IView {
     private final JPanel editorPanel;
 
     public ReactionEditorView(ApplicationEngine applicationEngine) {
-        this.applicationEngine = applicationEngine;
+        super(applicationEngine);
         editorPanel = createEditorPanel();
     }
 
@@ -85,7 +84,7 @@ public class ReactionEditorView implements IView {
             public void actionPerformed(ActionEvent e) {
                 Collection c = new ArrayList(1);
                 c.add(createReactionFromEditor());
-                applicationEngine.addReactions(c);
+                getApplicationEngine().addReactions(c);
             }
         });
         jPanel.add(addReaction);

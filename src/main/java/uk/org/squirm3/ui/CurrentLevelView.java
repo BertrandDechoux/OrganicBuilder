@@ -5,7 +5,8 @@ import uk.org.squirm3.ILogger;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.ILevelListener;
+import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.listener.EventDispatcher;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,8 +20,7 @@ import java.util.List;
  * ${my.copyright}
  */
 
-public class CurrentLevelView implements IView, ILevelListener {
-    private ApplicationEngine applicationEngine;
+public class CurrentLevelView extends AView {
     private JEditorPane description;
     private JButton hintButton, evaluateButton;
     private Level currentLevel;
@@ -30,11 +30,31 @@ public class CurrentLevelView implements IView, ILevelListener {
     private final ILogger logger;
 
     public CurrentLevelView(ApplicationEngine applicationEngine, ILogger loggerUrl) {
+        super(applicationEngine);
         currentLevelPanel = createCurrentLevelPanel();
         logger = loggerUrl;
-        this.applicationEngine = applicationEngine;
-        levelHasChanged();
-        applicationEngine.getEngineDispatcher().addLevelListener(this);
+
+        IListener levelListener = new IListener() {
+            public void propertyHasChanged() {
+                currentLevel = getApplicationEngine().getLevelManager().getCurrentLevel();
+                if (currentLevel == null) {
+                    description.setText(Application.localize("level.description.none"));
+                    hintButton.setEnabled(false);
+                    evaluateButton.setEnabled(false);
+                } else {
+                    description.setText("<b>" + currentLevel.getTitle() + "</b>" + currentLevel.getChallenge());
+                    if (currentLevel.getHint() == null || currentLevel.getHint().equals("")) {
+                        hintButton.setEnabled(false);
+                    } else {
+                        hintButton.setEnabled(true);
+                    }
+                    evaluateButton.setEnabled(true);
+                }
+            }
+        };
+        levelListener.propertyHasChanged();
+        getApplicationEngine().getEventDispatcher().addListener(levelListener,
+                EventDispatcher.Event.LEVEL);
     }
 
     private JPanel createCurrentLevelPanel() {
@@ -68,7 +88,7 @@ public class CurrentLevelView implements IView, ILevelListener {
         evaluateButton = new JButton(Application.localize("level.evaluate"));
         evaluateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                Collection c = applicationEngine.getAtoms();
+                Collection c = getApplicationEngine().getAtoms();
                 Iterator it = c.iterator();
                 Atom[] atoms = new Atom[c.size()];
                 int i = 0;
@@ -87,9 +107,9 @@ public class CurrentLevelView implements IView, ILevelListener {
                 if (success) {
                     //TODO keep always the same object
                     // TODO store the url into a configuration file
-                    List levelList = applicationEngine.getLevelManager().getLevels();
+                    List levelList = getApplicationEngine().getLevelManager().getLevels();
                     final int levelNumber = levelList.indexOf(currentLevel);
-                    logger.writeSolution(levelNumber, applicationEngine.getReactions());
+                    logger.writeSolution(levelNumber, getApplicationEngine().getReactions());
 
                     if (levelNumber + 1 > levelList.size() - 1) {
                         result = Application.localize("level.fullsuccess");
@@ -107,7 +127,7 @@ public class CurrentLevelView implements IView, ILevelListener {
                                 null,
                                 options,
                                 options[0]);
-                        if (n == JOptionPane.YES_OPTION) applicationEngine.goToNextLevel();
+                        if (n == JOptionPane.YES_OPTION) getApplicationEngine().goToNextLevel();
                     }
                 } else {
                     JOptionPane.showMessageDialog(currentLevelPanel, result,
@@ -117,26 +137,6 @@ public class CurrentLevelView implements IView, ILevelListener {
         });
         jPanel.add(evaluateButton);
         return jPanel;
-    }
-
-    public void levelHasChanged() {
-        currentLevel = applicationEngine.getLevelManager().getCurrentLevel();
-        if (currentLevel == null) {
-            description.setText(Application.localize("level.description.none"));
-            hintButton.setEnabled(false);
-            evaluateButton.setEnabled(false);
-        } else {
-            description.setText("<b>" + currentLevel.getTitle() + "</b>" + currentLevel.getChallenge());
-            if (currentLevel.getHint() == null || currentLevel.getHint().equals("")) {
-                hintButton.setEnabled(false);
-            } else {
-                hintButton.setEnabled(true);
-            }
-            evaluateButton.setEnabled(true);
-        }
-    }
-
-    public void configurationHasChanged() {
     }
 }
 

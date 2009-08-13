@@ -5,7 +5,8 @@ import java.util.*;
 /**
  * ${my.copyright}
  */
-public class EventDispatcher {
+public final class EventDispatcher {
+
     public enum Event {
         ATOMS, DRAGGING_POINT, LEVEL,
         CONFIGURATION, REACTIONS, SPEED, SIMULATION_STATE

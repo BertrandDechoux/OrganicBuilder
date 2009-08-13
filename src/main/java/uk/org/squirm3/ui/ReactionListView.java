@@ -3,7 +3,8 @@ package uk.org.squirm3.ui;
 import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Reaction;
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.IReactionListener;
+import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.listener.EventDispatcher;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -23,9 +24,7 @@ import java.util.Vector;
  * ${my.copyright}
  */
 
-public class ReactionListView implements IView, IReactionListener {
-    // commucation with the engine
-    private ApplicationEngine applicationEngine;
+public class ReactionListView extends AView {
     // list mode
     private JButton editButton, deleteButton, clearButton;
     private JList reactionsList;
@@ -40,11 +39,19 @@ public class ReactionListView implements IView, IReactionListener {
     private final JPanel listPanel;
 
     public ReactionListView(ApplicationEngine applicationEngine) {
-        this.applicationEngine = applicationEngine;
+        super(applicationEngine);
         listPanel = createListPanel();
         textArea = new JTextArea();
-        applicationEngine.getEngineDispatcher().addReactionListener(this);
-        reactionsHaveChanged();
+
+        IListener reactionListener = new IListener() {
+            public void propertyHasChanged() {
+                reactionsHaveChanged();
+            }
+        };
+        reactionListener.propertyHasChanged();
+        getApplicationEngine().getEventDispatcher().addListener(reactionListener,
+                EventDispatcher.Event.REACTIONS);
+
         updateDeleteButton();
     }
 
@@ -73,7 +80,7 @@ public class ReactionListView implements IView, IReactionListener {
         listButtonsPanel.add(deleteButton);
 
         clearButton = new JButton(Application.localize("reactions.clear"));
-        clearButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, applicationEngine, "clearReactions"));
+        clearButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, getApplicationEngine(), "clearReactions"));
         listButtonsPanel.add(clearButton);
 
         buttonParentPanel = new JPanel();
@@ -100,7 +107,7 @@ public class ReactionListView implements IView, IReactionListener {
         buttonParentPanel.remove(listButtonsPanel);
         buttonParentPanel.add(updateButton, BorderLayout.NORTH);
         buttonParentPanel.updateUI();
-        Object[] reactions = applicationEngine.getReactions().toArray();
+        Object[] reactions = getApplicationEngine().getReactions().toArray();
         String content = "";
         for (int i = 0; i < reactions.length; i++) {
             content += reactions[i].toString() + "\n";
@@ -134,7 +141,7 @@ public class ReactionListView implements IView, IReactionListener {
                     Application.localize("reactions.parsing.error"),
                     JOptionPane.ERROR_MESSAGE);
         } else {
-            applicationEngine.setReactions(v);
+            getApplicationEngine().setReactions(v);
             reactionsHaveChanged();
             buttonParentPanel.remove(updateButton);
             buttonParentPanel.add(listButtonsPanel, BorderLayout.NORTH);
@@ -148,7 +155,7 @@ public class ReactionListView implements IView, IReactionListener {
         for (int i = 0; i < reactions.length; i++) {
             c.add(reactions[i]);
         }
-        applicationEngine.removeReactions(c);
+        getApplicationEngine().removeReactions(c);
     }
 
     public void updateDeleteButton() {
@@ -156,7 +163,7 @@ public class ReactionListView implements IView, IReactionListener {
     }
 
     public void reactionsHaveChanged() {
-        Object[] reactions = applicationEngine.getReactions().toArray();
+        Object[] reactions = getApplicationEngine().getReactions().toArray();
         border.setTitle(Application.localize("reactions.current") + " (" + reactions.length + ")");
         clearButton.setEnabled(reactions.length != 0);
         reactionsList.setListData(reactions);

@@ -3,7 +3,8 @@ package uk.org.squirm3.ui;
 import uk.org.squirm3.Application;
 import uk.org.squirm3.Resource;
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.IStateListener;
+import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.listener.EventDispatcher;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -12,20 +13,28 @@ import java.awt.event.ActionEvent;
  * ${my.copyright}
  */
 
-public class StateView implements IView, IStateListener {
+public class StateView extends AView {
 
     // Actions controlling the simulation
     private final Action stop, run, reset;
-    // use to communicate
-    private ApplicationEngine applicationEngine;
 
     public StateView(ApplicationEngine applicationEngine) {
-        this.applicationEngine = applicationEngine;
+        super(applicationEngine);
         stop = createStopAction();
         run = createRunAction();
         reset = createResetAction();
-        simulationStateHasChanged();
-        applicationEngine.getEngineDispatcher().addStateListener(this);
+
+        IListener stateListener = new IListener() {
+            public void propertyHasChanged() {
+                boolean isRunning = getApplicationEngine().simulationIsRunning();
+                stop.setEnabled(isRunning);
+                run.setEnabled(!isRunning);
+            }
+        };
+        stateListener.propertyHasChanged();
+        getApplicationEngine().getEventDispatcher().addListener(stateListener,
+                EventDispatcher.Event.SIMULATION_STATE);
+
     }
 
     public Action getRunAction() {
@@ -43,7 +52,7 @@ public class StateView implements IView, IStateListener {
     private Action createRunAction() {
         final Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                applicationEngine.runSimulation();
+                getApplicationEngine().runSimulation();
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION, Application.localize("simulation.run"));
@@ -56,7 +65,7 @@ public class StateView implements IView, IStateListener {
     private Action createStopAction() {
         final Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                applicationEngine.pauseSimulation();
+                getApplicationEngine().pauseSimulation();
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION, Application.localize("simulation.stop"));
@@ -67,17 +76,11 @@ public class StateView implements IView, IStateListener {
     private Action createResetAction() {
         final Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                applicationEngine.restartLevel(null);
+                getApplicationEngine().restartLevel(null);
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION, Application.localize("simulation.reset"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("reset"));
         return action;
-    }
-
-    public void simulationStateHasChanged() {
-        boolean isRunning = applicationEngine.simulationIsRunning();
-        stop.setEnabled(isRunning);
-        run.setEnabled(!isRunning);
     }
 }
