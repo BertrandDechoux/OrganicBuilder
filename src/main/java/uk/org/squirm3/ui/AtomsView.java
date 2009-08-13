@@ -113,8 +113,8 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
         });
 
         controlsPanel = new JPanel();
-        controlsPanel.add(new JLabel(Application.localize(new String[]{"interface", "scale"})));
-        auto = new JCheckBox(Application.localize(new String[]{"interface", "scale", "auto"}));
+        controlsPanel.add(new JLabel(Application.localize("scale")));
+        auto = new JCheckBox(Application.localize("scale.auto"));
         auto.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 scaleSlider.setEnabled(!auto.isSelected());
@@ -132,7 +132,7 @@ public class AtomsView implements IView, IAtomListener, ILevelListener {
                 }
             }
         });
-        scaleSlider.setToolTipText(Application.localize(new String[]{"interface", "scale", "manual"}));
+        scaleSlider.setToolTipText(Application.localize("scale.manual"));
         scaleSlider.setEnabled(false);
         controlsPanel.add(scaleSlider);
 

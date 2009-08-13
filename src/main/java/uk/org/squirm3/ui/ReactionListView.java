@@ -56,23 +56,23 @@ public class ReactionListView implements IView, IReactionListener {
         final JPanel jPanel = new JPanel();
         jPanel.setLayout(new BorderLayout());
         border = BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), Application.localize(new String[]{"interface", "reactions", "current"}));
+                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), Application.localize("reactions.current"));
         jPanel.setBorder(border);
         listButtonsPanel = new JPanel();
         listButtonsPanel.setLayout(new GridLayout(4, 1));
 
-        editButton = new JButton(Application.localize(new String[]{"interface", "reactions", "edit"}));
+        editButton = new JButton(Application.localize("reactions.edit"));
         editButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, ReactionListView.this, "editReactions"));
         listButtonsPanel.add(editButton);
 
-        updateButton = new JButton(Application.localize(new String[]{"interface", "reactions", "update"}));
+        updateButton = new JButton(Application.localize("reactions.update"));
         updateButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, ReactionListView.this, "updateReactions"));
 
-        deleteButton = new JButton(Application.localize(new String[]{"interface", "reactions", "delete"}));
+        deleteButton = new JButton(Application.localize("reactions.delete"));
         deleteButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, ReactionListView.this, "deleteSelectedReactions"));
         listButtonsPanel.add(deleteButton);
 
-        clearButton = new JButton(Application.localize(new String[]{"interface", "reactions", "clear"}));
+        clearButton = new JButton(Application.localize("reactions.clear"));
         clearButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, applicationEngine, "clearReactions"));
         listButtonsPanel.add(clearButton);
 
@@ -131,7 +131,7 @@ public class ReactionListView implements IView, IReactionListener {
 
         if (result != null) {
             JOptionPane.showMessageDialog(listPanel, result,
-                    Application.localize(new String[]{"interface", "reactions", "parsing", "error"}),
+                    Application.localize("reactions.parsing.error"),
                     JOptionPane.ERROR_MESSAGE);
         } else {
             applicationEngine.setReactions(v);
@@ -157,7 +157,7 @@ public class ReactionListView implements IView, IReactionListener {
 
     public void reactionsHaveChanged() {
         Object[] reactions = applicationEngine.getReactions().toArray();
-        border.setTitle(Application.localize(new String[]{"interface", "reactions", "current"}) + " (" + reactions.length + ")");
+        border.setTitle(Application.localize("reactions.current") + " (" + reactions.length + ")");
         clearButton.setEnabled(reactions.length != 0);
         reactionsList.setListData(reactions);
         listPanel.repaint();

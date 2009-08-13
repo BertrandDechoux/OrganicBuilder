@@ -50,7 +50,7 @@ public class CustomResetView implements IView, ILevelListener {
         // parameters
         // number of atoms
         GridBagConstraints gbc = createCustomGBC(0, 0);
-        parametersPanel.add(new JLabel(Application.localize(new String[]{"interface", "parameters", "number"})), gbc);
+        parametersPanel.add(new JLabel(Application.localize("parameters.number")), gbc);
         gbc = createCustomGBC(1, 0);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -78,7 +78,7 @@ public class CustomResetView implements IView, ILevelListener {
         parametersPanel.add(atomNumberTF, gbc);
         // height
         gbc = createCustomGBC(0, 1);
-        parametersPanel.add(new JLabel(Application.localize(new String[]{"interface", "parameters", "height"})), gbc);
+        parametersPanel.add(new JLabel(Application.localize("parameters.height")), gbc);
         gbc = createCustomGBC(1, 1);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -106,7 +106,7 @@ public class CustomResetView implements IView, ILevelListener {
         parametersPanel.add(heightTF, gbc);
         // width
         gbc = createCustomGBC(0, 2);
-        parametersPanel.add(new JLabel(Application.localize(new String[]{"interface", "parameters", "width"})), gbc);
+        parametersPanel.add(new JLabel(Application.localize("parameters.width")), gbc);
         gbc = createCustomGBC(1, 2);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -134,7 +134,7 @@ public class CustomResetView implements IView, ILevelListener {
         parametersPanel.add(widthTF, gbc);
 
         gbc = createCustomGBC(2, 3);
-        JButton resetButton = new JButton(Application.localize(new String[]{"interface", "simulation", "reset"}));
+        JButton resetButton = new JButton(Application.localize("simulation.reset"));
         resetButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 Configuration configuration = new Configuration(atomNumberSelector.getValue(),

@@ -32,7 +32,7 @@ public class SpeedView implements IView, ISpeedListener {
         panel.setLayout(new GridBagLayout());
         // speed
         GridBagConstraints gbc = createCustomGBC(0, 0);
-        panel.add(new JLabel(Application.localize(new String[]{"interface", "parameters", "speed"})), gbc);
+        panel.add(new JLabel(Application.localize("parameters.speed")), gbc);
         gbc = createCustomGBC(1, 0);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;

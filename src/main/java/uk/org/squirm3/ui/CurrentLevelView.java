@@ -62,15 +62,15 @@ public class CurrentLevelView implements IView, ILevelListener {
     private JPanel createButtonsPanel() {
         final JPanel jPanel = new JPanel();
         jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.LINE_AXIS));
-        hintButton = new JButton(Application.localize(new String[]{"interface", "level", "hint"}));
+        hintButton = new JButton(Application.localize("level.hint"));
         hintButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                JOptionPane.showMessageDialog(currentLevelPanel, currentLevel.getHint(), Application.localize(new String[]{"interface", "level", "hint"}), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(currentLevelPanel, currentLevel.getHint(), Application.localize("level.hint"), JOptionPane.INFORMATION_MESSAGE);
             }
         });
         jPanel.add(hintButton);
         jPanel.add(Box.createHorizontalGlue());
-        evaluateButton = new JButton(Application.localize(new String[]{"interface", "level", "evaluate"}));
+        evaluateButton = new JButton(Application.localize("level.evaluate"));
         evaluateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 Collection c = applicationEngine.getAtoms();
@@ -84,9 +84,9 @@ public class CurrentLevelView implements IView, ILevelListener {
                 String result = currentLevel.evaluate(atoms);
                 boolean success = true;
                 if (result == null) {
-                    result = Application.localize(new String[]{"interface", "level", "success"});
+                    result = Application.localize("level.success");
                 } else {
-                    result = Application.localize(new String[]{"interface", "level", "error"}) + result;
+                    result = Application.localize("level.error") + result;
                     success = false;
                 }
                 if (success) {
@@ -97,16 +97,16 @@ public class CurrentLevelView implements IView, ILevelListener {
                     logger.writeSolution(levelNumber, applicationEngine.getReactions());
 
                     if (levelNumber + 1 > levelList.size() - 1) {
-                        result = Application.localize(new String[]{"interface", "level", "fullsuccess"});
+                        result = Application.localize("level.fullsuccess");
                         JOptionPane.showMessageDialog(currentLevelPanel, result,
-                                Application.localize(new String[]{"interface", "level", "success", "title"}),
+                                Application.localize("level.success.title"),
                                 JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        result = Application.localize(new String[]{"interface", "level", "success"});
-                        Object[] options = {Application.localize(new String[]{"interface", "level", "yes"}),
-                                Application.localize(new String[]{"interface", "level", "no"})};
+                        result = Application.localize("level.success");
+                        Object[] options = {Application.localize("level.yes"),
+                                Application.localize("level.no")};
                         int n = JOptionPane.showOptionDialog(currentLevelPanel,
-                                result, Application.localize(new String[]{"interface", "level", "success", "title"}),
+                                result, Application.localize("level.success.title"),
                                 JOptionPane.YES_NO_OPTION,
                                 JOptionPane.INFORMATION_MESSAGE,
                                 null,
@@ -116,7 +116,7 @@ public class CurrentLevelView implements IView, ILevelListener {
                     }
                 } else {
                     JOptionPane.showMessageDialog(currentLevelPanel, result,
-                            Application.localize(new String[]{"interface", "level", "error", "title"}), JOptionPane.ERROR_MESSAGE);
+                            Application.localize("level.error.title"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -127,7 +127,7 @@ public class CurrentLevelView implements IView, ILevelListener {
     public void levelHasChanged() {
         currentLevel = applicationEngine.getLevelManager().getCurrentLevel();
         if (currentLevel == null) {
-            description.setText(Application.localize(new String[]{"interface", "level", "description", "none"}));
+            description.setText(Application.localize("level.description.none"));
             hintButton.setEnabled(false);
             evaluateButton.setEnabled(false);
         } else {

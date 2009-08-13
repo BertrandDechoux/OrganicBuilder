@@ -39,7 +39,7 @@ public class ReactionEditorView implements IView {
         jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.PAGE_AXIS));
         jPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-                Application.localize(new String[]{"interface", "reactions", "editor"})));
+                Application.localize("reactions.editor")));
         final JPanel reactionPanel = new JPanel();
         reactionPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         ActionListener l = new ActionListener() {
@@ -79,7 +79,7 @@ public class ReactionEditorView implements IView {
         jPanel.add(reactionPanel);
         addReaction = new JButton(Resource.getIcon("add"));
         addReaction.setMargin(new Insets(0, 0, 0, 0));
-        addReaction.setToolTipText(Application.localize(new String[]{"interface", "reactions", "add", "tooltip"}));
+        addReaction.setToolTipText(Application.localize("reactions.add.tooltip"));
         addReaction.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Collection c = new ArrayList(1);

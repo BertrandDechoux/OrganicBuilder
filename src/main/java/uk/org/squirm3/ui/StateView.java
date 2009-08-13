@@ -45,7 +45,7 @@ public class StateView implements IView, IStateListener {
                 applicationEngine.runSimulation();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "simulation", "run"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("simulation.run"));
         //action.putValue(Action.LONG_DESCRIPTION, "Context-Sensitive Help Text"); TODO and for the others actions too
         action.putValue(Action.SMALL_ICON, Resource.getIcon("play"));
         //action.putValue(Action.MNEMONIC_KEY, new Integer(java.awt.event.KeyEvent.VK_A)); TODO
@@ -58,7 +58,7 @@ public class StateView implements IView, IStateListener {
                 applicationEngine.pauseSimulation();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "simulation", "stop"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("simulation.stop"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("pause"));
         return action;
     }
@@ -69,7 +69,7 @@ public class StateView implements IView, IStateListener {
                 applicationEngine.restartLevel(null);
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "simulation", "reset"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("simulation.reset"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("reset"));
         return action;
     }

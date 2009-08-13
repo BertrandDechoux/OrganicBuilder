@@ -11,21 +11,13 @@ import java.util.List;
 
 public final class LevelManager {
     private Level currentLevel;
-    private final List levelList;
+    private final List<Level> levels;
     private int levelIndex;
 
-    public LevelManager() {
-        levelList = new ArrayList();
-        levelIndex = -1;
-        currentLevel = null;
-    }
-
-    protected void addLevel(Level l) {
-        levelList.add(l);
-        if (levelIndex == -1) {
-            levelIndex = 0;
-            currentLevel = l;
-        }
+    public LevelManager(List<Level> levels) {
+        this.levels = levels;
+        levelIndex = 0;
+        setLevel(0);
     }
 
     public Level getCurrentLevel() {
@@ -36,18 +28,20 @@ public final class LevelManager {
         return levelIndex;
     }
 
-    public List getLevels() {
-        return new ArrayList(levelList);
+    public List<? extends Level> getLevels() {
+        return levels;
     }
 
     public int getNumberOfLevel() {
-        return levelList.size();
+        return levels.size();
     }
 
     protected void setLevel(int index) {
-        if (index > levelList.size()) index = levelList.size() - 1;
+        // TODO exception if index out of bounds
+        // TODO why protected ?
+        if (index > levels.size()) index = levels.size() - 1;
         if (index < 0) return;
         levelIndex = index;
-        currentLevel = (Level) levelList.get(index);
+        currentLevel = levels.get(index);
     }
 }

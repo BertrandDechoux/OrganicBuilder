@@ -17,11 +17,11 @@ import java.beans.PropertyChangeListener;
 
 public class GUI {
 
-    public static void createGUI(final ApplicationEngine applicationEngine, final JApplet applet) {
+    public static void createGUI(final ApplicationEngine applicationEngine, final JRootPane rootPane) {
         // create the graphical interface
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new GUI(applicationEngine, applet);
+                new GUI(applicationEngine, rootPane);
             }
         });
     }
@@ -38,13 +38,13 @@ public class GUI {
         else return languages[choice];
     }
 
-    public GUI(final ApplicationEngine applicationEngine, final JApplet applet) {
+    public GUI(final ApplicationEngine applicationEngine, final JRootPane rootPane) {
         Resource.loadPictures();
 
         //frame
-        JFrame frame = new JFrame(Application.localize(new String[]{"interface", "application", "title"}));
+        JFrame frame = new JFrame(Application.localize("application.title"));
         frame.setSize(1080, 630);
-        if (applet == null) {
+        if (rootPane == null) {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         } else {
             frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -53,7 +53,7 @@ public class GUI {
         //view
         AtomsView atomsView = new AtomsView(applicationEngine);
         CurrentLevelView currentLevelView = new CurrentLevelView(applicationEngine,
-                Application.getProperty("configuration.logger.url"));
+                Application.getConfigurationProperty("logger.url"));
         ReactionListView reactionListView = new ReactionListView(applicationEngine);
         ReactionEditorView reactionEditorView = new ReactionEditorView(applicationEngine);
         StateView stateView = new StateView(applicationEngine);
@@ -112,7 +112,8 @@ public class GUI {
         miscControlsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 2));
         miscControlsPanel.setBackground(bg);
         miscControlsPanel.add(createIconButton(createAboutAction(), bg));
-        if (applet != null) miscControlsPanel.add(createIconButton(createAppletAction(frame, applet), bg));
+        if (rootPane != null)
+            miscControlsPanel.add(createIconButton(createDockingAction(frame, rootPane), bg));
         toolBar.add(miscControlsPanel);
 
         // rootComponent
@@ -126,13 +127,13 @@ public class GUI {
         contentPane.add(toolBar, BorderLayout.NORTH);
         contentPane.add(rootComponent, BorderLayout.CENTER);
 
-        if (applet == null) {
+        if (rootPane == null) {
             frame.setContentPane(contentPane);
             SwingUtilities.updateComponentTreeUI(frame);
             frame.setVisible(true);
         } else {
-            applet.setContentPane(contentPane);
-            SwingUtilities.updateComponentTreeUI(applet);
+            rootPane.setContentPane(contentPane);
+            SwingUtilities.updateComponentTreeUI(rootPane);
         }
 
     }
@@ -155,58 +156,58 @@ public class GUI {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, message,
-                        Application.localize(new String[]{"interface", "application", "parameters"}),
+                        Application.localize("application.parameters"),
                         JOptionPane.INFORMATION_MESSAGE);
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "application", "parameters"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("application.parameters"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("parameters"));
         return action;
     }
 
     private static Action createAboutAction() {    //TODO mise en page des textes
         final JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab(Application.localize(new String[]{"interface", "application", "about"}),
+        tabbedPane.addTab(Application.localize("application.about"),
                 null, createTextPane("about.html"), null);
-        tabbedPane.addTab(Application.localize(new String[]{"interface", "application", "license"}),
+        tabbedPane.addTab(Application.localize("application.license"),
                 null, createTextPane("license.html"), null);
 
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, tabbedPane,
-                        Application.localize(new String[]{"interface", "application", "about"}),
+                        Application.localize("application.about"),
                         JOptionPane.QUESTION_MESSAGE);
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "application", "about"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("application.about"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("about"));
         return action;
     }
 
-    private static Action createAppletAction(final JFrame frame, final JApplet applet) {
+    private static Action createDockingAction(final JFrame frame, final JRootPane rootPane) {
         final Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if (frame.isVisible()) {
                     frame.setVisible(false);
-                    putValue(Action.NAME, Application.localize(new String[]{"interface", "undock"}));
-                    applet.setContentPane(frame.getContentPane());
-                    SwingUtilities.updateComponentTreeUI(applet);
+                    putValue(Action.NAME, Application.localize("undock"));
+                    rootPane.setContentPane(frame.getContentPane());
+                    SwingUtilities.updateComponentTreeUI(rootPane);
                 } else {
-                    putValue(Action.NAME, Application.localize(new String[]{"interface", "dock"}));
-                    frame.setContentPane(applet.getContentPane());
+                    putValue(Action.NAME, Application.localize("dock"));
+                    frame.setContentPane(rootPane.getContentPane());
                     frame.setVisible(true);
                     SwingUtilities.updateComponentTreeUI(frame);
-                    SwingUtilities.updateComponentTreeUI(applet);
+                     SwingUtilities.updateComponentTreeUI(rootPane);
                 }
             }
         };
-        action.putValue(Action.NAME, Application.localize(new String[]{"interface", "undock"}));
+        action.putValue(Action.NAME, Application.localize("undock"));
         frame.addWindowListener(
                 new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {
-                        action.putValue(Action.NAME, Application.localize(new String[]{"interface", "undock"}));
-                        applet.setContentPane(frame.getContentPane());
-                        SwingUtilities.updateComponentTreeUI(applet);
+                        action.putValue(Action.NAME, Application.localize("undock"));
+                        rootPane.setContentPane(frame.getContentPane());
+                        SwingUtilities.updateComponentTreeUI(rootPane);
                     }
 
                     public void windowDeiconified(WindowEvent e) {

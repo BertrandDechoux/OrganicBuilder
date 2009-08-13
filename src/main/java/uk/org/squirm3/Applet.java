@@ -33,11 +33,9 @@ public final class Applet extends JApplet {
             String userRegion = getParameter(Application.USER_REGION);
             Locale userLocale = (userLanguage == null) ? null :
                     new Locale(userLanguage, userRegion);
-            // TODO use the locale and do not pass the applet instance
-            Application.runAsApplet(this);
+            Application.runApplication(getRootPane(), userLocale);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-                    e, "Exception",
+            JOptionPane.showMessageDialog(null, e, "Exception",
                     JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }

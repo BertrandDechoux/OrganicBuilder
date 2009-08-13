@@ -75,7 +75,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
                         update = false;
                     }
                 });
-        cb.setToolTipText(Application.localize(new String[]{"interface", "navigation", "selected"}));
+        cb.setToolTipText(Application.localize("navigation.selected"));
         return cb;
     }
 
@@ -85,7 +85,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
                 applicationEngine.goToFirstLevel();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "navigation", "first"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("navigation.first"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("first"));
         return action;
     }
@@ -96,7 +96,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
                 applicationEngine.goToPreviousLevel();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "navigation", "previous"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("navigation.previous"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("previous"));
         return action;
     }
@@ -107,7 +107,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
                 applicationEngine.goToNextLevel();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "navigation", "next"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("navigation.next"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("next"));
         return action;
     }
@@ -118,7 +118,7 @@ public class LevelNavigatorView implements IView, ILevelListener {
                 applicationEngine.goToLastLevel();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize(new String[]{"interface", "navigation", "last"}));
+        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("navigation.last"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("last"));
         return action;
     }

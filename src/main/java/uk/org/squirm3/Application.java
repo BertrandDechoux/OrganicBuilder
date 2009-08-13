@@ -3,11 +3,15 @@ package uk.org.squirm3;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.ui.GUI;
 import uk.org.squirm3.ui.Resource;
+import uk.org.squirm3.data.*;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Properties;
+import java.util.*;
+import java.util.List;
+import java.lang.reflect.Constructor;
+import java.awt.*;
+import java.awt.geom.Point2D;
 
 /**
  * ${my.copyright}
@@ -25,116 +29,99 @@ public final class Application {
     public static final String USER_REGION = "user.region";
 
     private static final String CONFIGURATION_FILE_PATH = "/configuration.properties";
-    private static final Properties PROPERTIES = new Properties();
-
-    /**
-     * run the application embedded inside a browser
-     */
-    public static void runAsApplet(JApplet applet) throws Exception {
-        runApplication(applet, null);
-    }
+    private static final Properties CONFIGURATION = new Properties();
+    private static ResourceBundle INTERFACE_BUNDLE, LEVELS_BUNDLE;
 
     /**
      * run the application as stand alone (Java Web Start or command line)
      */
-    public static void main(String argv[]) throws Exception {
-        runApplication(null, argv);
+    public static void main(String argv[]) {
+        try {
+            String userLanguage = null;
+            String userRegion = null;
+            for (String arg : argv) {
+                String[] entry = arg.split("=");
+                if (entry.length != 2) throw new IllegalArgumentException(arg);
+                for (int i = 0; i < entry.length; i++) {
+                    entry[i] = entry[i].trim();
+                }
+                if (entry[0].equals(USER_LANGUAGE)) userLanguage = entry[1];
+                else if (entry[1].equals(USER_REGION)) userRegion = entry[1];
+            }
+            Locale userLocale = (userLanguage == null) ? null :
+                    new Locale(userLanguage, userRegion);
+            runApplication(null, userLocale);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * main logic for running the application
      */
-    private static void runApplication(final JApplet applet, String argv[]) throws Exception {
+    public static void runApplication(JRootPane rootPane, Locale locale) throws Exception {
         try {
-            setupConfiguration(applet, argv);
-            setupLanguage();
-            GUI.createGUI(new ApplicationEngine(), applet);
-        } catch (IOException e1) {
-            e1.printStackTrace();
+            // load configuration
+            CONFIGURATION.load(Resource.class.getResourceAsStream(CONFIGURATION_FILE_PATH));
+
+            // load i18n info
+            if (locale == null) locale = Locale.getDefault();
+            INTERFACE_BUNDLE = ResourceBundle.getBundle(
+                    getConfigurationProperty("i18n.interface"), locale);
+            LEVELS_BUNDLE = ResourceBundle.getBundle(
+                    getConfigurationProperty("i18n.levels"), locale);
+
+            // create the user interface
+            GUI.createGUI(new ApplicationEngine(), rootPane);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-    }
-
-    private static void setupConfiguration(final JApplet applet, String argv[]) throws IOException {
-        // load the configuration properties
-        Properties configurationProperties = new Properties();
-        configurationProperties.load(Resource.class.getResourceAsStream(CONFIGURATION_FILE_PATH));
-
-        if (applet != null) {
-            // configuration from the applet overrides default configuration
-            Iterator<?> it = configurationProperties.keySet().iterator();
-            while (it.hasNext()) {
-                String key = (String) it.next();
-                String value = applet.getParameter(key);
-                if (value != null) configurationProperties.setProperty(key, value);
-            }
-        } else {
-            // configuration from the command line overrides default configuration
-            for (int i = 0; i < argv.length; i++) {
-                String[] entry = argv[i].split("=");
-                if (entry.length == 2 && configurationProperties.containsKey(entry[0])) {
-                    configurationProperties.setProperty(entry[0], entry[1]);
-                }
-            }
-        }
-        // save configuration
-        loadSubProperties(PROPERTIES, configurationProperties, "configuration");
-    }
-
-    private static void setupLanguage() throws IOException {
-        // is the language choice part of the configuration ?
-        String key = "configuration.languages.choice";
-        String chosenLanguage = getProperty(key);
-        // else use default or ask the user
-        if (chosenLanguage.equals(key) || chosenLanguage.trim().isEmpty()) {
-            String[] languagesArray = getProperty("configuration.languages.available").split(" ");
-            if (languagesArray.length == 1) chosenLanguage = languagesArray[0];
-            else chosenLanguage = GUI.selectLanguage(languagesArray);
-        }
-
-        // find and load the messages used by the application
-        String levelsTranslationFilePath = getProperty("configuration.translation.levels");
-        String interfaceTranslationFilePath = getProperty("configuration.translation.interface");
-        Properties levelsProperties = new Properties();
-        Properties interfaceProperties = new Properties();
-        // use files in the specified language
-        // for more information, see http://www.loc.gov/standards/iso639-2/englangn.html
-        try {
-            levelsProperties.load(Resource.class.getResourceAsStream(levelsTranslationFilePath + "_" + chosenLanguage + ".properties"));
-            interfaceProperties.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath + "_" + chosenLanguage + ".properties"));
-        } catch (Exception e) {// use default files
-            levelsProperties.load(Resource.class.getResourceAsStream(levelsTranslationFilePath + ".properties"));
-            interfaceProperties.load(Resource.class.getResourceAsStream(interfaceTranslationFilePath + ".properties"));
-        } finally {
-            loadSubProperties(PROPERTIES, levelsProperties, "levels");
-            loadSubProperties(PROPERTIES, interfaceProperties, "interface");
-        }
     }
 
     /**
-     * get a configuration value or an internationalized message
+     * get a configuration value
      */
-    public static String getProperty(String key) {
-        return PROPERTIES.getProperty(key, key);
+    public static String getConfigurationProperty(String key) {
+        String value = CONFIGURATION.getProperty(key, null);
+        if(value==null) throw new MissingResourceException("","configuration",key);
+        return value;
     }
 
-    @Deprecated
-    public static String localize(String[] code) {
-        StringBuilder key = new StringBuilder(code[0]);
-        for (int i = 1; i < code.length; i++) {
-            key.append(".");
-            key.append(code[i]);
+    public static List<Level> getLevels() throws Exception {
+        final int simulationWidth = Integer.parseInt(getConfigurationProperty("simulation.width"));
+        final int simulationHeight = Integer.parseInt(getConfigurationProperty("simulation.height"));
+        final int numberOfAtoms = Integer.parseInt(getConfigurationProperty("simulation.atom.number"));
+
+        final Configuration configuration = new Configuration(numberOfAtoms, Level.TYPES, simulationWidth, simulationHeight);;
+
+        final int numberOfLevels = Integer.parseInt(getConfigurationProperty("levels.number"));
+        List<Level> levels = new ArrayList<Level>(numberOfLevels);
+
+        for (int i=0; i<numberOfLevels; i++) {
+            String className = getConfigurationProperty("levels." + i + ".class");
+            String key = getConfigurationProperty("levels." + i + ".key");
+
+            final String title = LEVELS_BUNDLE.getString(key + ".title");
+            final String texte = LEVELS_BUNDLE.getString(key + ".challenge");
+            final String hint = LEVELS_BUNDLE.getString(key + ".hint");
+            final int numberOfErrors = Integer.parseInt(LEVELS_BUNDLE.getString(key + ".errors"));
+            String[] errors = new String[numberOfErrors];
+            for (int j = 1; j <= numberOfErrors; j++) {
+                errors[j - 1] = LEVELS_BUNDLE.getString(key + ".error." + new Integer(j));
+            }
+
+            Class c = Class.forName(className);
+            Constructor[] cs = c.getConstructors();
+            Object[] os = new Object[]{title, texte, hint, errors, configuration};
+            Level level = (Level) cs[0].newInstance(os);
+            levels.add(level);
         }
-        return getProperty(key.toString());
+        return levels;
     }
 
-    private static void loadSubProperties(Properties parent, Properties child, String discriminator) {
-        discriminator += ".";
-        Iterator<?> it = child.keySet().iterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            String value = child.getProperty(key);
-            parent.put(discriminator + key, value);
-        }
+    public static String localize(String key) {
+        return INTERFACE_BUNDLE.getString(key);
     }
+
 }
