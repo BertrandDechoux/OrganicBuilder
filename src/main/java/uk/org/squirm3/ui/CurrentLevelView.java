@@ -2,7 +2,6 @@ package uk.org.squirm3.ui;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.ILogger;
-import uk.org.squirm3.NetLogger;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.ApplicationEngine;
@@ -30,9 +29,9 @@ public class CurrentLevelView implements IView, ILevelListener {
 
     private final ILogger logger;
 
-    public CurrentLevelView(ApplicationEngine applicationEngine, String loggerUrl) {
+    public CurrentLevelView(ApplicationEngine applicationEngine, ILogger loggerUrl) {
         currentLevelPanel = createCurrentLevelPanel();
-        logger = new NetLogger(loggerUrl);
+        logger = loggerUrl;
         this.applicationEngine = applicationEngine;
         levelHasChanged();
         applicationEngine.getEngineDispatcher().addLevelListener(this);

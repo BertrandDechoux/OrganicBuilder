@@ -1,15 +1,14 @@
 package uk.org.squirm3;
 
+import uk.org.squirm3.data.Configuration;
+import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.ui.GUI;
-import uk.org.squirm3.Resource;
-import uk.org.squirm3.data.*;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.*;
-import java.util.List;
 import java.lang.reflect.Constructor;
+import java.util.*;
 
 /**
  * ${my.copyright}
@@ -77,12 +76,9 @@ public final class Application {
 
     }
 
-    /**
-     * get a configuration value
-     */
-    public static String getConfigurationProperty(String key) {
+    private static String getConfigurationProperty(String key) {
         String value = CONFIGURATION.getProperty(key, null);
-        if(value==null) throw new MissingResourceException("","configuration",key);
+        if (value == null) throw new MissingResourceException("", "configuration", key);
         return value;
     }
 
@@ -91,12 +87,12 @@ public final class Application {
         final int simulationHeight = Integer.parseInt(getConfigurationProperty("simulation.height"));
         final int numberOfAtoms = Integer.parseInt(getConfigurationProperty("simulation.atom.number"));
 
-        final Configuration configuration = new Configuration(numberOfAtoms, Level.TYPES, simulationWidth, simulationHeight);;
+        final Configuration configuration = new Configuration(numberOfAtoms, Level.TYPES, simulationWidth, simulationHeight);
 
         final int numberOfLevels = Integer.parseInt(getConfigurationProperty("levels.number"));
         List<Level> levels = new ArrayList<Level>(numberOfLevels);
 
-        for (int i=0; i<numberOfLevels; i++) {
+        for (int i = 0; i < numberOfLevels; i++) {
             String className = getConfigurationProperty("levels." + i + ".class");
             String key = getConfigurationProperty("levels." + i + ".key");
 
@@ -116,6 +112,10 @@ public final class Application {
             levels.add(level);
         }
         return levels;
+    }
+
+    public static ILogger getLogger() {
+        return new NetLogger(Application.getConfigurationProperty("logger.url"));
     }
 
     public static String localize(String key) {

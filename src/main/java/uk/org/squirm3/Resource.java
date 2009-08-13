@@ -16,7 +16,14 @@ import java.net.URL;
 //class Resource : use to get pictures or to log something
 // all thingd related to I/O
 //*********************************************************
-public class Resource {
+// TODO clean all the code loading the images
+public final class Resource {
+
+    /**
+     * This is an utility class. Do no instantiate.
+     */
+    private Resource() {
+    }
 
     private static final String spikyImageName = "spiky.png";
     private static Image spikyImage;

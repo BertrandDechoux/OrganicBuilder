@@ -1,12 +1,13 @@
 package uk.org.squirm3.engine;
 
 import uk.org.squirm3.Application;
-import uk.org.squirm3.data.*;
+import uk.org.squirm3.data.Atom;
+import uk.org.squirm3.data.Configuration;
+import uk.org.squirm3.data.DraggingPoint;
+import uk.org.squirm3.data.Level;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 /**

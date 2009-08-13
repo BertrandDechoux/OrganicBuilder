@@ -2,7 +2,6 @@ package uk.org.squirm3.engine;
 
 import uk.org.squirm3.data.Level;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

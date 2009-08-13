@@ -54,7 +54,7 @@ public class GUI {
         //view
         AtomsView atomsView = new AtomsView(applicationEngine);
         CurrentLevelView currentLevelView = new CurrentLevelView(applicationEngine,
-                Application.getConfigurationProperty("logger.url"));
+                Application.getLogger());
         ReactionListView reactionListView = new ReactionListView(applicationEngine);
         ReactionEditorView reactionEditorView = new ReactionEditorView(applicationEngine);
         StateView stateView = new StateView(applicationEngine);
@@ -198,7 +198,7 @@ public class GUI {
                     frame.setContentPane(rootPane.getContentPane());
                     frame.setVisible(true);
                     SwingUtilities.updateComponentTreeUI(frame);
-                     SwingUtilities.updateComponentTreeUI(rootPane);
+                    SwingUtilities.updateComponentTreeUI(rootPane);
                 }
             }
         };
