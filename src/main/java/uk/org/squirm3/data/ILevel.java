@@ -9,13 +9,14 @@ import java.util.List;
 public interface ILevel {
 
     public String getTitle();
-    public String getDescription();
+    public String getChallenge();
     public String getHint();
-    public List<? extends String> getErrors();
+    public List<String> getErrors();
+    public Configuration getConfiguration();
     public Configuration getDefaultConfiguration();
 
-    public Collection<? extends Atom> generateAtoms();
-    public Collection<? extends Atom> generateAtoms(Configuration configuration);
+    public List<Atom> generateAtoms();
+    public List<Atom> generateAtoms(Configuration configuration);
 
     public boolean isEvaluable();
     public String evaluate(Collection<? extends Atom> atoms);

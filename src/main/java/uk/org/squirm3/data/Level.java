@@ -1,10 +1,36 @@
 package uk.org.squirm3.data;
 
+import java.util.*;
+
 /**
  * ${my.copyright}
  */
 
-public abstract class Level {
+public abstract class Level implements ILevel {
+
+    // implementation of the ILevel interface
+    public List<String> getErrors() {
+        return Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(errors)));
+    }
+
+    public List<Atom> generateAtoms() {
+        return Collections.unmodifiableList(new ArrayList<Atom>(Arrays.asList(createAtoms(null))));
+    }
+
+    public List<Atom> generateAtoms(Configuration configuration) {
+         return Collections.unmodifiableList(new ArrayList<Atom>(Arrays.asList(createAtoms(configuration))));
+    }
+
+    public boolean isEvaluable() {
+        return true;
+    }
+
+    public String evaluate(Collection<? extends Atom> atoms) {
+        return evaluate(atoms.toArray(new Atom[] {}));
+    }
+
+    // end of pseudo implementation
+
     public static final int[] TYPES = {0, 1, 2, 3, 4, 5};
 
     private final String title, challenge, hint;

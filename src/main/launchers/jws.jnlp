@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- http://java.sun.com/j2se/1.5.0/docs/guide/javaws/developersguide/syntax.html -->
+<jnlp spec="1.0+" codebase="http://organicbuilder.sourceforge.net/" href="jws">
+    <information>
+        <title>Organic Builder</title>
+        <vendor></vendor>
+        <homepage href="http://organicbuilder.sourceforge.net/"/>
+        <description kind="one-line">Didactic Artificial Chemistry</description>
+        <description kind="short">Make up our own rules of construction to simulate open-ended, creative evolution. Forget all that chemistry they made you learn in school, we're going to make it all up as we go along.</description>
+        <description kind="tooltip">Make up our own rules of construction to simulate open-ended, creative evolution.</description>
+    </information>
+
+    <offline-allowed/>
+
+    <resources>
+        <j2se version="1.5+" href="http://java.sun.com/products/autodl/j2se"/>
+        <jar href="http://organicbuilder.sourceforge.net/organicbuilder-${pom.version}.jar"/>
+    </resources>
+
+    <application-desc />
+</jnlp>

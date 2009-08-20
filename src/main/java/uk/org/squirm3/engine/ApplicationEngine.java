@@ -2,10 +2,7 @@ package uk.org.squirm3.engine;
 
 import uk.org.squirm3.Application;
 import uk.org.squirm3.listener.EventDispatcher;
-import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.Configuration;
-import uk.org.squirm3.data.DraggingPoint;
-import uk.org.squirm3.data.Level;
+import uk.org.squirm3.data.*;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -99,15 +96,9 @@ public class ApplicationEngine {
         });
     }
 
-    //TODO avoid to create a copy per call
     public Collection getAtoms() {
         synchronized (colliderExecution) {
-            Atom[] atoms = collider.getAtoms();
-            List list = new LinkedList();
-            for (int i = 0; i < atoms.length; i++) {
-                list.add(atoms[i]);
-            }
-            return list;
+            return collider.getAtoms();
         }
     }
 
@@ -165,8 +156,8 @@ public class ApplicationEngine {
     public void restartLevel(final Configuration configuration) {
         addCommand(new ICommand() {
             public void execute() {
-                Level currentLevel = levelManager.getCurrentLevel();
-                Atom[] atoms = currentLevel.createAtoms(configuration);
+                ILevel currentLevel = levelManager.getCurrentLevel();
+                List<Atom> atoms = currentLevel.generateAtoms(configuration);
                 if (atoms == null) return;
                 collider = new Collider(atoms, (int) currentLevel.getConfiguration().getWidth(),
                         (int) currentLevel.getConfiguration().getHeight());
@@ -243,8 +234,8 @@ public class ApplicationEngine {
             reactionManager.clearReactions();
             eventDispatcher.dispatchEvent(EventDispatcher.Event.REACTIONS);
         }
-        Level currentLevel = levelManager.getCurrentLevel();
-        Atom[] atoms = currentLevel.createAtoms(configuration);
+        ILevel currentLevel = levelManager.getCurrentLevel();
+        List<Atom> atoms = currentLevel.generateAtoms(configuration);
         if (atoms == null) return;
         collider = new Collider(atoms, (int) currentLevel.getConfiguration().getWidth(),
                 (int) currentLevel.getConfiguration().getHeight());

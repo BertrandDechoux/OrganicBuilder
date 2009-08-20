@@ -14,7 +14,7 @@ import java.util.*;
 final class Collider {
 
     // ------- data ---------
-    private Atom atoms[];
+    private List<? extends Atom> atoms;
 
     // structures for space-division speed-up:
     private final List buckets[][]; // each bucket has a list of the indices of the sq3Atoms contained within it
@@ -28,8 +28,8 @@ final class Collider {
 
 
     // ------- methods ---------
-    public Collider(Atom[] atoms, int w, int h) {
-        this.atoms = atoms; //TODO copy or create them locally with a Level instance
+    public Collider(List<? extends Atom> atoms, int w, int h) {
+        this.atoms = atoms;
         // size the buckets structure so each bucket is approximately R in size (approx 1 atom per bucket)
         final float R = Atom.getAtomSize();
         // recompute MAX_SPEED to allow for the new R
@@ -45,8 +45,8 @@ final class Collider {
         bucket_width = w / (float) n_buckets_x;
         bucket_height = h / (float) n_buckets_y;
         // insert any atoms currently present
-        for (int i = 0; i < atoms.length; i++) {
-            Atom a = atoms[i];
+        for (int i = 0; i < atoms.size(); i++) {
+            Atom a = atoms.get(i);
             int bucket_x, bucket_y;
             bucket_x = whichBucketX(a.getPhysicalPoint().getPositionX());
             bucket_y = whichBucketY(a.getPhysicalPoint().getPositionY());
@@ -55,7 +55,7 @@ final class Collider {
     }
 
     // TODO protect the collection : copy or immutable view
-    public Atom[] getAtoms() {
+    public List<? extends Atom> getAtoms() {
         return atoms;
     }
 
@@ -102,8 +102,8 @@ final class Collider {
         float diam = 2.0f * R;
         float diam2 = diam * diam;
 
-        for (int i = 0; i < atoms.length; i++) {
-            Atom a = atoms[i];
+        for (int i = 0; i < atoms.size(); i++) {
+            Atom a = atoms.get(i);
             // bounce off the walls
             if (a.getPhysicalPoint().getPositionX() < R)
                 a.getPhysicalPoint().setSpeedX(a.getPhysicalPoint().getSpeedX() + getForce(R - a.getPhysicalPoint().getPositionX()));
@@ -128,7 +128,7 @@ final class Collider {
                     while (it.hasNext()) {
                         int iOther = ((Integer) it.next()).intValue();
                         if (iOther <= i) continue; // using Newton's "action&reaction" as a shortcut
-                        Atom b = atoms[iOther];
+                        Atom b = atoms.get(iOther);
                         if ((new Point2D.Float(a.getPhysicalPoint().getPositionX(), a.getPhysicalPoint().getPositionY())).distanceSq(
                                 new Point2D.Float(b.getPhysicalPoint().getPositionX(), b.getPhysicalPoint().getPositionY())) < diam2) {
                             // this is a collision - can any reactions apply to these two atoms?
@@ -204,16 +204,16 @@ final class Collider {
         }
 
         // MOVE ATOMS
-        for (int i = 0; i < atoms.length; i++) {
-            Atom a = atoms[i];
+        for (int i = 0; i < atoms.size(); i++) {
+            Atom a = atoms.get(i);
             if (a.isStuck()) continue; // special atoms that don't move
 
             int current_bucket_x, current_bucket_y;
             current_bucket_x = whichBucketX(a.getPhysicalPoint().getPositionX());
             current_bucket_y = whichBucketY(a.getPhysicalPoint().getPositionY());
 
-            a.getPhysicalPoint().setPositionX(a.getPhysicalPoint().getPositionX() + atoms[i].getPhysicalPoint().getSpeedX());
-            a.getPhysicalPoint().setPositionY(a.getPhysicalPoint().getPositionY() + atoms[i].getPhysicalPoint().getSpeedY());
+            a.getPhysicalPoint().setPositionX(a.getPhysicalPoint().getPositionX() + atoms.get(i).getPhysicalPoint().getSpeedX());
+            a.getPhysicalPoint().setPositionY(a.getPhysicalPoint().getPositionY() + atoms.get(i).getPhysicalPoint().getSpeedY());
 
             int new_bucket_x, new_bucket_y;
             new_bucket_x = whichBucketX(a.getPhysicalPoint().getPositionX());

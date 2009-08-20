@@ -2,6 +2,7 @@ package uk.org.squirm3;
 
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.Level;
+import uk.org.squirm3.data.ILevel;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.ui.GUI;
 
@@ -82,7 +83,7 @@ public final class Application {
         return value;
     }
 
-    public static List<Level> getLevels() throws Exception {
+    public static List<ILevel> getLevels() throws Exception {
         final int simulationWidth = Integer.parseInt(getConfigurationProperty("simulation.width"));
         final int simulationHeight = Integer.parseInt(getConfigurationProperty("simulation.height"));
         final int numberOfAtoms = Integer.parseInt(getConfigurationProperty("simulation.atom.number"));
@@ -90,7 +91,7 @@ public final class Application {
         final Configuration configuration = new Configuration(numberOfAtoms, Level.TYPES, simulationWidth, simulationHeight);
 
         final int numberOfLevels = Integer.parseInt(getConfigurationProperty("levels.number"));
-        List<Level> levels = new ArrayList<Level>(numberOfLevels);
+        List<ILevel> levels = new ArrayList<ILevel>(numberOfLevels);
 
         for (int i = 0; i < numberOfLevels; i++) {
             String className = getConfigurationProperty("levels." + i + ".class");
@@ -111,7 +112,7 @@ public final class Application {
             Level level = (Level) cs[0].newInstance(os);
             levels.add(level);
         }
-        return levels;
+        return Collections.unmodifiableList(levels);
     }
 
     public static ILogger getLogger() {

@@ -4,6 +4,7 @@ import uk.org.squirm3.Application;
 import uk.org.squirm3.ILogger;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Level;
+import uk.org.squirm3.data.ILevel;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.IListener;
 import uk.org.squirm3.listener.EventDispatcher;
@@ -23,7 +24,7 @@ import java.util.List;
 public class CurrentLevelView extends AView {
     private JEditorPane description;
     private JButton hintButton, evaluateButton;
-    private Level currentLevel;
+    private ILevel currentLevel;
 
     private final JPanel currentLevelPanel;
 
@@ -88,15 +89,8 @@ public class CurrentLevelView extends AView {
         evaluateButton = new JButton(Application.localize("level.evaluate"));
         evaluateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                Collection c = getApplicationEngine().getAtoms();
-                Iterator it = c.iterator();
-                Atom[] atoms = new Atom[c.size()];
-                int i = 0;
-                while (it.hasNext()) {
-                    atoms[i] = (Atom) it.next();
-                    i++;
-                }
-                String result = currentLevel.evaluate(atoms);
+                String result = currentLevel.evaluate(
+                        getApplicationEngine().getAtoms());
                 boolean success = true;
                 if (result == null) {
                     result = Application.localize("level.success");
