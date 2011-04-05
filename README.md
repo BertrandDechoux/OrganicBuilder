@@ -2,7 +2,8 @@
 
 This is the motto of the OrganicBuilder, an application created by [Tim Hutton](http://www.sq3.org.uk).
 
-In 2006, I started from the online archive and contributed :
+In 2006, I started from the online archive and contributed : 
+
 * online hosting at [sourceforge](http://sourceforge.net/projects/organicbuilder/) with source code management (subversion),
 * [a project website](http://organicbuilder.sourceforge.net/),
 * internationalisation support (English and French at the moment),
