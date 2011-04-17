@@ -3,9 +3,6 @@ package uk.org.squirm3.data;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * ${my.copyright}
- */
 public interface ILevel {
 
     public String getTitle();

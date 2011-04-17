@@ -1,21 +1,17 @@
 package uk.org.squirm3.data;
 
-/**
- * ${my.copyright}
- */
-
 public final class FixedPoint implements IPhysicalPoint {
 
     private final float x, y;
 
-    public FixedPoint(float x, float y) {
+    public FixedPoint(final float x, final float y) {
         this.x = x;
         this.y = y;
     }
 
-    public FixedPoint(IPhysicalPoint physicalPoint) {
-        this.x = physicalPoint.getPositionX();
-        this.y = physicalPoint.getPositionY();
+    public FixedPoint(final IPhysicalPoint physicalPoint) {
+        x = physicalPoint.getPositionX();
+        y = physicalPoint.getPositionY();
     }
 
     public float getPositionX() {
@@ -42,27 +38,27 @@ public final class FixedPoint implements IPhysicalPoint {
         return 0;
     }
 
-    public boolean setPositionX(float x) {
+    public boolean setPositionX(final float x) {
         return false;
     }
 
-    public boolean setPositionY(float y) {
+    public boolean setPositionY(final float y) {
         return false;
     }
 
-    public boolean setSpeedX(float dx) {
+    public boolean setSpeedX(final float dx) {
         return false;
     }
 
-    public boolean setSpeedY(float dy) {
+    public boolean setSpeedY(final float dy) {
         return false;
     }
 
-    public boolean setAccelerationX(float ddx) {
+    public boolean setAccelerationX(final float ddx) {
         return false;
     }
 
-    public boolean setAccelerationY(float ddy) {
+    public boolean setAccelerationY(final float ddy) {
         return false;
     }
 

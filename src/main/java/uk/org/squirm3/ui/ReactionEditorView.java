@@ -1,22 +1,26 @@
 package uk.org.squirm3.ui;
 
-import uk.org.squirm3.Application;
-import uk.org.squirm3.Resource;
-import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.Reaction;
-import uk.org.squirm3.engine.ApplicationEngine;
-
-import javax.swing.*;
-import javax.swing.border.EtchedBorder;
-import java.awt.*;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * ${my.copyright}
- */
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EtchedBorder;
+
+import uk.org.squirm3.Application;
+import uk.org.squirm3.Resource;
+import uk.org.squirm3.data.Atom;
+import uk.org.squirm3.data.Reaction;
+import uk.org.squirm3.engine.ApplicationEngine;
 
 public class ReactionEditorView extends AView {
     private JCheckBox bondedBefore, bondedAfter;
@@ -25,7 +29,7 @@ public class ReactionEditorView extends AView {
     private JButton addReaction;
     private final JPanel editorPanel;
 
-    public ReactionEditorView(ApplicationEngine applicationEngine) {
+    public ReactionEditorView(final ApplicationEngine applicationEngine) {
         super(applicationEngine);
         editorPanel = createEditorPanel();
     }
@@ -42,8 +46,8 @@ public class ReactionEditorView extends AView {
                 Application.localize("reactions.editor")));
         final JPanel reactionPanel = new JPanel();
         reactionPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        ActionListener l = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        final ActionListener l = new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
                 addReaction.setText(createReactionFromEditor().toString());
             }
         };
@@ -79,10 +83,11 @@ public class ReactionEditorView extends AView {
         jPanel.add(reactionPanel);
         addReaction = new JButton(Resource.getIcon("add"));
         addReaction.setMargin(new Insets(0, 0, 0, 0));
-        addReaction.setToolTipText(Application.localize("reactions.add.tooltip"));
+        addReaction.setToolTipText(Application
+                .localize("reactions.add.tooltip"));
         addReaction.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Collection c = new ArrayList(1);
+            public void actionPerformed(final ActionEvent e) {
+                final Collection c = new ArrayList(1);
                 c.add(createReactionFromEditor());
                 getApplicationEngine().addReactions(c);
             }
@@ -93,13 +98,15 @@ public class ReactionEditorView extends AView {
     }
 
     private Reaction createReactionFromEditor() {
-        return new Reaction(aType.getSelectedIndex(), aState.getSelectedIndex(), bondedBefore.isSelected(),
-                bType.getSelectedIndex(), bState.getSelectedIndex(), futureAState.getSelectedIndex(),
-                bondedAfter.isSelected(), futureBState.getSelectedIndex());
+        return new Reaction(aType.getSelectedIndex(),
+                aState.getSelectedIndex(), bondedBefore.isSelected(),
+                bType.getSelectedIndex(), bState.getSelectedIndex(),
+                futureAState.getSelectedIndex(), bondedAfter.isSelected(),
+                futureBState.getSelectedIndex());
     }
 
     private JComboBox createTypeComboBox() {
-        JComboBox jComboBox = new JComboBox();
+        final JComboBox jComboBox = new JComboBox();
         for (int i = 0; i < 8; i++) {
             jComboBox.addItem(String.valueOf(Atom.type_code.charAt(i)));
         }
@@ -107,8 +114,8 @@ public class ReactionEditorView extends AView {
     }
 
     private JComboBox createStateComboBox() {
-        JComboBox jComboBox = new JComboBox();
-        for (int i = 0; i < 50; i++) { //TODO no hardcoded value!
+        final JComboBox jComboBox = new JComboBox();
+        for (int i = 0; i < 50; i++) { // TODO no hardcoded value!
             jComboBox.addItem(String.valueOf(i));
         }
         return jComboBox;

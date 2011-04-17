@@ -1,32 +1,31 @@
 package uk.org.squirm3.ui;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+
 import uk.org.squirm3.Application;
 import uk.org.squirm3.Resource;
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.IListener;
 import uk.org.squirm3.listener.EventDispatcher;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-
-/**
- * ${my.copyright}
- */
+import uk.org.squirm3.listener.IListener;
 
 public class StateView extends AView {
 
     // Actions controlling the simulation
     private final Action stop, run, reset;
 
-    public StateView(ApplicationEngine applicationEngine) {
+    public StateView(final ApplicationEngine applicationEngine) {
         super(applicationEngine);
         stop = createStopAction();
         run = createRunAction();
         reset = createResetAction();
 
-        IListener stateListener = new IListener() {
+        final IListener stateListener = new IListener() {
             public void propertyHasChanged() {
-                boolean isRunning = getApplicationEngine().simulationIsRunning();
+                final boolean isRunning = getApplicationEngine()
+                        .simulationIsRunning();
                 stop.setEnabled(isRunning);
                 run.setEnabled(!isRunning);
             }
@@ -51,35 +50,55 @@ public class StateView extends AView {
 
     private Action createRunAction() {
         final Action action = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
+            /**
+			 * 
+			 */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().runSimulation();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("simulation.run"));
-        //action.putValue(Action.LONG_DESCRIPTION, "Context-Sensitive Help Text"); TODO and for the others actions too
+        action.putValue(Action.SHORT_DESCRIPTION,
+                Application.localize("simulation.run"));
+        // action.putValue(Action.LONG_DESCRIPTION,
+        // "Context-Sensitive Help Text"); TODO and for the others actions too
         action.putValue(Action.SMALL_ICON, Resource.getIcon("play"));
-        //action.putValue(Action.MNEMONIC_KEY, new Integer(java.awt.event.KeyEvent.VK_A)); TODO
+        // action.putValue(Action.MNEMONIC_KEY, new
+        // Integer(java.awt.event.KeyEvent.VK_A)); TODO
         return action;
     }
 
     private Action createStopAction() {
         final Action action = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
+            /**
+			 * 
+			 */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().pauseSimulation();
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("simulation.stop"));
+        action.putValue(Action.SHORT_DESCRIPTION,
+                Application.localize("simulation.stop"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("pause"));
         return action;
     }
 
     private Action createResetAction() {
         final Action action = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
+            /**
+			 * 
+			 */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().restartLevel(null);
             }
         };
-        action.putValue(Action.SHORT_DESCRIPTION, Application.localize("simulation.reset"));
+        action.putValue(Action.SHORT_DESCRIPTION,
+                Application.localize("simulation.reset"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("reset"));
         return action;
     }

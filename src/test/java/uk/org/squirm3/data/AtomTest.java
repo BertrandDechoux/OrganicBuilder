@@ -2,13 +2,10 @@ package uk.org.squirm3.data;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
 import java.util.LinkedList;
 
-/**
- * ${my.copyright}
- */
+import org.junit.Test;
 
 public class AtomTest {
 
@@ -17,9 +14,9 @@ public class AtomTest {
      */
     @Test
     public void testAtom() {
-        int t = 4;
-        int s = 5;
-        Atom a = new Atom(new MobilePoint(), t, s);
+        final int t = 4;
+        final int s = 5;
+        final Atom a = new Atom(new MobilePoint(), t, s);
         assertTrue(a.getType() == t);
         assertTrue(a.getState() == s);
     }
@@ -53,15 +50,14 @@ public class AtomTest {
      */
     @Test
     public void testBondingAndBreaking() {
-        Atom a1 = new Atom(new MobilePoint(), 0, 1);
-        Atom a2 = new Atom(new MobilePoint(), 0, 2);
+        final Atom a1 = new Atom(new MobilePoint(), 0, 1);
+        final Atom a2 = new Atom(new MobilePoint(), 0, 2);
         assertFalse(a1.hasBondWith(a2));
         assertFalse(a2.hasBondWith(a1));
 
         a1.bondWith(a2);
         assertTrue(a1.hasBondWith(a2));
         assertTrue(a2.hasBondWith(a1));
-
 
         a1.breakBondWith(a2);
         assertFalse(a1.hasBondWith(a2));
@@ -73,13 +69,13 @@ public class AtomTest {
      */
     @Test
     public void testGeneralMethods() {
-        MobilePoint physicalPoint = new MobilePoint();
-        Atom a1 = new Atom(physicalPoint, 0, 1);
-        Atom a2 = new Atom(physicalPoint, 0, 2);
-        Atom a3 = new Atom(physicalPoint, 0, 3);
-        Atom a4 = new Atom(physicalPoint, 0, 4);
-        Atom a5 = new Atom(physicalPoint, 0, 3);
-        Atom a6 = new Atom(physicalPoint, 0, 4);
+        final MobilePoint physicalPoint = new MobilePoint();
+        final Atom a1 = new Atom(physicalPoint, 0, 1);
+        final Atom a2 = new Atom(physicalPoint, 0, 2);
+        final Atom a3 = new Atom(physicalPoint, 0, 3);
+        final Atom a4 = new Atom(physicalPoint, 0, 4);
+        final Atom a5 = new Atom(physicalPoint, 0, 3);
+        final Atom a6 = new Atom(physicalPoint, 0, 4);
 
         a1.bondWith(a2);
         a1.bondWith(a3);
@@ -88,7 +84,7 @@ public class AtomTest {
         a3.bondWith(a5);
         a5.bondWith(a6);
 
-        LinkedList<Atom> l = new LinkedList<Atom>();
+        final LinkedList<Atom> l = new LinkedList<Atom>();
         a1.getAllConnectedAtoms(l);
 
         assertTrue(l.contains(a1));
@@ -111,7 +107,7 @@ public class AtomTest {
      */
     @Test
     public void testToString() {
-        Atom a = new Atom(new MobilePoint(), 1, 1);
+        final Atom a = new Atom(new MobilePoint(), 1, 1);
         assertTrue("b1".equals(a.toString()));
     }
 }

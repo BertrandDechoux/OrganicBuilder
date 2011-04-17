@@ -1,208 +1,194 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>uk.org.squirm3</groupId>
-    <artifactId>organicbuilder</artifactId>
-    <version>SNAPSHOT</version>
-    <packaging>jar</packaging>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>uk.org.squirm3</groupId>
+	<artifactId>organicbuilder</artifactId>
+	<version>1.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
-    <name>Organic Builder</name>
-    <description>Artificial chemistry low-level simulation : make up our own rules of construction to simulate open-ended, creative evolution.</description>
-    <url>http://organicbuilder.sourceforge.net/</url>
-    <inceptionYear>2002</inceptionYear>
+	<name>Organic Builder</name>
+	<description>Artificial chemistry low-level simulation : make up our own rules of construction to simulate open-ended, creative evolution.</description>
+	<url>http://organicbuilder.sourceforge.net/</url>
+	<inceptionYear>2002</inceptionYear>
 
-    <licenses>
-        <license>
-            <name>GNU GENERAL PUBLIC LICENSE</name>
-            <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
-            <distribution>manual</distribution>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>GNU GENERAL PUBLIC LICENSE</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+			<distribution>manual</distribution>
+		</license>
+	</licenses>
 
-    <mailingLists>
-        <mailingList>
-            <name>OrganicBuilder Google Group</name>
-            <archive>http://groups.google.fr/group/OrganicBuilder</archive>
-        </mailingList>
-    </mailingLists>
+	<mailingLists>
+		<mailingList>
+			<name>OrganicBuilder Google Group</name>
+			<archive>http://groups.google.fr/group/OrganicBuilder</archive>
+		</mailingList>
+	</mailingLists>
 
-    <developers>
-        <developer>
-            <name>Tim J. Hutton</name>
-            <url>http://www.sq3.org.uk/</url>
-        </developer>
-        <developer>
-            <name>Bertrand Dechoux</name>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<name>Tim J. Hutton</name>
+			<url>http://www.sq3.org.uk/</url>
+		</developer>
+		<developer>
+			<name>Bertrand Dechoux</name>
+		</developer>
+	</developers>
 
-    <contributors>
-        <contributor>
-            <name>Ralph Hartley</name>
-        </contributor>
-    </contributors>
+	<contributors>
+		<contributor>
+			<name>Ralph Hartley</name>
+		</contributor>
+	</contributors>
 
-    <issueManagement>
-        <system>mailing list</system>
-        <url>http://groups.google.fr/group/OrganicBuilder</url>
-    </issueManagement>
+	<issueManagement>
+		<system>mailing list</system>
+		<url>http://groups.google.fr/group/OrganicBuilder</url>
+	</issueManagement>
 
-    <scm>
-        <connection>scm:svn:https://organicbuilder.svn.sourceforge.net/svnroot/organicbuilder/trunk</connection>
-        <developerConnection>scm:svn:https://organicbuilder.svn.sourceforge.net/svnroot/organicbuilder/trunk</developerConnection>
-        <tag>HEAD</tag>
-        <url>http://organicbuilder.svn.sourceforge.net/viewvc/organicbuilder</url>
-    </scm>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.6</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>uk.org.squirm3.Application</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<!-- http://www.wakaleo.com/blog/292-site-generation-in-maven-3 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.0-beta-2</version>
+				<configuration>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>2.7</version>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-jxr-plugin</artifactId>
+							<version>2.1</version>
+							<configuration>
+								<aggregate>true</aggregate>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-surefire-report-plugin</artifactId>
+							<version>2.6</version>
+						</plugin>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>cobertura-maven-plugin</artifactId>
+							<version>2.4</version>
+							<configuration>
+								<formats>
+									<format>xml</format>
+									<format>html</format>
+								</formats>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-checkstyle-plugin</artifactId>
+							<version>2.6</version>
+							<configuration>
+								<!-- TODO evaluate what the checks should be -->
+								<!-- <configLocation>config/sun_checks.xml</configLocation> -->
+								<!-- <configLocation>config/maven_checks.xml</configLocation> -->
+								<!-- <configLocation>config/turbine_checks.xml</configLocation> -->
+								<!-- <configLocation>config/avalon_checks.xml</configLocation> -->
+								<!-- <configLocation>my_checks.xml</configLocation> -->
+								<includeTestSourceDirectory>true</includeTestSourceDirectory>
+							</configuration>
+						</plugin>
+					</reportPlugins>
+				</configuration>
+			</plugin>
 
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <filtering>true</filtering>
-                <targetPath>./java-sources/main</targetPath>
-            </resource>
-            <resource>
-                <directory>src/main/launchers</directory>
-                <filtering>true</filtering>
-                <targetPath>..</targetPath>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/java</directory>
-                <filtering>true</filtering>
-                <targetPath>./java-sources/test</targetPath>
-            </testResource>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>false</filtering>
-            </testResource>
-        </testResources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                    <encoding>UTF-8</encoding>
-        	</configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>uk.org.squirm3.Application</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+		</plugins>
+	</build>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <minmemory>128m</minmemory>
-                    <maxmemory>512m</maxmemory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-		            <sourceEncoding>UTF-8</sourceEncoding>
-		            <targetJdk>1.5</targetJdk>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jdepend-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
-                <version>2.0-beta-1</version>
-                <configuration>
-                    <tags>TODO, @todo</tags>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+	<profiles>
+		<profile>
+			<id>maven-3</id>
+			<activation>
+				<file>
+					<!-- This employs that the basedir expression is only recognized by 
+						Maven 3.x (see MNG-2363) -->
+					<exists>${basedir}</exists>
+				</file>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-site-plugin</artifactId>
+							<version>3.0-beta-3</version>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+				<plugins>
+					<plugin>
+						<artifactId>maven-site-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-descriptor</id>
+								<goals>
+									<goal>attach-descriptor</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
-    <properties>
-        <my.copyright>
-Copyright 2002-2009 Tim J. Hutton, Ralph Hartley, Bertrand Dechoux
 
-This file is part of Organic Builder.
-
-Organic Builder is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-Organic Builder is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Organic Builder; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-        </my.copyright>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<cobertura.version>2.4</cobertura.version>
+	</properties>
 
 
 </project>

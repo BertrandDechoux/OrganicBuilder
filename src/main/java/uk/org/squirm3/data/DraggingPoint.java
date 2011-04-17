@@ -1,15 +1,12 @@
 package uk.org.squirm3.data;
 
-/**
- * ${my.copyright}
- */
-
 public class DraggingPoint {
     private final long x;
     private final long y;
     private final int whichBeingDragging;
 
-    public DraggingPoint(long x, long y, int whichBeingDragging) {
+    public DraggingPoint(final long x, final long y,
+            final int whichBeingDragging) {
         this.x = x;
         this.y = y;
         this.whichBeingDragging = whichBeingDragging;
@@ -27,20 +24,27 @@ public class DraggingPoint {
         return y;
     }
 
-    public boolean equals(Object obj) {
-        if (this == obj)
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final DraggingPoint other = (DraggingPoint) obj;
-        if (whichBeingDragging != other.whichBeingDragging)
+        if (whichBeingDragging != other.whichBeingDragging) {
             return false;
-        if (x != other.x)
+        }
+        if (x != other.x) {
             return false;
-        if (y != other.y)
+        }
+        if (y != other.y) {
             return false;
+        }
         return true;
     }
 

@@ -1,18 +1,14 @@
 package uk.org.squirm3.data;
 
-/**
- * ${my.copyright}
- */
-
 public final class Configuration {
     private final int numberOfAtoms;
     private final float width, height;
     private final int[] types;
 
-    public Configuration(int numberOfAtoms, int[] types,
-                         float width, float height) {
+    public Configuration(final int numberOfAtoms, final int[] types,
+            final float width, final float height) {
         this.numberOfAtoms = numberOfAtoms;
-        int[] types_copy = new int[types.length];
+        final int[] types_copy = new int[types.length];
         System.arraycopy(types, 0, types_copy, 0, types.length);
         this.types = types_copy;
         this.width = width;

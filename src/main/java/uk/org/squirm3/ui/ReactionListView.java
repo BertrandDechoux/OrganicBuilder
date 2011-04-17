@@ -1,16 +1,7 @@
 package uk.org.squirm3.ui;
 
-import uk.org.squirm3.Application;
-import uk.org.squirm3.data.Reaction;
-import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.IListener;
-import uk.org.squirm3.listener.EventDispatcher;
-
-import javax.swing.*;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,9 +11,22 @@ import java.util.Collection;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-/**
- * ${my.copyright}
- */
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionListener;
+
+import uk.org.squirm3.Application;
+import uk.org.squirm3.data.Reaction;
+import uk.org.squirm3.engine.ApplicationEngine;
+import uk.org.squirm3.listener.EventDispatcher;
+import uk.org.squirm3.listener.IListener;
 
 public class ReactionListView extends AView {
     // list mode
@@ -31,26 +35,26 @@ public class ReactionListView extends AView {
     private JPanel listButtonsPanel;
     // edit mode
     private JButton updateButton;
-    private JTextArea textArea;
+    private final JTextArea textArea;
     // main components
     private JPanel buttonParentPanel;
     private JScrollPane scrollPanel;
     private TitledBorder border;
     private final JPanel listPanel;
 
-    public ReactionListView(ApplicationEngine applicationEngine) {
+    public ReactionListView(final ApplicationEngine applicationEngine) {
         super(applicationEngine);
         listPanel = createListPanel();
         textArea = new JTextArea();
 
-        IListener reactionListener = new IListener() {
+        final IListener reactionListener = new IListener() {
             public void propertyHasChanged() {
                 reactionsHaveChanged();
             }
         };
         reactionListener.propertyHasChanged();
-        getApplicationEngine().getEventDispatcher().addListener(reactionListener,
-                EventDispatcher.Event.REACTIONS);
+        getApplicationEngine().getEventDispatcher().addListener(
+                reactionListener, EventDispatcher.Event.REACTIONS);
 
         updateDeleteButton();
     }
@@ -63,24 +67,31 @@ public class ReactionListView extends AView {
         final JPanel jPanel = new JPanel();
         jPanel.setLayout(new BorderLayout());
         border = BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), Application.localize("reactions.current"));
+                BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+                Application.localize("reactions.current"));
         jPanel.setBorder(border);
         listButtonsPanel = new JPanel();
         listButtonsPanel.setLayout(new GridLayout(4, 1));
 
         editButton = new JButton(Application.localize("reactions.edit"));
-        editButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, ReactionListView.this, "editReactions"));
+        editButton.addActionListener(EventHandler.create(ActionListener.class,
+                ReactionListView.this, "editReactions"));
         listButtonsPanel.add(editButton);
 
         updateButton = new JButton(Application.localize("reactions.update"));
-        updateButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, ReactionListView.this, "updateReactions"));
+        updateButton
+                .addActionListener(EventHandler.create(ActionListener.class,
+                        ReactionListView.this, "updateReactions"));
 
         deleteButton = new JButton(Application.localize("reactions.delete"));
-        deleteButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, ReactionListView.this, "deleteSelectedReactions"));
+        deleteButton.addActionListener(EventHandler.create(
+                ActionListener.class, ReactionListView.this,
+                "deleteSelectedReactions"));
         listButtonsPanel.add(deleteButton);
 
         clearButton = new JButton(Application.localize("reactions.clear"));
-        clearButton.addActionListener((ActionListener) EventHandler.create(ActionListener.class, getApplicationEngine(), "clearReactions"));
+        clearButton.addActionListener(EventHandler.create(ActionListener.class,
+                getApplicationEngine(), "clearReactions"));
         listButtonsPanel.add(clearButton);
 
         buttonParentPanel = new JPanel();
@@ -90,9 +101,11 @@ public class ReactionListView extends AView {
 
         reactionsList = new JList();
         reactionsList.getSelectionModel().addListSelectionListener(
-                (ListSelectionListener) EventHandler.create(ListSelectionListener.class, ReactionListView.this, "updateDeleteButton"));
+                EventHandler.create(ListSelectionListener.class,
+                        ReactionListView.this, "updateDeleteButton"));
         reactionsList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     editReactions();
                 }
@@ -107,10 +120,11 @@ public class ReactionListView extends AView {
         buttonParentPanel.remove(listButtonsPanel);
         buttonParentPanel.add(updateButton, BorderLayout.NORTH);
         buttonParentPanel.updateUI();
-        Object[] reactions = getApplicationEngine().getReactions().toArray();
+        final Object[] reactions = getApplicationEngine().getReactions()
+                .toArray();
         String content = "";
-        for (int i = 0; i < reactions.length; i++) {
-            content += reactions[i].toString() + "\n";
+        for (final Object reaction : reactions) {
+            content += reaction.toString() + "\n";
         }
         textArea.setText(content);
         scrollPanel.setViewportView(textArea);
@@ -118,22 +132,31 @@ public class ReactionListView extends AView {
 
     public void updateReactions() {
         String result = null;
-        Vector v = new Vector();
+        final Vector v = new Vector();
         // System.out.println("Input: "+text); // DEBUG
-        // for each line in the text			
-        StringTokenizer lines = new StringTokenizer(textArea.getText(), "\n", true);
+        // for each line in the text
+        final StringTokenizer lines = new StringTokenizer(textArea.getText(),
+                "\n", true);
         String line = new String();
         while (lines.hasMoreTokens()) {
             line = lines.nextToken();
-            line = line.trim(); // remove leading and trailing whitespace and control chars
-            if (line.length() == 0) continue; // nothing doing
-            if (line.length() > 2 && line.charAt(0) == '/' && line.charAt(1) == '/')
+            line = line.trim(); // remove leading and trailing whitespace and
+                                // control chars
+            if (line.length() == 0) {
+                continue; // nothing doing
+            }
+            if (line.length() > 2 && line.charAt(0) == '/'
+                    && line.charAt(1) == '/') {
                 continue; // this line contains a comment, skip it
+            }
             // System.out.println("Parsing line: "+line+" (length "+String.valueOf(line.length())+")");
-            Reaction r = Reaction.parse(line);
+            final Reaction r = Reaction.parse(line);
             // System.out.println(r.getString()+"\n"); // DEBUG
-            if (r != null) v.add(r);
-            else result = line;
+            if (r != null) {
+                v.add(r);
+            } else {
+                result = line;
+            }
         }
 
         if (result != null) {
@@ -150,10 +173,10 @@ public class ReactionListView extends AView {
     }
 
     public void deleteSelectedReactions() {
-        Object[] reactions = reactionsList.getSelectedValues();
-        Collection c = new ArrayList(reactions.length);
-        for (int i = 0; i < reactions.length; i++) {
-            c.add(reactions[i]);
+        final Object[] reactions = reactionsList.getSelectedValues();
+        final Collection c = new ArrayList(reactions.length);
+        for (final Object reaction : reactions) {
+            c.add(reaction);
         }
         getApplicationEngine().removeReactions(c);
     }
@@ -163,8 +186,10 @@ public class ReactionListView extends AView {
     }
 
     public void reactionsHaveChanged() {
-        Object[] reactions = getApplicationEngine().getReactions().toArray();
-        border.setTitle(Application.localize("reactions.current") + " (" + reactions.length + ")");
+        final Object[] reactions = getApplicationEngine().getReactions()
+                .toArray();
+        border.setTitle(Application.localize("reactions.current") + " ("
+                + reactions.length + ")");
         clearButton.setEnabled(reactions.length != 0);
         reactionsList.setListData(reactions);
         listPanel.repaint();

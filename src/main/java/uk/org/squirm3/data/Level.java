@@ -1,32 +1,35 @@
 package uk.org.squirm3.data;
 
-import java.util.*;
-
-/**
- * ${my.copyright}
- */
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class Level implements ILevel {
 
     // implementation of the ILevel interface
     public List<String> getErrors() {
-        return Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(errors)));
+        return Collections.unmodifiableList(new ArrayList<String>(Arrays
+                .asList(errors)));
     }
 
     public List<Atom> generateAtoms() {
-        return Collections.unmodifiableList(new ArrayList<Atom>(Arrays.asList(createAtoms(null))));
+        return Collections.unmodifiableList(new ArrayList<Atom>(Arrays
+                .asList(createAtoms(null))));
     }
 
-    public List<Atom> generateAtoms(Configuration configuration) {
-         return Collections.unmodifiableList(new ArrayList<Atom>(Arrays.asList(createAtoms(configuration))));
+    public List<Atom> generateAtoms(final Configuration configuration) {
+        return Collections.unmodifiableList(new ArrayList<Atom>(Arrays
+                .asList(createAtoms(configuration))));
     }
 
     public boolean isEvaluable() {
         return true;
     }
 
-    public String evaluate(Collection<? extends Atom> atoms) {
-        return evaluate(atoms.toArray(new Atom[] {}));
+    public String evaluate(final Collection<? extends Atom> atoms) {
+        return evaluate(atoms.toArray(new Atom[]{}));
     }
 
     // end of pseudo implementation
@@ -38,23 +41,24 @@ public abstract class Level implements ILevel {
     private Configuration configuration;
     private final Configuration defaultConfiguration;
 
-    public Level(String title, String challenge, String hint, String[] errors,
-                 Configuration defaultConfiguration) {
+    public Level(final String title, final String challenge, final String hint,
+            final String[] errors, final Configuration defaultConfiguration) {
         this.title = title;
         this.challenge = challenge;
         this.hint = hint;
         this.errors = new String[errors.length];
-        System.arraycopy(errors, 0,
-                this.errors, 0, this.errors.length);
+        System.arraycopy(errors, 0, this.errors, 0, this.errors.length);
         this.defaultConfiguration = defaultConfiguration;
     }
 
-    final public Atom[] createAtoms(Configuration configuration) {
+    final public Atom[] createAtoms(final Configuration configuration) {
         if (configuration == null) {
             return createAtoms_internal(getConfiguration());
         }
-        Atom[] atoms = createAtoms_internal(configuration);
-        if (atoms != null) setConfiguration(configuration);
+        final Atom[] atoms = createAtoms_internal(configuration);
+        if (atoms != null) {
+            setConfiguration(configuration);
+        }
         return atoms;
     }
 
@@ -79,44 +83,53 @@ public abstract class Level implements ILevel {
     }
 
     public Configuration getConfiguration() {
-        return (configuration == null) ? defaultConfiguration : configuration;
+        return configuration == null ? defaultConfiguration : configuration;
     }
 
-    protected String getError(int number) {
+    protected String getError(final int number) {
         return errors[number - 1]; // indices in level*.properties are one-based
     }
 
-    protected void setConfiguration(Configuration configuration) {
+    protected void setConfiguration(final Configuration configuration) {
         this.configuration = configuration;
     }
 
-    protected static void setRandomSpeed(IPhysicalPoint iPhysicalPoint) {
+    protected static void setRandomSpeed(final IPhysicalPoint iPhysicalPoint) {
         final float ms = Atom.getAtomSize() / 3;
         iPhysicalPoint.setSpeedX((float) (Math.random() * ms - ms / 2.0));
         iPhysicalPoint.setSpeedY((float) (Math.random() * ms - ms / 2.0));
     }
 
-    protected static boolean createAtoms(int numberOfAtoms, int[] types,
-                                         float x0, float x1, float y0, float y1, Atom[] atoms) {
-        if (types.length < 1 || numberOfAtoms > atoms.length) return false;
+    protected static boolean createAtoms(final int numberOfAtoms,
+            final int[] types, final float x0, final float x1, final float y0,
+            final float y1, final Atom[] atoms) {
+        if (types.length < 1 || numberOfAtoms > atoms.length) {
+            return false;
+        }
         final float atomSize = Atom.getAtomSize();
 
         // check that enough space will be let to allow clean reactions
-        final int evaluation = (int) ((x1 - x0) / (atomSize * 3)) * (int) ((y1 - y0) / (atomSize * 3));
-        if (evaluation < numberOfAtoms) return false;
+        final int evaluation = (int) ((x1 - x0) / (atomSize * 3))
+                * (int) ((y1 - y0) / (atomSize * 3));
+        if (evaluation < numberOfAtoms) {
+            return false;
+        }
 
         // creation of the atoms
         final IPhysicalPoint iPhysicalPoint = new MobilePoint();
         int n = atoms.length - numberOfAtoms;
 
-        for (float x = x0 + 2 * atomSize; x < x1 - 2 * atomSize && n < atoms.length; x += 3 * atomSize)
-            for (float y = y0 + 2 * atomSize; y < y1 - 2 * atomSize && n < atoms.length; y += 3 * atomSize) {
+        for (float x = x0 + 2 * atomSize; x < x1 - 2 * atomSize
+                && n < atoms.length; x += 3 * atomSize) {
+            for (float y = y0 + 2 * atomSize; y < y1 - 2 * atomSize
+                    && n < atoms.length; y += 3 * atomSize) {
                 iPhysicalPoint.setPositionX(x);
                 iPhysicalPoint.setPositionY(y);
                 setRandomSpeed(iPhysicalPoint);
                 atoms[n] = new Atom(iPhysicalPoint, types[n % types.length], 0);
                 n++;
             }
+        }
         return true;
     }
 }

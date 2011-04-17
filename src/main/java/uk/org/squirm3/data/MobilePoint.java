@@ -1,9 +1,5 @@
 package uk.org.squirm3.data;
 
-/**
- * ${my.copyright}
- */
-
 public class MobilePoint implements IPhysicalPoint {
 
     private float x, y, dx, dy, ddx, ddy;
@@ -12,8 +8,8 @@ public class MobilePoint implements IPhysicalPoint {
         this(0, 0, 0, 0, 0, 0);
     }
 
-    public MobilePoint(float x, float y,
-                       float dx, float dy, float ddx, float ddy) {
+    public MobilePoint(final float x, final float y, final float dx,
+            final float dy, final float ddx, final float ddy) {
         setPositionX(x);
         setPositionY(y);
         setSpeedX(dx);
@@ -22,7 +18,7 @@ public class MobilePoint implements IPhysicalPoint {
         setAccelerationY(ddy);
     }
 
-    public MobilePoint(IPhysicalPoint physicalPoint) {
+    public MobilePoint(final IPhysicalPoint physicalPoint) {
         setPositionX(physicalPoint.getPositionX());
         setPositionY(physicalPoint.getPositionY());
         setSpeedX(physicalPoint.getSpeedX());
@@ -55,32 +51,32 @@ public class MobilePoint implements IPhysicalPoint {
         return ddy;
     }
 
-    public boolean setPositionX(float x) {
+    public boolean setPositionX(final float x) {
         this.x = x;
         return true;
     }
 
-    public boolean setPositionY(float y) {
+    public boolean setPositionY(final float y) {
         this.y = y;
         return true;
     }
 
-    public boolean setSpeedX(float dx) {
+    public boolean setSpeedX(final float dx) {
         this.dx = dx;
         return true;
     }
 
-    public boolean setSpeedY(float dy) {
+    public boolean setSpeedY(final float dy) {
         this.dy = dy;
         return true;
     }
 
-    public boolean setAccelerationX(float ddx) {
+    public boolean setAccelerationX(final float ddx) {
         this.ddx = ddx;
         return true;
     }
 
-    public boolean setAccelerationY(float ddy) {
+    public boolean setAccelerationY(final float ddy) {
         this.ddy = ddy;
         return true;
     }

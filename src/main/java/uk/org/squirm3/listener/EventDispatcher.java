@@ -1,38 +1,39 @@
 package uk.org.squirm3.listener;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
-/**
- * ${my.copyright}
- */
 public final class EventDispatcher {
 
     public enum Event {
-        ATOMS, DRAGGING_POINT, LEVEL,
-        CONFIGURATION, REACTIONS, SPEED, SIMULATION_STATE
+        ATOMS, DRAGGING_POINT, LEVEL, CONFIGURATION, REACTIONS, SPEED, SIMULATION_STATE
     }
 
     private final Map<Event, Collection<IListener>> listeners;
 
     public EventDispatcher() {
-        listeners = new HashMap<Event, Collection<IListener>>(Event.values().length);
-        Event[] events = Event.values();
-        for(int i = 0; i < events.length; i++) {
-            listeners.put(events[i],new LinkedList<IListener>());
+        listeners = new HashMap<Event, Collection<IListener>>(
+                Event.values().length);
+        final Event[] events = Event.values();
+        for (final Event event : events) {
+            listeners.put(event, new LinkedList<IListener>());
         }
     }
 
-    public void addListener(IListener listener, Event event) {
+    public void addListener(final IListener listener, final Event event) {
         listeners.get(event).add(listener);
     }
 
-    public void removeListener(IListener listener, Event event) {
+    public void removeListener(final IListener listener, final Event event) {
         listeners.get(event).remove(listener);
     }
 
-    public void dispatchEvent(Event event) {
-        Iterator<IListener> iterator = listeners.get(event).iterator();
-        while(iterator.hasNext()) {
+    public void dispatchEvent(final Event event) {
+        final Iterator<IListener> iterator = listeners.get(event).iterator();
+        while (iterator.hasNext()) {
             iterator.next().propertyHasChanged();
         }
     }

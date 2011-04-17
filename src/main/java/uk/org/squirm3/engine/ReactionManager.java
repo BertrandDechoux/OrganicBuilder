@@ -1,42 +1,43 @@
 package uk.org.squirm3.engine;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import uk.org.squirm3.data.Reaction;
 
-import java.util.*;
-
-/**
- * ${my.copyright}
- */
-
 public class ReactionManager {
-    private List reactions = new LinkedList();
-    private List Immutablereactions = Collections.unmodifiableList(reactions);
+    private final List reactions = new LinkedList();
+    private final List Immutablereactions = Collections
+            .unmodifiableList(reactions);
 
-    public void addReaction(Reaction r) {
+    public void addReaction(final Reaction r) {
         reactions.add(r);
     }
 
-    public void addReactions(Collection c) {
-        Iterator it = c.iterator();
+    public void addReactions(final Collection c) {
+        final Iterator it = c.iterator();
         while (it.hasNext()) {
-            Object o = it.next();
+            final Object o = it.next();
             if (o instanceof Reaction) {
-                Reaction r = (Reaction) o;
+                final Reaction r = (Reaction) o;
                 reactions.add(r);
             }
         }
     }
 
-    public void removeReactions(Reaction r) {
+    public void removeReactions(final Reaction r) {
         reactions.remove(r);
     }
 
-    public void removeReactions(Collection c) {
-        Iterator it = c.iterator();
+    public void removeReactions(final Collection c) {
+        final Iterator it = c.iterator();
         while (it.hasNext()) {
-            Object o = it.next();
+            final Object o = it.next();
             if (o instanceof Reaction) {
-                Reaction r = (Reaction) o;
+                final Reaction r = (Reaction) o;
                 reactions.remove(r);
             }
         }

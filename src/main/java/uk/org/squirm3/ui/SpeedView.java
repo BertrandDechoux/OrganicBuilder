@@ -1,22 +1,23 @@
 package uk.org.squirm3.ui;
 
-import uk.org.squirm3.Application;
-import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.IListener;
-import uk.org.squirm3.listener.EventDispatcher;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.NumberFormatter;
-import java.awt.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 
-/**
- * ${my.copyright}
- */
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.NumberFormatter;
+
+import uk.org.squirm3.Application;
+import uk.org.squirm3.engine.ApplicationEngine;
+import uk.org.squirm3.listener.EventDispatcher;
+import uk.org.squirm3.listener.IListener;
 
 public class SpeedView extends AView {
 
@@ -25,7 +26,7 @@ public class SpeedView extends AView {
     private final JFormattedTextField speedTF;
     private final JPanel panel;
 
-    public SpeedView(ApplicationEngine applicationEngine) {
+    public SpeedView(final ApplicationEngine applicationEngine) {
         super(applicationEngine);
         panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -35,13 +36,15 @@ public class SpeedView extends AView {
         gbc = createCustomGBC(1, 0);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        speedSelector = new JSlider(1, 100, getApplicationEngine().getSimulationSpeed());
+        speedSelector = new JSlider(1, 100, getApplicationEngine()
+                .getSimulationSpeed());
         speedSelector.setInverted(true);
         speedSelector.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                JSlider source = (JSlider) e.getSource();
+            public void stateChanged(final ChangeEvent e) {
+                final JSlider source = (JSlider) e.getSource();
                 if (!source.getValueIsAdjusting()) {
-                    SpeedView.this.getApplicationEngine().setSimulationSpeed((short) source.getValue());
+                    SpeedView.this.getApplicationEngine().setSimulationSpeed(
+                            (short) source.getValue());
                 }
             }
         });
@@ -49,43 +52,48 @@ public class SpeedView extends AView {
         gbc = createCustomGBC(2, 0);
         gbc.weightx = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        speedTF = createCustomTF(1, 100, getApplicationEngine().getSimulationSpeed());
+        speedTF = createCustomTF(1, 100, getApplicationEngine()
+                .getSimulationSpeed());
         speedTF.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent e) {
+            public void propertyChange(final PropertyChangeEvent e) {
                 if ("value".equals(e.getPropertyName())) {
-                    SpeedView.this.getApplicationEngine().setSimulationSpeed(((Number) e.getNewValue()).shortValue());
+                    SpeedView.this.getApplicationEngine().setSimulationSpeed(
+                            ((Number) e.getNewValue()).shortValue());
                 }
             }
         });
 
         panel.add(speedTF, gbc);
 
-
-        getApplicationEngine().getEventDispatcher().addListener(new IListener() {
-            public void propertyHasChanged() {
-                int speed = getApplicationEngine().getSimulationSpeed();
-                speedTF.setValue(new Integer(speed));
-                speedSelector.setValue(speed);
-            }
-        }, EventDispatcher.Event.SPEED);
+        getApplicationEngine().getEventDispatcher().addListener(
+                new IListener() {
+                    public void propertyHasChanged() {
+                        final int speed = getApplicationEngine()
+                                .getSimulationSpeed();
+                        speedTF.setValue(new Integer(speed));
+                        speedSelector.setValue(speed);
+                    }
+                }, EventDispatcher.Event.SPEED);
     }
 
     public JPanel getPanel() {
         return panel;
     }
 
-    private JFormattedTextField createCustomTF(int min, int max, int now) {
-        NumberFormatter formatter = new NumberFormatter(NumberFormat.getIntegerInstance());
+    private JFormattedTextField createCustomTF(final int min, final int max,
+            final int now) {
+        final NumberFormatter formatter = new NumberFormatter(
+                NumberFormat.getIntegerInstance());
         formatter.setMinimum(new Integer(min));
         formatter.setMaximum(new Integer(max));
-        JFormattedTextField TF = new JFormattedTextField(formatter);
+        final JFormattedTextField TF = new JFormattedTextField(formatter);
         TF.setValue(new Integer(now));
         TF.setColumns(5);
         return TF;
     }
 
-    private GridBagConstraints createCustomGBC(int x, int y) {
-        GridBagConstraints gbc = new GridBagConstraints();
+    private GridBagConstraints createCustomGBC(final int x, final int y) {
+        final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = x;
         gbc.gridy = y;
         return gbc;

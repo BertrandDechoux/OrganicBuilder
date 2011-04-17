@@ -1,9 +1,5 @@
 package uk.org.squirm3.data;
 
-/**
- * ${my.copyright}
- */
-
 public interface IPhysicalPoint {
     public float getPositionX();
 
@@ -30,5 +26,5 @@ public interface IPhysicalPoint {
 
     public boolean setAccelerationY(float ddy);
 
-    public IPhysicalPoint copy(); //TODO use clone, with generic ?
+    public IPhysicalPoint copy(); // TODO use clone, with generic ?
 }
