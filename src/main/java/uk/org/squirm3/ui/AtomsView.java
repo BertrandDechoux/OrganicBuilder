@@ -32,7 +32,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import uk.org.squirm3.Application;
 import uk.org.squirm3.Resource;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
@@ -177,8 +176,8 @@ public class AtomsView extends AView {
         });
 
         controlsPanel = new JPanel();
-        controlsPanel.add(new JLabel(Application.localize("scale")));
-        auto = new JCheckBox(Application.localize("scale.auto"));
+        controlsPanel.add(new JLabel(GUI.localize("scale")));
+        auto = new JCheckBox(GUI.localize("scale.auto"));
         auto.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent arg0) {
                 scaleSlider.setEnabled(!auto.isSelected());
@@ -196,7 +195,7 @@ public class AtomsView extends AView {
                 }
             }
         });
-        scaleSlider.setToolTipText(Application.localize("scale.manual"));
+        scaleSlider.setToolTipText(GUI.localize("scale.manual"));
         scaleSlider.setEnabled(false);
         controlsPanel.add(scaleSlider);
 

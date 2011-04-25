@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+
+import org.springframework.context.MessageSource;
 
 public abstract class Level implements ILevel {
 
@@ -41,14 +44,29 @@ public abstract class Level implements ILevel {
     private Configuration configuration;
     private final Configuration defaultConfiguration;
 
-    public Level(final String title, final String challenge, final String hint,
-            final String[] errors, final Configuration defaultConfiguration) {
+    public Level(final MessageSource messageSource, final String key,
+            final Configuration defaultConfiguration) {
+        final String title = localize(messageSource, key + ".title");
+        final String challenge = localize(messageSource, key + ".challenge");
+        final String hint = localize(messageSource, key + ".hint");
+        final int numberOfErrors = Integer.parseInt(localize(messageSource, key
+                + ".errors"));
+        final String[] errors = new String[numberOfErrors];
+        for (int j = 1; j <= numberOfErrors; j++) {
+            errors[j - 1] = localize(messageSource, key + ".error." + new Integer(j));
+        }
+
         this.title = title;
         this.challenge = challenge;
         this.hint = hint;
         this.errors = new String[errors.length];
         System.arraycopy(errors, 0, this.errors, 0, this.errors.length);
         this.defaultConfiguration = defaultConfiguration;
+    }
+
+    public static String localize(final MessageSource messageSource,
+            final String key) {
+        return messageSource.getMessage(key, null, Locale.getDefault());
     }
 
     final public Atom[] createAtoms(final Configuration configuration) {

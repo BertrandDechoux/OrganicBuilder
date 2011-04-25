@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
-import uk.org.squirm3.Application;
 import uk.org.squirm3.Resource;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
@@ -60,7 +59,7 @@ public class StateView extends AView {
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION,
-                Application.localize("simulation.run"));
+                GUI.localize("simulation.run"));
         // action.putValue(Action.LONG_DESCRIPTION,
         // "Context-Sensitive Help Text"); TODO and for the others actions too
         action.putValue(Action.SMALL_ICON, Resource.getIcon("play"));
@@ -81,7 +80,7 @@ public class StateView extends AView {
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION,
-                Application.localize("simulation.stop"));
+                GUI.localize("simulation.stop"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("pause"));
         return action;
     }
@@ -98,7 +97,7 @@ public class StateView extends AView {
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION,
-                Application.localize("simulation.reset"));
+                GUI.localize("simulation.reset"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("reset"));
         return action;
     }

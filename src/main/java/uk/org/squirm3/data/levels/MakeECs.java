@@ -1,15 +1,16 @@
 package uk.org.squirm3.data.levels;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.Level;
 
-public class Make_ECs extends Level {
+public class MakeECs extends Level {
 
-    public Make_ECs(final String title, final String challenge,
-            final String hint, final String[] errors,
+    public MakeECs(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "makeecs", defaultConfiguration);
     }
 
     @Override

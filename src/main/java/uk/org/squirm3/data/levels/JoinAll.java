@@ -2,16 +2,17 @@ package uk.org.squirm3.data.levels;
 
 import java.util.LinkedList;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.Level;
 
-public class Join_all extends Level {
+public class JoinAll extends Level {
 
-    public Join_all(final String title, final String challenge,
-            final String hint, final String[] errors,
+    public JoinAll(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "joinall", defaultConfiguration);
     }
 
     @Override

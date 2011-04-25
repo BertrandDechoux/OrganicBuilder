@@ -5,18 +5,19 @@ import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.Random;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.IPhysicalPoint;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.data.MobilePoint;
 
-public class Cell_division extends Level {
+public class CellDivision extends Level {
 
-    public Cell_division(final String title, final String challenge,
-            final String hint, final String[] errors,
+    public CellDivision(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "celldivision", defaultConfiguration);
     }
 
     @Override

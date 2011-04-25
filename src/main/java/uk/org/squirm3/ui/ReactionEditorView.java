@@ -16,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
-import uk.org.squirm3.Application;
 import uk.org.squirm3.Resource;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Reaction;
@@ -43,7 +42,7 @@ public class ReactionEditorView extends AView {
         jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.PAGE_AXIS));
         jPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-                Application.localize("reactions.editor")));
+                GUI.localize("reactions.editor")));
         final JPanel reactionPanel = new JPanel();
         reactionPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         final ActionListener l = new ActionListener() {
@@ -83,7 +82,7 @@ public class ReactionEditorView extends AView {
         jPanel.add(reactionPanel);
         addReaction = new JButton(Resource.getIcon("add"));
         addReaction.setMargin(new Insets(0, 0, 0, 0));
-        addReaction.setToolTipText(Application
+        addReaction.setToolTipText(GUI
                 .localize("reactions.add.tooltip"));
         addReaction.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {

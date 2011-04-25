@@ -3,16 +3,17 @@ package uk.org.squirm3.data.levels;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.Level;
 
-public class Abcdef_chains extends Level {
+public class AbcdefChains extends Level {
 
-    public Abcdef_chains(final String title, final String challenge,
-            final String hint, final String[] errors,
+    public AbcdefChains(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "abcdefchains", defaultConfiguration);
     }
 
     @Override

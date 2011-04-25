@@ -14,7 +14,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
-import uk.org.squirm3.Application;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
@@ -32,7 +31,7 @@ public class SpeedView extends AView {
         panel.setLayout(new GridBagLayout());
         // speed
         GridBagConstraints gbc = createCustomGBC(0, 0);
-        panel.add(new JLabel(Application.localize("parameters.speed")), gbc);
+        panel.add(new JLabel(GUI.localize("parameters.speed")), gbc);
         gbc = createCustomGBC(1, 0);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;

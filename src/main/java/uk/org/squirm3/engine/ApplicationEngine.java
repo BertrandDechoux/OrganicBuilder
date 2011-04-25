@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.DraggingPoint;
@@ -29,9 +28,9 @@ public class ApplicationEngine {
 
     private final EventDispatcher eventDispatcher;
 
-    public ApplicationEngine() throws Exception {
+    public ApplicationEngine(final List<ILevel> levels) throws Exception {
         // load levels
-        levelManager = new LevelManager(Application.getLevels());
+        levelManager = new LevelManager(levels);
         reactionManager = new ReactionManager();
         // manager of the listeners
         eventDispatcher = new EventDispatcher();

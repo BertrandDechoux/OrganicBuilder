@@ -1,5 +1,7 @@
 package uk.org.squirm3.data;
 
+import com.google.common.base.Objects;
+
 public final class Configuration {
     private final int numberOfAtoms;
     private final float width, height;
@@ -29,5 +31,11 @@ public final class Configuration {
 
     public int[] getTypes() {
         return types;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("numberOfAtoms", numberOfAtoms)
+                .add("width", width).add("height", height).toString();
     }
 }

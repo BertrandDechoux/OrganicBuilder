@@ -19,7 +19,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
-import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.ApplicationEngine;
@@ -68,7 +67,7 @@ public class CustomResetView extends AView {
         // number of atoms
         GridBagConstraints gbc = createCustomGBC(0, 0);
         parametersPanel.add(
-                new JLabel(Application.localize("parameters.number")), gbc);
+                new JLabel(GUI.localize("parameters.number")), gbc);
         gbc = createCustomGBC(1, 0);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -97,7 +96,7 @@ public class CustomResetView extends AView {
         // height
         gbc = createCustomGBC(0, 1);
         parametersPanel.add(
-                new JLabel(Application.localize("parameters.height")), gbc);
+                new JLabel(GUI.localize("parameters.height")), gbc);
         gbc = createCustomGBC(1, 1);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -126,7 +125,7 @@ public class CustomResetView extends AView {
         // width
         gbc = createCustomGBC(0, 2);
         parametersPanel.add(
-                new JLabel(Application.localize("parameters.width")), gbc);
+                new JLabel(GUI.localize("parameters.width")), gbc);
         gbc = createCustomGBC(1, 2);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -155,7 +154,7 @@ public class CustomResetView extends AView {
 
         gbc = createCustomGBC(2, 3);
         final JButton resetButton = new JButton(
-                Application.localize("simulation.reset"));
+                GUI.localize("simulation.reset"));
         resetButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent arg0) {
                 final Configuration configuration = new Configuration(

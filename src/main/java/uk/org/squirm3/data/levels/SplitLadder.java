@@ -2,18 +2,19 @@ package uk.org.squirm3.data.levels;
 
 import java.util.Random;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.IPhysicalPoint;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.data.MobilePoint;
 
-public class Split_ladder extends Level {
+public class SplitLadder extends Level {
 
-    public Split_ladder(final String title, final String challenge,
-            final String hint, final String[] errors,
+    public SplitLadder(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "splitladder", defaultConfiguration);
     }
 
     @Override

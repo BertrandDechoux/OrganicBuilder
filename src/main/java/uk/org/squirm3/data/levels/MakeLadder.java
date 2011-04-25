@@ -4,18 +4,19 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.IPhysicalPoint;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.data.MobilePoint;
 
-public class Make_ladder extends Level {
+public class MakeLadder extends Level {
 
-    public Make_ladder(final String title, final String challenge,
-            final String hint, final String[] errors,
+    public MakeLadder(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "makeladder", defaultConfiguration);
     }
 
     @Override

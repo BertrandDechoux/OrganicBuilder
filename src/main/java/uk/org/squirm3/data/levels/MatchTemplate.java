@@ -2,17 +2,18 @@ package uk.org.squirm3.data.levels;
 
 import java.util.Random;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.FixedPoint;
 import uk.org.squirm3.data.Level;
 
-public class Match_template extends Level {
-
-    public Match_template(final String title, final String challenge,
-            final String hint, final String[] errors,
+public class MatchTemplate extends Level {
+    
+    public MatchTemplate(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "matchtemplate", defaultConfiguration);
     }
 
     @Override

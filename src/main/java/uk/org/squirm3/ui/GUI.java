@@ -8,6 +8,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -26,42 +27,22 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import uk.org.squirm3.Application;
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.Resource;
 import uk.org.squirm3.engine.ApplicationEngine;
 
 public class GUI {
+    
+    private static MessageSource messageSource;
 
     public static void createGUI(final ApplicationEngine applicationEngine) {
-        // create the graphical interface
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new GUI(applicationEngine);
-            }
-        });
-    }
 
-    public static String selectLanguage(final String[] languages) {
-        final Icon[] icons = new Icon[languages.length];
-        for (int i = 0; i < icons.length; i++) {
-            icons[i] = Resource.getIcon(languages[i]);
-        }
-        final int choice = JOptionPane.showOptionDialog(null, "",
-                "Organic Builder", JOptionPane.YES_NO_OPTION,
-                JOptionPane.PLAIN_MESSAGE, null, icons, null);
-        if (choice == JOptionPane.CLOSED_OPTION) {
-            return null;
-        } else {
-            return languages[choice];
-        }
-    }
-
-    public GUI(final ApplicationEngine applicationEngine) {
         Resource.loadPictures();
 
         // frame
         final JFrame frame = new JFrame(
-                Application.localize("application.title"));
+                GUI.localize("application.title"));
         frame.setSize(1080, 630);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -163,7 +144,30 @@ public class GUI {
         frame.setContentPane(contentPane);
         SwingUtilities.updateComponentTreeUI(frame);
         frame.setVisible(true);
+    }
 
+    public static String selectLanguage(final String[] languages) {
+        final Icon[] icons = new Icon[languages.length];
+        for (int i = 0; i < icons.length; i++) {
+            icons[i] = Resource.getIcon(languages[i]);
+        }
+        final int choice = JOptionPane.showOptionDialog(null, "",
+                "Organic Builder", JOptionPane.YES_NO_OPTION,
+                JOptionPane.PLAIN_MESSAGE, null, icons, null);
+        if (choice == JOptionPane.CLOSED_OPTION) {
+            return null;
+        } else {
+            return languages[choice];
+        }
+    }
+
+    public GUI(final MessageSource messageSource, final ApplicationEngine applicationEngine) {
+        GUI.messageSource = messageSource;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createGUI(applicationEngine);
+            }
+        });
     }
 
     private static JButton createIconButton(final Action action, final Color bg) {
@@ -189,21 +193,21 @@ public class GUI {
 
             public void actionPerformed(final ActionEvent e) {
                 JOptionPane.showMessageDialog(null, message,
-                        Application.localize("application.parameters"),
+                        GUI.localize("application.parameters"),
                         JOptionPane.INFORMATION_MESSAGE);
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION,
-                Application.localize("application.parameters"));
+                GUI.localize("application.parameters"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("parameters"));
         return action;
     }
 
     private static Action createAboutAction() { // TODO mise en page des textes
         final JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab(Application.localize("application.about"), null,
+        tabbedPane.addTab(GUI.localize("application.about"), null,
                 createTextPane("about.html"), null);
-        tabbedPane.addTab(Application.localize("application.license"), null,
+        tabbedPane.addTab(GUI.localize("application.license"), null,
                 createTextPane("license.html"), null);
 
         final Action action = new AbstractAction() {
@@ -214,12 +218,12 @@ public class GUI {
 
             public void actionPerformed(final ActionEvent e) {
                 JOptionPane.showMessageDialog(null, tabbedPane,
-                        Application.localize("application.about"),
+                        GUI.localize("application.about"),
                         JOptionPane.QUESTION_MESSAGE);
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION,
-                Application.localize("application.about"));
+                GUI.localize("application.about"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("about"));
         return action;
     }
@@ -232,6 +236,10 @@ public class GUI {
         final JScrollPane sp = new JScrollPane(textPane);
         sp.setPreferredSize(new Dimension(600, 400));
         return sp;
+    }
+
+    public static String localize(final String key) {
+        return GUI.messageSource.getMessage(key, null, Locale.getDefault());
     }
 
 }

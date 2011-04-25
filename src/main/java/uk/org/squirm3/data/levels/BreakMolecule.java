@@ -1,17 +1,18 @@
 package uk.org.squirm3.data.levels;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.IPhysicalPoint;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.data.MobilePoint;
 
-public class Break_molecule extends Level {
+public class BreakMolecule extends Level {
 
-    public Break_molecule(final String title, final String challenge,
-            final String hint, final String[] errors,
+    public BreakMolecule(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "breakmolecule", defaultConfiguration);
     }
 
     @Override

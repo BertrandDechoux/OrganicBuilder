@@ -1,6 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+	<!-- http://www.wakaleo.com/blog/292-site-generation-in-maven-3 -->
+	<!-- http://blog.springsource.com/2009/12/02/obtaining-spring-3-artifacts-with-maven/ -->
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.org.squirm3</groupId>
 	<artifactId>organicbuilder</artifactId>
@@ -48,11 +51,49 @@
 		<url>http://groups.google.fr/group/OrganicBuilder</url>
 	</issueManagement>
 
+
 	<dependencies>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>r09</version>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-expression</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -77,20 +118,6 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>uk.org.squirm3.Application</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-			<!-- http://www.wakaleo.com/blog/292-site-generation-in-maven-3 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
@@ -131,19 +158,41 @@
 							<artifactId>maven-checkstyle-plugin</artifactId>
 							<version>2.6</version>
 							<configuration>
-								<!-- TODO evaluate what the checks should be -->
+								<!-- default : sun -->
 								<!-- <configLocation>config/sun_checks.xml</configLocation> -->
 								<!-- <configLocation>config/maven_checks.xml</configLocation> -->
 								<!-- <configLocation>config/turbine_checks.xml</configLocation> -->
 								<!-- <configLocation>config/avalon_checks.xml</configLocation> -->
-								<!-- <configLocation>my_checks.xml</configLocation> -->
 								<includeTestSourceDirectory>true</includeTestSourceDirectory>
 							</configuration>
 						</plugin>
 					</reportPlugins>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>uk.org.squirm3.springframework.StandaloneSpringLauncher</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -188,6 +237,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cobertura.version>2.4</cobertura.version>
+		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 	</properties>
 
 

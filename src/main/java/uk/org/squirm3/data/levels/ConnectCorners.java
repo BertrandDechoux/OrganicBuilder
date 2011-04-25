@@ -2,17 +2,18 @@ package uk.org.squirm3.data.levels;
 
 import java.util.LinkedList;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.FixedPoint;
 import uk.org.squirm3.data.Level;
 
-public class Connect_corners extends Level {
+public class ConnectCorners extends Level {
 
-    public Connect_corners(final String title, final String challenge,
-            final String hint, final String[] errors,
+    public ConnectCorners(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "connectcorners", defaultConfiguration);
     }
 
     @Override

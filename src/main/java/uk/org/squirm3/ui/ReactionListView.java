@@ -22,7 +22,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionListener;
 
-import uk.org.squirm3.Application;
 import uk.org.squirm3.data.Reaction;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
@@ -68,28 +67,28 @@ public class ReactionListView extends AView {
         jPanel.setLayout(new BorderLayout());
         border = BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-                Application.localize("reactions.current"));
+                GUI.localize("reactions.current"));
         jPanel.setBorder(border);
         listButtonsPanel = new JPanel();
         listButtonsPanel.setLayout(new GridLayout(4, 1));
 
-        editButton = new JButton(Application.localize("reactions.edit"));
+        editButton = new JButton(GUI.localize("reactions.edit"));
         editButton.addActionListener(EventHandler.create(ActionListener.class,
                 ReactionListView.this, "editReactions"));
         listButtonsPanel.add(editButton);
 
-        updateButton = new JButton(Application.localize("reactions.update"));
+        updateButton = new JButton(GUI.localize("reactions.update"));
         updateButton
                 .addActionListener(EventHandler.create(ActionListener.class,
                         ReactionListView.this, "updateReactions"));
 
-        deleteButton = new JButton(Application.localize("reactions.delete"));
+        deleteButton = new JButton(GUI.localize("reactions.delete"));
         deleteButton.addActionListener(EventHandler.create(
                 ActionListener.class, ReactionListView.this,
                 "deleteSelectedReactions"));
         listButtonsPanel.add(deleteButton);
 
-        clearButton = new JButton(Application.localize("reactions.clear"));
+        clearButton = new JButton(GUI.localize("reactions.clear"));
         clearButton.addActionListener(EventHandler.create(ActionListener.class,
                 getApplicationEngine(), "clearReactions"));
         listButtonsPanel.add(clearButton);
@@ -161,7 +160,7 @@ public class ReactionListView extends AView {
 
         if (result != null) {
             JOptionPane.showMessageDialog(listPanel, result,
-                    Application.localize("reactions.parsing.error"),
+                    GUI.localize("reactions.parsing.error"),
                     JOptionPane.ERROR_MESSAGE);
         } else {
             getApplicationEngine().setReactions(v);
@@ -188,7 +187,7 @@ public class ReactionListView extends AView {
     public void reactionsHaveChanged() {
         final Object[] reactions = getApplicationEngine().getReactions()
                 .toArray();
-        border.setTitle(Application.localize("reactions.current") + " ("
+        border.setTitle(GUI.localize("reactions.current") + " ("
                 + reactions.length + ")");
         clearButton.setEnabled(reactions.length != 0);
         reactionsList.setListData(reactions);

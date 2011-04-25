@@ -9,7 +9,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComboBox;
 
-import uk.org.squirm3.Application;
 import uk.org.squirm3.Resource;
 import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.ApplicationEngine;
@@ -106,7 +105,7 @@ public class LevelNavigatorView extends AView {
                 update = false;
             }
         });
-        cb.setToolTipText(Application.localize("navigation.selected"));
+        cb.setToolTipText(GUI.localize("navigation.selected"));
         return cb;
     }
 
@@ -122,7 +121,7 @@ public class LevelNavigatorView extends AView {
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION,
-                Application.localize("navigation.first"));
+                GUI.localize("navigation.first"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("first"));
         return action;
     }
@@ -139,7 +138,7 @@ public class LevelNavigatorView extends AView {
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION,
-                Application.localize("navigation.previous"));
+                GUI.localize("navigation.previous"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("previous"));
         return action;
     }
@@ -156,7 +155,7 @@ public class LevelNavigatorView extends AView {
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION,
-                Application.localize("navigation.next"));
+                GUI.localize("navigation.next"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("next"));
         return action;
     }
@@ -173,7 +172,7 @@ public class LevelNavigatorView extends AView {
             }
         };
         action.putValue(Action.SHORT_DESCRIPTION,
-                Application.localize("navigation.last"));
+                GUI.localize("navigation.last"));
         action.putValue(Action.SMALL_ICON, Resource.getIcon("last"));
         return action;
     }

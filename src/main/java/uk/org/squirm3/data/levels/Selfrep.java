@@ -3,6 +3,8 @@ package uk.org.squirm3.data.levels;
 import java.util.LinkedList;
 import java.util.Random;
 
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.data.Atom;
 import uk.org.squirm3.data.Configuration;
 import uk.org.squirm3.data.IPhysicalPoint;
@@ -11,10 +13,9 @@ import uk.org.squirm3.data.MobilePoint;
 
 public class Selfrep extends Level {
 
-    public Selfrep(final String title, final String challenge,
-            final String hint, final String[] errors,
+    public Selfrep(final MessageSource messageSource,
             final Configuration defaultConfiguration) {
-        super(title, challenge, hint, errors, defaultConfiguration);
+        super(messageSource, "selfrep", defaultConfiguration);
     }
 
     @Override
