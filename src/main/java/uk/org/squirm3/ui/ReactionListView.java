@@ -22,10 +22,10 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionListener;
 
-import uk.org.squirm3.data.Reaction;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.model.Reaction;
 
 public class ReactionListView extends AView {
     // list mode
@@ -47,6 +47,7 @@ public class ReactionListView extends AView {
         textArea = new JTextArea();
 
         final IListener reactionListener = new IListener() {
+            @Override
             public void propertyHasChanged() {
                 reactionsHaveChanged();
             }
@@ -131,7 +132,7 @@ public class ReactionListView extends AView {
 
     public void updateReactions() {
         String result = null;
-        final Vector v = new Vector();
+        final Vector<Reaction> v = new Vector<Reaction>();
         // System.out.println("Input: "+text); // DEBUG
         // for each line in the text
         final StringTokenizer lines = new StringTokenizer(textArea.getText(),
@@ -173,9 +174,9 @@ public class ReactionListView extends AView {
 
     public void deleteSelectedReactions() {
         final Object[] reactions = reactionsList.getSelectedValues();
-        final Collection c = new ArrayList(reactions.length);
+        final Collection<Reaction> c = new ArrayList<Reaction>(reactions.length);
         for (final Object reaction : reactions) {
-            c.add(reaction);
+            c.add((Reaction) reaction);
         }
         getApplicationEngine().removeReactions(c);
     }

@@ -33,7 +33,7 @@ import uk.org.squirm3.Resource;
 import uk.org.squirm3.engine.ApplicationEngine;
 
 public class GUI {
-    
+
     private static MessageSource messageSource;
 
     public static void createGUI(final ApplicationEngine applicationEngine) {
@@ -41,8 +41,7 @@ public class GUI {
         Resource.loadPictures();
 
         // frame
-        final JFrame frame = new JFrame(
-                GUI.localize("application.title"));
+        final JFrame frame = new JFrame(GUI.localize("application.title"));
         frame.setSize(1080, 630);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -74,6 +73,7 @@ public class GUI {
                 reactionEditorView.getEditorPanel(),
                 reactionListView.getListPanel());
         reactionsPane.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
             public void propertyChange(final PropertyChangeEvent arg0) {
                 if (arg0.getPropertyName().equals("dividerLocation")
                         && !arg0.getNewValue().toString().equals("1")) {
@@ -161,9 +161,11 @@ public class GUI {
         }
     }
 
-    public GUI(final MessageSource messageSource, final ApplicationEngine applicationEngine) {
+    public GUI(final MessageSource messageSource,
+            final ApplicationEngine applicationEngine) {
         GUI.messageSource = messageSource;
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 createGUI(applicationEngine);
             }
@@ -191,6 +193,7 @@ public class GUI {
 			 */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 JOptionPane.showMessageDialog(null, message,
                         GUI.localize("application.parameters"),
@@ -216,6 +219,7 @@ public class GUI {
 			 */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 JOptionPane.showMessageDialog(null, tabbedPane,
                         GUI.localize("application.about"),

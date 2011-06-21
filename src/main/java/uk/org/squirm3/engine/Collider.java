@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.DraggingPoint;
-import uk.org.squirm3.data.Reaction;
+import uk.org.squirm3.model.Atom;
+import uk.org.squirm3.model.DraggingPoint;
+import uk.org.squirm3.model.Reaction;
 
 final class Collider {
 

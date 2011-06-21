@@ -10,10 +10,10 @@ import javax.swing.Action;
 import javax.swing.JComboBox;
 
 import uk.org.squirm3.Resource;
-import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.model.level.ILevel;
 
 public class LevelNavigatorView extends AView {
 
@@ -34,9 +34,10 @@ public class LevelNavigatorView extends AView {
 
         final IListener levelListener = new IListener() {
 
+            @Override
             public void propertyHasChanged() {
-                final List levelList = getApplicationEngine().getLevelManager()
-                        .getLevels();
+                final List<? extends ILevel> levelList = getApplicationEngine()
+                        .getLevelManager().getLevels();
                 final int levelNumber = levelList
                         .indexOf(getApplicationEngine().getLevelManager()
                                 .getCurrentLevel());
@@ -49,7 +50,6 @@ public class LevelNavigatorView extends AView {
                 last.setEnabled(!lastLevel);
                 next.setEnabled(!lastLevel);
 
-                // quick fix TODO chang
                 update = true;
                 levelComboBox.setSelectedIndex(levelNumber);
             }
@@ -82,21 +82,22 @@ public class LevelNavigatorView extends AView {
     }
 
     private JComboBox createLevelComboBox() {
-        final List levelList = getApplicationEngine().getLevelManager()
-                .getLevels();
+        final List<? extends ILevel> levelList = getApplicationEngine()
+                .getLevelManager().getLevels();
         final String[] levelsLabels = new String[levelList.size()];
-        final Iterator it = levelList.iterator();
+        final Iterator<? extends ILevel> it = levelList.iterator();
         int i = 0;
         while (it.hasNext()) {
             String number = String.valueOf(i) + "  ";
             if (i < 10) {
                 number += "  ";
             }
-            levelsLabels[i] = number + ((Level) it.next()).getTitle();
+            levelsLabels[i] = number + it.next().getTitle();
             i++;
         }
         final JComboBox cb = new JComboBox(levelsLabels);
         cb.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 if (!update) {
                     getApplicationEngine().goToLevel(
@@ -116,6 +117,7 @@ public class LevelNavigatorView extends AView {
 			 */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().goToFirstLevel();
             }
@@ -133,6 +135,7 @@ public class LevelNavigatorView extends AView {
 			 */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().goToPreviousLevel();
             }
@@ -150,6 +153,7 @@ public class LevelNavigatorView extends AView {
 			 */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().goToNextLevel();
             }
@@ -167,6 +171,7 @@ public class LevelNavigatorView extends AView {
 			 */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().goToLastLevel();
             }

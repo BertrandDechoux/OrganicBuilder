@@ -4,11 +4,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.Configuration;
-import uk.org.squirm3.data.DraggingPoint;
-import uk.org.squirm3.data.ILevel;
 import uk.org.squirm3.listener.EventDispatcher;
+import uk.org.squirm3.model.Atom;
+import uk.org.squirm3.model.Configuration;
+import uk.org.squirm3.model.DraggingPoint;
+import uk.org.squirm3.model.Reaction;
+import uk.org.squirm3.model.level.ILevel;
 
 public class ApplicationEngine {
 
@@ -18,7 +19,7 @@ public class ApplicationEngine {
     private final Object colliderExecution;
     private boolean isRunning;
     private short sleepPeriod;
-    private final LinkedList commands;
+    private final LinkedList<ICommand> commands;
     // things to do with the dragging around of atoms
     private DraggingPoint draggingPoint;
     private DraggingPoint lastUsedDraggingPoint;
@@ -40,18 +41,18 @@ public class ApplicationEngine {
             setLevel(0, null);
         } catch (final Exception e) {
         }
-        commands = new LinkedList();
+        commands = new LinkedList<ICommand>();
         colliderExecution = new Object();
         isRunning = true;
         // create and run the thread of this application
         applicationThread = new Thread(new Runnable() {
+            @Override
             public void run() {
                 while (applicationThread == Thread.currentThread()) {
                     // execute commands
                     synchronized (commands) {
                         while (!commands.isEmpty()) {
-                            final ICommand command = (ICommand) commands
-                                    .removeFirst();
+                            final ICommand command = commands.removeFirst();
                             command.execute();
                         }
                     }
@@ -59,8 +60,10 @@ public class ApplicationEngine {
                     synchronized (colliderExecution) {
                         if (isRunning) {
                             lastUsedDraggingPoint = draggingPoint;
-                            collider.doTimeStep(draggingPoint, new LinkedList(
-                                    reactionManager.getReactions()));
+                            collider.doTimeStep(
+                                    draggingPoint,
+                                    new LinkedList<Reaction>(reactionManager
+                                            .getReactions()));
                             eventDispatcher
                                     .dispatchEvent(EventDispatcher.Event.ATOMS);
                             try {
@@ -87,6 +90,7 @@ public class ApplicationEngine {
 
     public void clearReactions() {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 if (!reactionManager.getReactions().isEmpty()) {
                     reactionManager.clearReactions();
@@ -97,7 +101,7 @@ public class ApplicationEngine {
         });
     }
 
-    public Collection getAtoms() {
+    public Collection<? extends Atom> getAtoms() {
         synchronized (colliderExecution) {
             return collider.getAtoms();
         }
@@ -115,7 +119,7 @@ public class ApplicationEngine {
         return lastUsedDraggingPoint;
     }
 
-    public Collection getReactions() {
+    public Collection<Reaction> getReactions() {
         return reactionManager.getReactions();
     }
 
@@ -125,6 +129,7 @@ public class ApplicationEngine {
 
     public void pauseSimulation() {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 synchronized (colliderExecution) {
                     if (isRunning) {
@@ -137,8 +142,9 @@ public class ApplicationEngine {
         });
     }
 
-    public void addReactions(final Collection reactions) {
+    public void addReactions(final Collection<Reaction> reactions) {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 reactionManager.addReactions(reactions);
                 eventDispatcher.dispatchEvent(EventDispatcher.Event.REACTIONS);
@@ -146,8 +152,9 @@ public class ApplicationEngine {
         });
     }
 
-    public void removeReactions(final Collection reactions) {
+    public void removeReactions(final Collection<Reaction> reactions) {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 reactionManager.removeReactions(reactions);
                 eventDispatcher.dispatchEvent(EventDispatcher.Event.REACTIONS);
@@ -157,6 +164,7 @@ public class ApplicationEngine {
 
     public void restartLevel(final Configuration configuration) {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 final ILevel currentLevel = levelManager.getCurrentLevel();
                 final List<Atom> atoms = currentLevel
@@ -185,6 +193,7 @@ public class ApplicationEngine {
 
     public void runSimulation() {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 synchronized (colliderExecution) {
                     if (!isRunning) {
@@ -214,8 +223,9 @@ public class ApplicationEngine {
         eventDispatcher.dispatchEvent(EventDispatcher.Event.DRAGGING_POINT);
     }
 
-    public void setReactions(final Collection reactions) {
+    public void setReactions(final Collection<Reaction> reactions) {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 reactionManager.clearReactions();
                 reactionManager.addReactions(reactions);
@@ -226,6 +236,7 @@ public class ApplicationEngine {
 
     public void setSimulationSpeed(final short newSleepPeriod) {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 sleepPeriod = newSleepPeriod;
                 eventDispatcher.dispatchEvent(EventDispatcher.Event.SPEED);
@@ -263,6 +274,7 @@ public class ApplicationEngine {
     public void goToLevel(final int levelIndex,
             final Configuration configuration) {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 setLevel(levelIndex, configuration);
             }
@@ -275,6 +287,7 @@ public class ApplicationEngine {
 
     public void goToLastLevel() {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 setLevel(levelManager.getNumberOfLevel() - 1, null);
             }
@@ -283,6 +296,7 @@ public class ApplicationEngine {
 
     public void goToNextLevel() {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 final int levelIndex = levelManager.getCurrentLevelIndex();
                 if (levelIndex + 1 < levelManager.getNumberOfLevel()) {
@@ -294,6 +308,7 @@ public class ApplicationEngine {
 
     public void goToPreviousLevel() {
         addCommand(new ICommand() {
+            @Override
             public void execute() {
                 final int levelIndex = levelManager.getCurrentLevelIndex();
                 if (levelIndex - 1 >= 0) {

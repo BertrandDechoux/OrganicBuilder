@@ -29,13 +29,16 @@ public class RoundGradientContext implements PaintContext {
         mC2 = c2;
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public ColorModel getColorModel() {
         return ColorModel.getRGBdefault();
     }
 
+    @Override
     public Raster getRaster(final int x, final int y, final int w, final int h) {
         final WritableRaster raster = getColorModel()
                 .createCompatibleWritableRaster(w, h);

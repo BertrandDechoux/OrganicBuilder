@@ -19,11 +19,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
-import uk.org.squirm3.data.Configuration;
-import uk.org.squirm3.data.Level;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.model.Configuration;
 
 public class CustomResetView extends AView {
 
@@ -38,6 +37,7 @@ public class CustomResetView extends AView {
         panel = createParametersPanel();
 
         final IListener levelListener = new IListener() {
+            @Override
             public void propertyHasChanged() {
                 final Configuration configuration = getApplicationEngine()
                         .getLevelManager().getCurrentLevel().getConfiguration();
@@ -66,13 +66,13 @@ public class CustomResetView extends AView {
         // parameters
         // number of atoms
         GridBagConstraints gbc = createCustomGBC(0, 0);
-        parametersPanel.add(
-                new JLabel(GUI.localize("parameters.number")), gbc);
+        parametersPanel.add(new JLabel(GUI.localize("parameters.number")), gbc);
         gbc = createCustomGBC(1, 0);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         atomNumberSelector = new JSlider(30, 300, 30);
         atomNumberSelector.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(final ChangeEvent e) {
                 final JSlider source = (JSlider) e.getSource();
                 if (!source.getValueIsAdjusting()) {
@@ -86,6 +86,7 @@ public class CustomResetView extends AView {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         atomNumberTF = createCustomTF(30, 300, 30);
         atomNumberTF.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
             public void propertyChange(final PropertyChangeEvent e) {
                 if ("value".equals(e.getPropertyName())) {
                     updateNumberOfAtoms(((Number) e.getNewValue()).intValue());
@@ -95,13 +96,13 @@ public class CustomResetView extends AView {
         parametersPanel.add(atomNumberTF, gbc);
         // height
         gbc = createCustomGBC(0, 1);
-        parametersPanel.add(
-                new JLabel(GUI.localize("parameters.height")), gbc);
+        parametersPanel.add(new JLabel(GUI.localize("parameters.height")), gbc);
         gbc = createCustomGBC(1, 1);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         heightSelector = new JSlider(50, 2000, 50);
         heightSelector.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(final ChangeEvent e) {
                 final JSlider source = (JSlider) e.getSource();
                 if (!source.getValueIsAdjusting()) {
@@ -115,6 +116,7 @@ public class CustomResetView extends AView {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         heightTF = createCustomTF(50, 2000, 50);
         heightTF.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
             public void propertyChange(final PropertyChangeEvent e) {
                 if ("value".equals(e.getPropertyName())) {
                     updateHeight(((Number) e.getNewValue()).intValue());
@@ -124,13 +126,13 @@ public class CustomResetView extends AView {
         parametersPanel.add(heightTF, gbc);
         // width
         gbc = createCustomGBC(0, 2);
-        parametersPanel.add(
-                new JLabel(GUI.localize("parameters.width")), gbc);
+        parametersPanel.add(new JLabel(GUI.localize("parameters.width")), gbc);
         gbc = createCustomGBC(1, 2);
         gbc.weightx = 80;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         widthSelector = new JSlider(50, 2000, 50);
         widthSelector.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(final ChangeEvent e) {
                 final JSlider source = (JSlider) e.getSource();
                 if (!source.getValueIsAdjusting()) {
@@ -144,6 +146,7 @@ public class CustomResetView extends AView {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         widthTF = createCustomTF(50, 2000, 50);
         widthTF.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
             public void propertyChange(final PropertyChangeEvent e) {
                 if ("value".equals(e.getPropertyName())) {
                     updateWidth(((Number) e.getNewValue()).intValue());
@@ -156,9 +159,10 @@ public class CustomResetView extends AView {
         final JButton resetButton = new JButton(
                 GUI.localize("simulation.reset"));
         resetButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent arg0) {
                 final Configuration configuration = new Configuration(
-                        atomNumberSelector.getValue(), Level.TYPES,
+                        atomNumberSelector.getValue(),
                         widthSelector.getValue(), heightSelector.getValue());
                 getApplicationEngine().restartLevel(configuration);
             }

@@ -22,6 +22,7 @@ public class StateView extends AView {
         reset = createResetAction();
 
         final IListener stateListener = new IListener() {
+            @Override
             public void propertyHasChanged() {
                 final boolean isRunning = getApplicationEngine()
                         .simulationIsRunning();
@@ -54,6 +55,7 @@ public class StateView extends AView {
 			 */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().runSimulation();
             }
@@ -75,6 +77,7 @@ public class StateView extends AView {
 			 */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().pauseSimulation();
             }
@@ -92,6 +95,7 @@ public class StateView extends AView {
 			 */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 getApplicationEngine().restartLevel(null);
             }

@@ -14,10 +14,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import uk.org.squirm3.data.ILevel;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.model.level.ILevel;
 
 public class CurrentLevelView extends AView {
     private JEditorPane description;
@@ -31,12 +31,12 @@ public class CurrentLevelView extends AView {
         currentLevelPanel = createCurrentLevelPanel();
 
         final IListener levelListener = new IListener() {
+            @Override
             public void propertyHasChanged() {
                 currentLevel = getApplicationEngine().getLevelManager()
                         .getCurrentLevel();
                 if (currentLevel == null) {
-                    description.setText(GUI
-                            .localize("level.description.none"));
+                    description.setText(GUI.localize("level.description.none"));
                     hintButton.setEnabled(false);
                     evaluateButton.setEnabled(false);
                 } else {
@@ -79,10 +79,10 @@ public class CurrentLevelView extends AView {
         jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.LINE_AXIS));
         hintButton = new JButton(GUI.localize("level.hint"));
         hintButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent arg0) {
                 JOptionPane.showMessageDialog(currentLevelPanel,
-                        currentLevel.getHint(),
-                        GUI.localize("level.hint"),
+                        currentLevel.getHint(), GUI.localize("level.hint"),
                         JOptionPane.INFORMATION_MESSAGE);
             }
         });
@@ -90,6 +90,7 @@ public class CurrentLevelView extends AView {
         jPanel.add(Box.createHorizontalGlue());
         evaluateButton = new JButton(GUI.localize("level.evaluate"));
         evaluateButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent arg0) {
                 String result = currentLevel.evaluate(getApplicationEngine()
                         .getAtoms());
@@ -103,20 +104,18 @@ public class CurrentLevelView extends AView {
                 if (success) {
                     // TODO keep always the same object
                     // TODO store the url into a configuration file
-                    final List levelList = getApplicationEngine()
+                    final List<? extends ILevel> levelList = getApplicationEngine()
                             .getLevelManager().getLevels();
                     final int levelNumber = levelList.indexOf(currentLevel);
 
                     if (levelNumber + 1 > levelList.size() - 1) {
                         result = GUI.localize("level.fullsuccess");
                         JOptionPane.showMessageDialog(currentLevelPanel,
-                                result,
-                                GUI.localize("level.success.title"),
+                                result, GUI.localize("level.success.title"),
                                 JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         result = GUI.localize("level.success");
-                        final Object[] options = {
-                                GUI.localize("level.yes"),
+                        final Object[] options = {GUI.localize("level.yes"),
                                 GUI.localize("level.no")};
                         final int n = JOptionPane.showOptionDialog(
                                 currentLevelPanel, result,

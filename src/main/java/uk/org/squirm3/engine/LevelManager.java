@@ -2,7 +2,7 @@ package uk.org.squirm3.engine;
 
 import java.util.List;
 
-import uk.org.squirm3.data.ILevel;
+import uk.org.squirm3.model.level.ILevel;
 
 public final class LevelManager {
     private ILevel currentLevel;

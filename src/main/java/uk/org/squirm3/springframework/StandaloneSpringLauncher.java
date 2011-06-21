@@ -18,7 +18,7 @@ public class StandaloneSpringLauncher {
      * @warn If any bean need to be created, this is the responsibility of the
      *       application context itself and not of this method.
      */
-    public static void main(String... args) {
+    public static void main(final String... args) {
         new ClassPathXmlApplicationContext(DEFAULT_APPLICATION_CONTEXT);
     }
 

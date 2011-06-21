@@ -20,7 +20,7 @@ import javax.swing.JFrame;
 
 // *********************************************************
 // class Resource : use to get pictures or to log something
-// all thingd related to I/O
+// all things related to I/O
 // *********************************************************
 // TODO clean all the code loading the images
 public final class Resource {
@@ -63,7 +63,7 @@ public final class Resource {
     private static Image loadImage(final String name, final Component c) {
         final boolean old_version = true;
         if (old_version) { // TODO make a benchmark or something
-            // in order to chose the most efficent method
+            // in order to chose the most efficient method
             final URL url = Resource.class.getResource("/graphics/" + name);
             final Image img = c.getToolkit().createImage(url);
             try {

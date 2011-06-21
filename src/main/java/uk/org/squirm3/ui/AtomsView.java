@@ -33,13 +33,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import uk.org.squirm3.Resource;
-import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.Configuration;
-import uk.org.squirm3.data.DraggingPoint;
 import uk.org.squirm3.derivative.RoundGradientPaint;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.model.Atom;
+import uk.org.squirm3.model.Configuration;
+import uk.org.squirm3.model.DraggingPoint;
 
 public class AtomsView extends AView {
     private DraggingPoint draggingPoint;
@@ -75,6 +75,7 @@ public class AtomsView extends AView {
         collisionsPanel = createCollisionsPanel();
 
         final IListener sizeListener = new IListener() {
+            @Override
             public void propertyHasChanged() {
                 final Configuration configuration = getApplicationEngine()
                         .getLevelManager().getCurrentLevel().getConfiguration();
@@ -90,13 +91,15 @@ public class AtomsView extends AView {
                 EventDispatcher.Event.CONFIGURATION);
 
         final IListener atomsListener = new IListener() {
+            @Override
             public void propertyHasChanged() {
-                final Collection c = getApplicationEngine().getAtoms();
-                final Iterator it = c.iterator();
+                final Collection<? extends Atom> c = getApplicationEngine()
+                        .getAtoms();
+                final Iterator<? extends Atom> it = c.iterator();
                 latestAtomsCopy = new Atom[c.size()];
                 int i = 0;
                 while (it.hasNext()) {
-                    latestAtomsCopy[i] = (Atom) it.next();
+                    latestAtomsCopy[i] = it.next();
                     i++;
                 }
                 imageHasChanged();
@@ -107,6 +110,7 @@ public class AtomsView extends AView {
                 EventDispatcher.Event.ATOMS);
 
         final IListener draggingPointListener = new IListener() {
+            @Override
             public void propertyHasChanged() {
                 draggingPoint = getApplicationEngine()
                         .getCurrentDraggingPoint();
@@ -161,16 +165,20 @@ public class AtomsView extends AView {
         imagePanel = new ImagePanel();
         scrollPane = new JScrollPane(imagePanel);
         scrollPane.addComponentListener(new ComponentListener() {
+            @Override
             public void componentResized(final ComponentEvent arg0) {
                 imageSizeHasChanged();
             }
 
+            @Override
             public void componentHidden(final ComponentEvent arg0) {
             }
 
+            @Override
             public void componentMoved(final ComponentEvent arg0) {
             }
 
+            @Override
             public void componentShown(final ComponentEvent arg0) {
             }
         });
@@ -179,6 +187,7 @@ public class AtomsView extends AView {
         controlsPanel.add(new JLabel(GUI.localize("scale")));
         auto = new JCheckBox(GUI.localize("scale.auto"));
         auto.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent arg0) {
                 scaleSlider.setEnabled(!auto.isSelected());
                 imageSizeHasChanged();
@@ -188,6 +197,7 @@ public class AtomsView extends AView {
         controlsPanel.add(auto);
         scaleSlider = new JSlider(30, 100, scale);
         scaleSlider.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(final ChangeEvent e) {
                 if (!scaleSlider.getValueIsAdjusting()) {
                     scale = (byte) scaleSlider.getValue();
@@ -365,15 +375,19 @@ public class AtomsView extends AView {
 
         public ImagePanel() {
             addMouseListener(new MouseListener() {
+                @Override
                 public void mouseClicked(final MouseEvent event) {
                 }
 
+                @Override
                 public void mouseEntered(final MouseEvent event) {
                 }
 
+                @Override
                 public void mouseExited(final MouseEvent event) {
                 }
 
+                @Override
                 public void mousePressed(final MouseEvent event) {
                     // who did we click on?
                     final Point p = event.getPoint();
@@ -396,11 +410,13 @@ public class AtomsView extends AView {
                     }
                 }
 
+                @Override
                 public void mouseReleased(final MouseEvent event) {
                     getApplicationEngine().setDraggingPoint(null);
                 }
             });
             addMouseMotionListener(new MouseMotionListener() {
+                @Override
                 public void mouseDragged(final MouseEvent event) {
                     if (draggingPoint != null) {
                         final float zoom = (float) scale / 100;
@@ -412,6 +428,7 @@ public class AtomsView extends AView {
                     }
                 }
 
+                @Override
                 public void mouseMoved(final MouseEvent event) {
                     if (draggingPoint != null) {
                         final float zoom = (float) scale / 100;
@@ -434,23 +451,28 @@ public class AtomsView extends AView {
                     (int) (bimg.getHeight() * zoom), this);
         }
 
+        @Override
         public Dimension getPreferredScrollableViewportSize() {
             return getPreferredSize();
         }
 
+        @Override
         public int getScrollableBlockIncrement(final Rectangle arg0,
                 final int arg1, final int arg2) {
             return 1; // TODO
         }
 
+        @Override
         public boolean getScrollableTracksViewportHeight() {
             return false;
         }
 
+        @Override
         public boolean getScrollableTracksViewportWidth() {
             return false;
         }
 
+        @Override
         public int getScrollableUnitIncrement(final Rectangle arg0,
                 final int arg1, final int arg2) {
             return 1; // TODO

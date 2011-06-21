@@ -39,6 +39,7 @@ public class SpeedView extends AView {
                 .getSimulationSpeed());
         speedSelector.setInverted(true);
         speedSelector.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(final ChangeEvent e) {
                 final JSlider source = (JSlider) e.getSource();
                 if (!source.getValueIsAdjusting()) {
@@ -54,6 +55,7 @@ public class SpeedView extends AView {
         speedTF = createCustomTF(1, 100, getApplicationEngine()
                 .getSimulationSpeed());
         speedTF.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
             public void propertyChange(final PropertyChangeEvent e) {
                 if ("value".equals(e.getPropertyName())) {
                     SpeedView.this.getApplicationEngine().setSimulationSpeed(
@@ -66,6 +68,7 @@ public class SpeedView extends AView {
 
         getApplicationEngine().getEventDispatcher().addListener(
                 new IListener() {
+                    @Override
                     public void propertyHasChanged() {
                         final int speed = getApplicationEngine()
                                 .getSimulationSpeed();

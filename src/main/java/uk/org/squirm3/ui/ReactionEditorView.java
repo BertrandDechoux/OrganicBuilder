@@ -17,9 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
 import uk.org.squirm3.Resource;
-import uk.org.squirm3.data.Atom;
-import uk.org.squirm3.data.Reaction;
 import uk.org.squirm3.engine.ApplicationEngine;
+import uk.org.squirm3.model.Atom;
+import uk.org.squirm3.model.Reaction;
 
 public class ReactionEditorView extends AView {
     private JCheckBox bondedBefore, bondedAfter;
@@ -46,6 +46,7 @@ public class ReactionEditorView extends AView {
         final JPanel reactionPanel = new JPanel();
         reactionPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         final ActionListener l = new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 addReaction.setText(createReactionFromEditor().toString());
             }
@@ -82,11 +83,11 @@ public class ReactionEditorView extends AView {
         jPanel.add(reactionPanel);
         addReaction = new JButton(Resource.getIcon("add"));
         addReaction.setMargin(new Insets(0, 0, 0, 0));
-        addReaction.setToolTipText(GUI
-                .localize("reactions.add.tooltip"));
+        addReaction.setToolTipText(GUI.localize("reactions.add.tooltip"));
         addReaction.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent e) {
-                final Collection c = new ArrayList(1);
+                final Collection<Reaction> c = new ArrayList<Reaction>(1);
                 c.add(createReactionFromEditor());
                 getApplicationEngine().addReactions(c);
             }

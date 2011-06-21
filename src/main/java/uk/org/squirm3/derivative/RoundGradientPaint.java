@@ -37,6 +37,7 @@ public class RoundGradientPaint implements Paint {
         mBackgroundColor = backgroundColor;
     }
 
+    @Override
     public PaintContext createContext(final ColorModel cm,
             final Rectangle deviceBounds, final Rectangle2D userBounds,
             final AffineTransform xform, final RenderingHints hints) {
@@ -46,6 +47,7 @@ public class RoundGradientPaint implements Paint {
                 transformedRadius, mBackgroundColor);
     }
 
+    @Override
     public int getTransparency() {
         final int a1 = mPointColor.getAlpha();
         final int a2 = mBackgroundColor.getAlpha();

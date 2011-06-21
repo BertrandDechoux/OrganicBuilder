@@ -1,5 +1,6 @@
 #Organize Import Order
-#Sun Apr 17 01:05:42 CEST 2011
+#Thu Jun 02 19:34:53 CEST 2011
+4=\#org.fest.assertions.Assertions.assertThat
 3=com
 2=org
 1=javax
