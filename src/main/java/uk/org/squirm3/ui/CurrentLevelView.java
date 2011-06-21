@@ -17,12 +17,12 @@ import javax.swing.JScrollPane;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
-import uk.org.squirm3.model.level.ILevel;
+import uk.org.squirm3.model.level.Level;
 
 public class CurrentLevelView extends AView {
     private JEditorPane description;
     private JButton hintButton, evaluateButton;
-    private ILevel currentLevel;
+    private Level currentLevel;
 
     private final JPanel currentLevelPanel;
 
@@ -104,7 +104,7 @@ public class CurrentLevelView extends AView {
                 if (success) {
                     // TODO keep always the same object
                     // TODO store the url into a configuration file
-                    final List<? extends ILevel> levelList = getApplicationEngine()
+                    final List<? extends Level> levelList = getApplicationEngine()
                             .getLevelManager().getLevels();
                     final int levelNumber = levelList.indexOf(currentLevel);
 

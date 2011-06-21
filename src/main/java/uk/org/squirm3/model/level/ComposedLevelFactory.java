@@ -29,16 +29,16 @@ public class ComposedLevelFactory {
         this.atomBuilder = atomBuilder;
     }
 
-    public ILevel create(final String key, final AtomValidator atomValidator) {
+    public Level create(final String key, final AtomValidator atomValidator) {
         return create(key, key + ".map", atomValidator);
     }
 
-    public ILevel createRandom(final String key,
+    public Level createRandom(final String key,
             final AtomValidator atomValidator) {
         return create(key, "random.map", atomValidator);
     }
 
-    private ILevel create(final String key, final String map,
+    private Level create(final String key, final String map,
             final AtomValidator atomValidator) {
         final String levelDescription = conversionService.convert(
                 resourceLoader.getResource("classpath:levels/" + map),

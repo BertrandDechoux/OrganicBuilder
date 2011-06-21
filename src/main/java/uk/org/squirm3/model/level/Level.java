@@ -6,7 +6,7 @@ import java.util.List;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 
-public interface ILevel {
+public interface Level {
 
     public String getTitle();
     public String getChallenge();

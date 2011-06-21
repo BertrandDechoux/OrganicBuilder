@@ -10,7 +10,7 @@ import uk.org.squirm3.model.Configuration;
 
 import com.google.common.collect.Lists;
 
-public class ComposedLevel implements ILevel {
+public class ComposedLevel implements Level {
 
     private final AtomGenerator atomGenerator;
     private final LevelMessages messages;

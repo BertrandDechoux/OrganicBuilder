@@ -9,7 +9,7 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
 import uk.org.squirm3.model.Reaction;
-import uk.org.squirm3.model.level.ILevel;
+import uk.org.squirm3.model.level.Level;
 
 public class ApplicationEngine {
 
@@ -29,7 +29,7 @@ public class ApplicationEngine {
 
     private final EventDispatcher eventDispatcher;
 
-    public ApplicationEngine(final List<ILevel> levels) throws Exception {
+    public ApplicationEngine(final List<Level> levels) throws Exception {
         // load levels
         levelManager = new LevelManager(levels);
         reactionManager = new ReactionManager();
@@ -166,7 +166,7 @@ public class ApplicationEngine {
         addCommand(new ICommand() {
             @Override
             public void execute() {
-                final ILevel currentLevel = levelManager.getCurrentLevel();
+                final Level currentLevel = levelManager.getCurrentLevel();
                 final List<Atom> atoms = currentLevel
                         .generateAtoms(configuration);
                 if (atoms == null) {
@@ -259,7 +259,7 @@ public class ApplicationEngine {
             reactionManager.clearReactions();
             eventDispatcher.dispatchEvent(EventDispatcher.Event.REACTIONS);
         }
-        final ILevel currentLevel = levelManager.getCurrentLevel();
+        final Level currentLevel = levelManager.getCurrentLevel();
         final List<Atom> atoms = currentLevel.generateAtoms(configuration);
         if (atoms == null) {
             return;

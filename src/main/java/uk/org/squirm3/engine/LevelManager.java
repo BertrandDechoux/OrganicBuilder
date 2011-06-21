@@ -2,20 +2,20 @@ package uk.org.squirm3.engine;
 
 import java.util.List;
 
-import uk.org.squirm3.model.level.ILevel;
+import uk.org.squirm3.model.level.Level;
 
 public final class LevelManager {
-    private ILevel currentLevel;
-    private final List<ILevel> levels;
+    private Level currentLevel;
+    private final List<Level> levels;
     private int levelIndex;
 
-    public LevelManager(final List<ILevel> levels) {
+    public LevelManager(final List<Level> levels) {
         this.levels = levels;
         levelIndex = 0;
         setLevel(0);
     }
 
-    public ILevel getCurrentLevel() {
+    public Level getCurrentLevel() {
         return currentLevel;
     }
 
@@ -23,7 +23,7 @@ public final class LevelManager {
         return levelIndex;
     }
 
-    public List<? extends ILevel> getLevels() {
+    public List<? extends Level> getLevels() {
         return levels;
     }
 

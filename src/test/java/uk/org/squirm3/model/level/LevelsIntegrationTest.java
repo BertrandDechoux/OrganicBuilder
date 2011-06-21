@@ -17,10 +17,10 @@ import com.google.common.collect.Lists;
 @RunWith(Parameterized.class)
 public class LevelsIntegrationTest {
     private final Configuration configuration;
-    private final ILevel level;
+    private final Level level;
 
     public LevelsIntegrationTest(final Configuration configuration,
-            final ILevel level) {
+            final Level level) {
         this.configuration = configuration;
         this.level = level;
     }
@@ -33,10 +33,10 @@ public class LevelsIntegrationTest {
                 .getBean(Configuration.class);
 
         @SuppressWarnings("unchecked")
-        final List<ILevel> levels = applicationContext.getBean("levels",
+        final List<Level> levels = applicationContext.getBean("levels",
                 List.class);
         final Collection<Object[]> parameters = Lists.newArrayList();
-        for (final ILevel level : levels) {
+        for (final Level level : levels) {
             parameters.add(new Object[]{configuration, level});
         }
         return parameters;

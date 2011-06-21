@@ -13,7 +13,7 @@ import uk.org.squirm3.Resource;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
-import uk.org.squirm3.model.level.ILevel;
+import uk.org.squirm3.model.level.Level;
 
 public class LevelNavigatorView extends AView {
 
@@ -36,7 +36,7 @@ public class LevelNavigatorView extends AView {
 
             @Override
             public void propertyHasChanged() {
-                final List<? extends ILevel> levelList = getApplicationEngine()
+                final List<? extends Level> levelList = getApplicationEngine()
                         .getLevelManager().getLevels();
                 final int levelNumber = levelList
                         .indexOf(getApplicationEngine().getLevelManager()
@@ -82,10 +82,10 @@ public class LevelNavigatorView extends AView {
     }
 
     private JComboBox createLevelComboBox() {
-        final List<? extends ILevel> levelList = getApplicationEngine()
+        final List<? extends Level> levelList = getApplicationEngine()
                 .getLevelManager().getLevels();
         final String[] levelsLabels = new String[levelList.size()];
-        final Iterator<? extends ILevel> it = levelList.iterator();
+        final Iterator<? extends Level> it = levelList.iterator();
         int i = 0;
         while (it.hasNext()) {
             String number = String.valueOf(i) + "  ";
