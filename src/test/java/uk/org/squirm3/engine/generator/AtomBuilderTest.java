@@ -12,8 +12,8 @@ import static org.fest.assertions.Assertions.assertThat;
 public class AtomBuilderTest {
     private final AtomBuilder levelBuilder = new AtomBuilder();
 
-    private static final Configuration configuration = new Configuration(50,
-            500f, 500f);
+    private static final Configuration configuration = new Configuration(500f,
+            500f);
 
     @Test
     public void shouldSupportEmptyDescription() throws BuilderException {
@@ -159,6 +159,20 @@ public class AtomBuilderTest {
     public void shouldFailWithVerticalBondingWithEmpty()
             throws BuilderException {
         levelBuilder.build("......\n(_a0⇡)", configuration);
+    }
+
+    @Test(expected = BuilderException.class)
+    public void shouldFailWhenNotEnoughHorizontalSpace()
+            throws BuilderException {
+        levelBuilder.build("(_a0_)(_a0_)(_a0_)(_a0_)(_a0_)(_a0_)(_a0_)",
+                new Configuration(100, 500));
+    }
+
+    @Test(expected = BuilderException.class)
+    public void shouldFailWhenNotEnoughVerticalSpace() throws BuilderException {
+        levelBuilder.build(
+                "(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n",
+                new Configuration(500, 100));
     }
 
 }

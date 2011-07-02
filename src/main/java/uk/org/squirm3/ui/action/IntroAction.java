@@ -19,7 +19,8 @@ public class IntroAction extends AbstractAction {
     public IntroAction(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final ImageIcon introIcon) {
         this.applicationEngine = applicationEngine;
-        putValue(Action.SHORT_DESCRIPTION, Messages.localize("navigation.first", messageSource));
+        putValue(Action.SHORT_DESCRIPTION,
+                Messages.localize("navigation.first", messageSource));
         putValue(Action.SMALL_ICON, introIcon);
     }
 

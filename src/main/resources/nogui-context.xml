@@ -36,19 +36,22 @@
 	</bean>
 
 	<bean id="configuration" class="uk.org.squirm3.model.Configuration">
-		<constructor-arg name="numberOfAtoms" value="50" />
 		<constructor-arg name="width" value="650" />
 		<constructor-arg name="height" value="550" />
 	</bean>
 
 	<bean id="applicationEngine" class="uk.org.squirm3.engine.ApplicationEngine">
-		<constructor-arg ref="levels" />
+		<constructor-arg>
+			<bean class="uk.org.squirm3.engine.LevelManager">
+				<constructor-arg ref="levels" />
+			</bean>
+		</constructor-arg>
+		<constructor-arg ref="configuration" />
 	</bean>
 
 	<bean id="levelFactory" class="uk.org.squirm3.model.level.ComposedLevelFactory">
 		<constructor-arg ref="conversionService" />
 		<constructor-arg ref="messageSource" />
-		<constructor-arg ref="configuration" />
 		<constructor-arg>
 			<bean class="uk.org.squirm3.engine.generator.AtomBuilder" />
 		</constructor-arg>
@@ -175,8 +178,7 @@
 		<bean factory-bean="levelFactory" factory-method="create">
 			<constructor-arg value="celldivision" />
 			<constructor-arg>
-				<bean
-					class="uk.org.squirm3.model.level.validators.CellDivisionValidator" />
+				<bean class="uk.org.squirm3.model.level.validators.CellDivisionValidator" />
 			</constructor-arg>
 		</bean>
 	</util:list>

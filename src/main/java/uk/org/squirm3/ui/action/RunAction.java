@@ -19,7 +19,8 @@ public class RunAction extends AbstractAction {
     public RunAction(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final ImageIcon runIcon) {
         this.applicationEngine = applicationEngine;
-        putValue(Action.SHORT_DESCRIPTION, Messages.localize("simulation.run", messageSource));
+        putValue(Action.SHORT_DESCRIPTION,
+                Messages.localize("simulation.run", messageSource));
         putValue(Action.SMALL_ICON, runIcon);
     }
 

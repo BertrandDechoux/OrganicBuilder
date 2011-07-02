@@ -19,7 +19,8 @@ public class PreviousAction extends AbstractAction {
     public PreviousAction(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final ImageIcon previousIcon) {
         this.applicationEngine = applicationEngine;
-        putValue(Action.SHORT_DESCRIPTION, Messages.localize("navigation.previous", messageSource));
+        putValue(Action.SHORT_DESCRIPTION,
+                Messages.localize("navigation.previous", messageSource));
         putValue(Action.SMALL_ICON, previousIcon);
     }
 

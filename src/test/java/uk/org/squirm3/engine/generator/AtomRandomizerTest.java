@@ -27,10 +27,13 @@ public class AtomRandomizerTest {
 
     @Test
     public void shouldReturnRandomConfiguredTypeIntIdentifierInRange() {
-        Assertions.assertThat(new AtomRandomizer().getIntegerIdentifier(
-                RandomBuilderType.RANDOM, "def")).isGreaterThanOrEqualTo(3);
-        Assertions.assertThat(new AtomRandomizer().getIntegerIdentifier(
-                RandomBuilderType.RANDOM, "abc")).isLessThan(3);
+        Assertions.assertThat(
+                new AtomRandomizer().getIntegerIdentifier(
+                        RandomBuilderType.RANDOM, "def"))
+                .isGreaterThanOrEqualTo(3);
+        Assertions.assertThat(
+                new AtomRandomizer().getIntegerIdentifier(
+                        RandomBuilderType.RANDOM, "abc")).isLessThan(3);
     }
 
 }

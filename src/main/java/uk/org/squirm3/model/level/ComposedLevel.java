@@ -14,16 +14,13 @@ public class ComposedLevel implements Level {
 
     private final AtomGenerator atomGenerator;
     private final LevelMessages messages;
-    private final Configuration defaultConfiguration;
     private final AtomValidator atomValidator;
 
     public ComposedLevel(final AtomGenerator atomGenerator,
             final LevelMessages messages,
-            final Configuration defaultConfiguration,
             final AtomValidator atomValidator) {
         this.atomGenerator = atomGenerator;
         this.messages = messages;
-        this.defaultConfiguration = defaultConfiguration;
         this.atomValidator = atomValidator;
     }
 
@@ -43,30 +40,15 @@ public class ComposedLevel implements Level {
     }
 
     @Override
-    public Configuration getDefaultConfiguration() {
-        return defaultConfiguration;
-    }
-
-    @Override
-    public Configuration getConfiguration() {
-        return defaultConfiguration;
-    }
-
-    @Override
-    public List<Atom> generateAtoms() {
+    public List<Atom> generateAtoms(final Configuration configuration) {
         try {
             final List<Atom> atoms = Lists.newArrayList(atomGenerator
-                    .generate());
+                    .generate(configuration));
             atomValidator.setup(atoms);
             return atoms;
         } catch (final GeneratorException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public List<Atom> generateAtoms(final Configuration configuration) {
-        return generateAtoms();
     }
 
     @Override

@@ -19,7 +19,8 @@ public class StopAction extends AbstractAction {
     public StopAction(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final ImageIcon previousIcon) {
         this.applicationEngine = applicationEngine;
-        putValue(Action.SHORT_DESCRIPTION, Messages.localize("simulation.stop", messageSource));
+        putValue(Action.SHORT_DESCRIPTION,
+                Messages.localize("simulation.stop", messageSource));
         putValue(Action.SMALL_ICON, previousIcon);
     }
 

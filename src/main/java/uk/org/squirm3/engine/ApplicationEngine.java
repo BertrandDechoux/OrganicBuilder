@@ -28,17 +28,20 @@ public class ApplicationEngine {
     private final ReactionManager reactionManager;
 
     private final EventDispatcher eventDispatcher;
+    private final Configuration configuration;
 
-    public ApplicationEngine(final List<Level> levels) throws Exception {
+    public ApplicationEngine(final LevelManager levelManager,
+            final Configuration configuration) throws Exception {
+        this.configuration = configuration;
         // load levels
-        levelManager = new LevelManager(levels);
+        this.levelManager = levelManager;
         reactionManager = new ReactionManager();
         // manager of the listeners
         eventDispatcher = new EventDispatcher();
         sleepPeriod = 50;
         // start the challenge by the introduction
         try {
-            setLevel(0, null);
+            setLevel(0);
         } catch (final Exception e) {
         }
         commands = new LinkedList<ICommand>();
@@ -86,6 +89,10 @@ public class ApplicationEngine {
         });
         applicationThread.setPriority(Thread.MIN_PRIORITY);
         applicationThread.start();
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     public void clearReactions() {
@@ -162,7 +169,7 @@ public class ApplicationEngine {
         });
     }
 
-    public void restartLevel(final Configuration configuration) {
+    public void restartLevel() {
         addCommand(new ICommand() {
             @Override
             public void execute() {
@@ -172,13 +179,8 @@ public class ApplicationEngine {
                 if (atoms == null) {
                     return;
                 }
-                collider = new Collider(atoms, (int) currentLevel
-                        .getConfiguration().getWidth(), (int) currentLevel
-                        .getConfiguration().getHeight());
-                if (configuration != null) {
-                    eventDispatcher
-                            .dispatchEvent(EventDispatcher.Event.CONFIGURATION);
-                }
+                collider = new Collider(atoms, (int) configuration.getWidth(),
+                        (int) configuration.getHeight());
                 eventDispatcher.dispatchEvent(EventDispatcher.Event.ATOMS);
                 synchronized (colliderExecution) {
                     if (!isRunning) {
@@ -252,8 +254,7 @@ public class ApplicationEngine {
         return eventDispatcher;
     }
 
-    private void setLevel(final int levelIndex,
-            final Configuration configuration) {
+    private void setLevel(final int levelIndex) {
         levelManager.setLevel(levelIndex);
         if (collider != null) {
             reactionManager.clearReactions();
@@ -264,32 +265,31 @@ public class ApplicationEngine {
         if (atoms == null) {
             return;
         }
-        collider = new Collider(atoms, (int) currentLevel.getConfiguration()
-                .getWidth(), (int) currentLevel.getConfiguration().getHeight());
+        collider = new Collider(atoms, (int) configuration.getWidth(),
+                (int) configuration.getHeight());
         eventDispatcher.dispatchEvent(EventDispatcher.Event.ATOMS);
         eventDispatcher.dispatchEvent(EventDispatcher.Event.LEVEL);
         return;
     }
 
-    public void goToLevel(final int levelIndex,
-            final Configuration configuration) {
+    public void goToLevel(final int levelIndex) {
         addCommand(new ICommand() {
             @Override
             public void execute() {
-                setLevel(levelIndex, configuration);
+                setLevel(levelIndex);
             }
         });
     }
 
     public void goToFirstLevel() {
-        goToLevel(0, null);
+        goToLevel(0);
     }
 
     public void goToLastLevel() {
         addCommand(new ICommand() {
             @Override
             public void execute() {
-                setLevel(levelManager.getNumberOfLevel() - 1, null);
+                setLevel(levelManager.getNumberOfLevel() - 1);
             }
         });
     }
@@ -300,7 +300,7 @@ public class ApplicationEngine {
             public void execute() {
                 final int levelIndex = levelManager.getCurrentLevelIndex();
                 if (levelIndex + 1 < levelManager.getNumberOfLevel()) {
-                    setLevel(levelIndex + 1, null);
+                    setLevel(levelIndex + 1);
                 }
             }
         });
@@ -312,7 +312,7 @@ public class ApplicationEngine {
             public void execute() {
                 final int levelIndex = levelManager.getCurrentLevelIndex();
                 if (levelIndex - 1 >= 0) {
-                    setLevel(levelIndex - 1, null);
+                    setLevel(levelIndex - 1);
                 }
             }
         });

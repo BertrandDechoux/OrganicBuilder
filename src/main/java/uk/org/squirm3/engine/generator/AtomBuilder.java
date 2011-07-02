@@ -77,9 +77,9 @@ public class AtomBuilder {
             final AtomRandomizer levelRandomizer = new AtomRandomizer();
             int x = 0;
             int y = 0;
+            int maxX = 0;
 
             while (descriptionLine != null) {
-
                 y++;
                 x = 1;
 
@@ -118,8 +118,12 @@ public class AtomBuilder {
                 previousAtomLine = currentAtomLine;
                 currentAtomLine = Lists.newArrayList();
                 descriptionLine = descriptionReader.readLine();
+                if (x > maxX) {
+                    maxX = x;
+                }
             }
             atoms.removeAll(Collections.singleton(null));
+            checkConfiguration(configuration, maxX, y);
             return atoms;
 
         } catch (final IOException e) {
@@ -135,6 +139,22 @@ public class AtomBuilder {
 
     }
 
+    private void checkConfiguration(Configuration configuration, int x, int y) throws BuilderException {
+        final double horizontalSpace = Atom.getAtomSize() * (x * 2 + 1);
+        if (horizontalSpace > configuration.getWidth()) {
+            throw new BuilderException(
+                    "Map horizontal space is greater than the configuration's width : "
+                            + horizontalSpace + " > "
+                            + configuration.getWidth());
+        }
+        final double verticalSpace = Atom.getAtomSize() * (y * 2 + 1);
+        if (verticalSpace > configuration.getHeight()) {
+            throw new BuilderException(
+                    "Map vertical space is greater than the configuration's height : "
+                            + verticalSpace + " > "
+                            + configuration.getHeight());
+        }
+    }
     private boolean isHorizontalBondActivated(final char[] atomDescription)
             throws BuilderException {
         if (atomDescription[1] == HORIZONTAL_BOND) {

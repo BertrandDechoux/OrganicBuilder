@@ -19,7 +19,8 @@ public class NextAction extends AbstractAction {
     public NextAction(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final ImageIcon nextIcon) {
         this.applicationEngine = applicationEngine;
-        putValue(Action.SHORT_DESCRIPTION, Messages.localize("navigation.next", messageSource));
+        putValue(Action.SHORT_DESCRIPTION,
+                Messages.localize("navigation.next", messageSource));
         putValue(Action.SMALL_ICON, nextIcon);
     }
 

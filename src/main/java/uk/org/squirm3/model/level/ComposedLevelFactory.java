@@ -8,7 +8,6 @@ import org.springframework.core.io.ResourceLoader;
 import uk.org.squirm3.engine.generator.AtomBuilder;
 import uk.org.squirm3.engine.generator.AtomBuilderGenerator;
 import uk.org.squirm3.engine.generator.AtomGenerator;
-import uk.org.squirm3.model.Configuration;
 
 public class ComposedLevelFactory implements ResourceLoaderAware {
 
@@ -17,15 +16,12 @@ public class ComposedLevelFactory implements ResourceLoaderAware {
     private final ConversionService conversionService;
     private final MessageSource messageSource;
 
-    private final Configuration configuration;
     private final AtomBuilder atomBuilder;
 
     private ComposedLevelFactory(final ConversionService conversionService,
-            final MessageSource messageSource,
-            final Configuration configuration, final AtomBuilder atomBuilder) {
+            final MessageSource messageSource, final AtomBuilder atomBuilder) {
         this.conversionService = conversionService;
         this.messageSource = messageSource;
-        this.configuration = configuration;
         this.atomBuilder = atomBuilder;
     }
 
@@ -44,14 +40,13 @@ public class ComposedLevelFactory implements ResourceLoaderAware {
                 resourceLoader.getResource("classpath:levels/" + map),
                 String.class);
         final AtomGenerator atomGenerator = new AtomBuilderGenerator(
-                levelDescription, configuration, atomBuilder);
+                levelDescription, atomBuilder);
         final LevelMessages messages = new LevelMessages(key, messageSource);
-        return new ComposedLevel(atomGenerator, messages, configuration,
-                atomValidator);
+        return new ComposedLevel(atomGenerator, messages, atomValidator);
     }
 
     @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
+    public void setResourceLoader(final ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 

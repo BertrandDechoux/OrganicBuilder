@@ -44,7 +44,6 @@ public class LevelsIntegrationTest {
 
     @Test
     public void shouldGenerateSucessfullyAllLevels() {
-        level.generateAtoms();
         level.generateAtoms(configuration);
         level.getTitle();
         level.getChallenge();

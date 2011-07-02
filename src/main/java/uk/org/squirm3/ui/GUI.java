@@ -32,7 +32,12 @@ public class GUI {
 
     private static MessageSource messageSource;
 
-    public static void createGUI(final ApplicationEngine applicationEngine, final Action aboutAction, final LevelNavigatorView levelNavigatorView, final StateView stateView, final ReactionEditorView reactionEditorView, final AtomsView atomsView, final ImageIcon parameterIcon) {
+    public static void createGUI(final ApplicationEngine applicationEngine,
+            final Action aboutAction,
+            final LevelNavigatorView levelNavigatorView,
+            final StateView stateView,
+            final ReactionEditorView reactionEditorView,
+            final AtomsView atomsView, final ImageIcon parameterIcon) {
         // frame
         final JFrame frame = new JFrame(GUI.localize("application.title"));
         frame.setSize(1080, 630);
@@ -42,8 +47,6 @@ public class GUI {
         final CurrentLevelView currentLevelView = new CurrentLevelView(
                 applicationEngine);
         final ReactionListView reactionListView = new ReactionListView(
-                applicationEngine);
-        final CustomResetView customResetView = new CustomResetView(
                 applicationEngine);
         final SpeedView speedView = new SpeedView(applicationEngine);
 
@@ -82,11 +85,10 @@ public class GUI {
         simControlsPanel.add(createIconButton(stateView.getStopAction(), bg));
         simControlsPanel.add(createIconButton(stateView.getRunAction(), bg));
         simControlsPanel.add(createIconButton(stateView.getResetAction(), bg));
-        simControlsPanel
-                .add(createIconButton(
-                        createParametersAction(customResetView.getPanel(),
-                                speedView.getPanel(),
-                                atomsView.getControlsPanel(), parameterIcon), bg));
+        simControlsPanel.add(createIconButton(
+                createParametersAction(
+                        speedView.getPanel(), atomsView.getControlsPanel(),
+                        parameterIcon), bg));
         toolBar.add(simControlsPanel);
         toolBar.add(Box.createHorizontalGlue());
         // navigation controls
@@ -134,12 +136,18 @@ public class GUI {
     }
 
     public GUI(final MessageSource messageSource,
-            final ApplicationEngine applicationEngine, final Action aboutAction, final LevelNavigatorView levelNavigatorView, final StateView stateView, final ReactionEditorView reactionEditorView, final AtomsView atomsView, final ImageIcon parameterIcon) {
+            final ApplicationEngine applicationEngine,
+            final Action aboutAction,
+            final LevelNavigatorView levelNavigatorView,
+            final StateView stateView,
+            final ReactionEditorView reactionEditorView,
+            final AtomsView atomsView, final ImageIcon parameterIcon) {
         GUI.messageSource = messageSource;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                createGUI(applicationEngine, aboutAction, levelNavigatorView, stateView, reactionEditorView, atomsView, parameterIcon);
+                createGUI(applicationEngine, aboutAction, levelNavigatorView,
+                        stateView, reactionEditorView, atomsView, parameterIcon);
             }
         });
     }
@@ -152,13 +160,12 @@ public class GUI {
         return button;
     }
 
-    private static Action createParametersAction(final JPanel p1,
-            final JPanel p2, final JPanel p3, final ImageIcon parameterIcon) {
+    private static Action createParametersAction(
+            final JPanel p1, final JPanel p2, final ImageIcon parameterIcon) {
         final JPanel message = new JPanel();
         message.setLayout(new BoxLayout(message, BoxLayout.PAGE_AXIS));
         message.add(p1);
         message.add(p2);
-        message.add(p3);
         final Action action = new AbstractAction() {
             /**
 			 * 

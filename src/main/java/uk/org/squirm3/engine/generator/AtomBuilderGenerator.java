@@ -8,18 +8,16 @@ import uk.org.squirm3.model.Configuration;
 public class AtomBuilderGenerator implements AtomGenerator {
 
     private final String levelDescription;
-    private final Configuration configuration;
     private final AtomBuilder atomBuilder;
 
     public AtomBuilderGenerator(final String levelDescription,
-            final Configuration configuration, final AtomBuilder atomBuilder) {
+            final AtomBuilder atomBuilder) {
         this.levelDescription = levelDescription;
-        this.configuration = configuration;
         this.atomBuilder = atomBuilder;
     }
 
     @Override
-    public Collection<Atom> generate() throws GeneratorException {
+    public Collection<Atom> generate(final Configuration configuration) throws GeneratorException {
         try {
             return atomBuilder.build(levelDescription, configuration);
         } catch (final BuilderException e) {

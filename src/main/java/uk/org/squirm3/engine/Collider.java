@@ -30,7 +30,7 @@ final class Collider {
     protected float bucket_width, bucket_height;
 
     private float MAX_SPEED = 5.0f; // recomputed when R changes (thanks Ralph)
-    private final Set reactedAtoms = new HashSet();
+    private final Set<Atom> reactedAtoms = new HashSet<Atom>();
 
     // ------- methods ---------
     public Collider(final List<? extends Atom> atoms, final int w, final int h) {
@@ -110,7 +110,7 @@ final class Collider {
     // - a lattice-based physics can run very fast indeed but doesn't look as
     // satisfying
     public void doTimeStep(final DraggingPoint draggingPoint,
-            final List reactions) {
+            final List<Reaction> reactions) {
         // boolean is_dragging,int which_being_dragged, int mouse_x,int mouse_y
         // COMPUTE AND REACT
         // we shuffle the reactions list in order to prevent any reaction
@@ -193,13 +193,12 @@ final class Collider {
                                         && !reactedAtoms.contains(a)
                                         && !reactedAtoms.contains(b); twice++) {
                                     // try each reaction in turn
-                                    final Iterator iterator = reactions
+                                    final Iterator<Reaction> iterator = reactions
                                             .listIterator();
                                     while (iterator.hasNext()
                                             && !reactedAtoms.contains(a)
                                             && !reactedAtoms.contains(b)) {
-                                        if (((Reaction) iterator.next()).tryOn(
-                                                a, b)) {
+                                        if (iterator.next().tryOn(a, b)) {
                                             reactedAtoms.add(a);
                                             reactedAtoms.add(b);
                                         }
@@ -257,9 +256,9 @@ final class Collider {
                 }
             }
             // bonds act like springs
-            final Iterator it = a.getBonds().iterator();
+            final Iterator<Atom> it = a.getBonds().iterator();
             while (it.hasNext()) {
-                final Atom other = (Atom) it.next();
+                final Atom other = it.next();
                 final float sep = (float) new Point2D.Float(a
                         .getPhysicalPoint().getPositionX(), a
                         .getPhysicalPoint().getPositionY())

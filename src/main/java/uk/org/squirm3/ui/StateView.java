@@ -11,7 +11,9 @@ public class StateView extends AView {
     // Actions controlling the simulation
     private final Action stopAction, runAction, resetAction;
 
-    public StateView(final ApplicationEngine applicationEngine, final Action stopAction, final Action runAction, final Action resetAction) {
+    public StateView(final ApplicationEngine applicationEngine,
+            final Action stopAction, final Action runAction,
+            final Action resetAction) {
         super(applicationEngine);
         this.stopAction = stopAction;
         this.runAction = runAction;

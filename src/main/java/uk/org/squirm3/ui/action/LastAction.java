@@ -19,7 +19,8 @@ public class LastAction extends AbstractAction {
     public LastAction(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final ImageIcon lastIcon) {
         this.applicationEngine = applicationEngine;
-        putValue(Action.SHORT_DESCRIPTION, Messages.localize("navigation.last", messageSource));
+        putValue(Action.SHORT_DESCRIPTION,
+                Messages.localize("navigation.last", messageSource));
         putValue(Action.SMALL_ICON, lastIcon);
     }
 

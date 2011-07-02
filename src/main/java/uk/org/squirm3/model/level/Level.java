@@ -12,10 +12,6 @@ public interface Level {
     public String getChallenge();
     public String getHint();
 
-    public Configuration getConfiguration();
-    public Configuration getDefaultConfiguration();
-
-    public List<Atom> generateAtoms();
     public List<Atom> generateAtoms(Configuration configuration);
 
     public String evaluate(Collection<? extends Atom> atoms);

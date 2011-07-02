@@ -18,41 +18,41 @@ import uk.org.squirm3.ui.Messages;
 
 public class AboutAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
-    
+
     private final String siteUrl;
     private final MessageSource messageSource;
-    
-    public AboutAction(final String siteUrl, final MessageSource messageSource, final ImageIcon aboutIcon) {
+
+    public AboutAction(final String siteUrl, final MessageSource messageSource,
+            final ImageIcon aboutIcon) {
         this.siteUrl = siteUrl;
         this.messageSource = messageSource;
-        putValue(Action.SHORT_DESCRIPTION, Messages.localize("about.tooltip", messageSource));
+        putValue(Action.SHORT_DESCRIPTION,
+                Messages.localize("about.tooltip", messageSource));
         putValue(Action.SMALL_ICON, aboutIcon);
     }
-    
 
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(final ActionEvent event) {
         if (Desktop.isDesktopSupported()) {
             final Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
                 try {
                     desktop.browse(new URI(siteUrl));
                     return;
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     // on error show the message
-                } catch (URISyntaxException e) {
+                } catch (final URISyntaxException e) {
                     // on error show the message
                 }
             }
         }
-        final Component component = (Component) ((event.getSource() instanceof Component)
+        final Component component = (Component) (event.getSource() instanceof Component
                 ? event.getSource()
                 : null);
         JOptionPane.showMessageDialog(component,
-                Messages.localize("about.text",messageSource),
-                Messages.localize("about.title",messageSource),
+                Messages.localize("about.text", messageSource),
+                Messages.localize("about.title", messageSource),
                 JOptionPane.QUESTION_MESSAGE);
     }
-    
-}
 
+}

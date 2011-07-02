@@ -19,12 +19,13 @@ public class ResetAction extends AbstractAction {
     public ResetAction(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final ImageIcon resetIcon) {
         this.applicationEngine = applicationEngine;
-        putValue(Action.SHORT_DESCRIPTION, Messages.localize("simulation.reset", messageSource));
+        putValue(Action.SHORT_DESCRIPTION,
+                Messages.localize("simulation.reset", messageSource));
         putValue(Action.SMALL_ICON, resetIcon);
     }
 
     @Override
     public void actionPerformed(final ActionEvent e) {
-        applicationEngine.restartLevel(null);
+        applicationEngine.restartLevel();
     }
 }

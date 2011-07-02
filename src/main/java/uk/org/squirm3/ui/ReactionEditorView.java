@@ -26,7 +26,7 @@ import uk.org.squirm3.model.Reaction;
 public class ReactionEditorView extends AView {
     private final MessageSource messageSource;
     private final ImageIcon addIcon;
-    
+
     private JCheckBox bondedBefore, bondedAfter;
     private JComboBox aType, aState, bType, bState, futureAState, futureBState;
     private JLabel futureAType, futureBType;
@@ -91,7 +91,8 @@ public class ReactionEditorView extends AView {
         jPanel.add(reactionPanel);
         addReaction = new JButton(addIcon);
         addReaction.setMargin(new Insets(0, 0, 0, 0));
-        addReaction.setToolTipText(Messages.localize("reactions.add.tooltip", messageSource));
+        addReaction.setToolTipText(Messages.localize("reactions.add.tooltip",
+                messageSource));
         addReaction.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

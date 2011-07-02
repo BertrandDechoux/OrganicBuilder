@@ -22,7 +22,10 @@ public class LevelNavigatorView extends AView {
 
     private boolean update;
 
-    public LevelNavigatorView(final MessageSource messageSource, final ApplicationEngine applicationEngine, final Action introAction, final Action previousAction, final Action nextAction, final Action lastAction) {
+    public LevelNavigatorView(final MessageSource messageSource,
+            final ApplicationEngine applicationEngine,
+            final Action introAction, final Action previousAction,
+            final Action nextAction, final Action lastAction) {
         super(applicationEngine);
 
         this.introAction = introAction;
@@ -101,12 +104,13 @@ public class LevelNavigatorView extends AView {
             public void actionPerformed(final ActionEvent e) {
                 if (!update) {
                     getApplicationEngine().goToLevel(
-                            levelComboBox.getSelectedIndex(), null);
+                            levelComboBox.getSelectedIndex());
                 }
                 update = false;
             }
         });
-        cb.setToolTipText(Messages.localize("navigation.selected", messageSource));
+        cb.setToolTipText(Messages.localize("navigation.selected",
+                messageSource));
         return cb;
     }
 

@@ -69,7 +69,7 @@ public class AtomsView extends AView {
             new Color(0xef160f), new Color(0x00df06)};
     private static final BufferedImage[] atomsImages = new BufferedImage[atomsColors.length];
     private final Image spikyImage;
-    
+
     private final MessageSource messageSource;
 
     public AtomsView(final ApplicationEngine applicationEngine,
@@ -82,21 +82,11 @@ public class AtomsView extends AView {
         scale = 100;
         collisionsPanel = createCollisionsPanel();
 
-        final IListener sizeListener = new IListener() {
-            @Override
-            public void propertyHasChanged() {
-                final Configuration configuration = getApplicationEngine()
-                        .getLevelManager().getCurrentLevel().getConfiguration();
-                simulationHeight = (int) configuration.getHeight();
-                simulationWidth = (int) configuration.getWidth();
-                imageSizeHasChanged();
-            }
-        };
-        sizeListener.propertyHasChanged();
-        applicationEngine.getEventDispatcher().addListener(sizeListener,
-                EventDispatcher.Event.LEVEL);
-        applicationEngine.getEventDispatcher().addListener(sizeListener,
-                EventDispatcher.Event.CONFIGURATION);
+        final Configuration configuration = getApplicationEngine()
+                .getConfiguration();
+        simulationHeight = (int) configuration.getHeight();
+        simulationWidth = (int) configuration.getWidth();
+        imageSizeHasChanged();
 
         final IListener atomsListener = new IListener() {
             @Override
@@ -192,7 +182,8 @@ public class AtomsView extends AView {
         });
 
         controlsPanel = new JPanel();
-        controlsPanel.add(new JLabel(Messages.localize("scale", messageSource)));
+        controlsPanel
+                .add(new JLabel(Messages.localize("scale", messageSource)));
         auto = new JCheckBox(Messages.localize("scale.auto", messageSource));
         auto.addActionListener(new ActionListener() {
             @Override
@@ -213,7 +204,8 @@ public class AtomsView extends AView {
                 }
             }
         });
-        scaleSlider.setToolTipText(Messages.localize("scale.manual", messageSource));
+        scaleSlider.setToolTipText(Messages.localize("scale.manual",
+                messageSource));
         scaleSlider.setEnabled(false);
         controlsPanel.add(scaleSlider);
 

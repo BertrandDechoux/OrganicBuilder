@@ -9,7 +9,7 @@ import java.util.Map;
 public final class EventDispatcher {
 
     public enum Event {
-        ATOMS, DRAGGING_POINT, LEVEL, CONFIGURATION, REACTIONS, SPEED, SIMULATION_STATE
+        ATOMS, DRAGGING_POINT, LEVEL, REACTIONS, SPEED, SIMULATION_STATE
     }
 
     private final Map<Event, Collection<IListener>> listeners;
