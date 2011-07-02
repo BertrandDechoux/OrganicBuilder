@@ -46,9 +46,6 @@
 	</bean>
 
 	<bean id="levelFactory" class="uk.org.squirm3.model.level.ComposedLevelFactory">
-		<constructor-arg>
-			<bean class="org.springframework.core.io.DefaultResourceLoader" />
-		</constructor-arg>
 		<constructor-arg ref="conversionService" />
 		<constructor-arg ref="messageSource" />
 		<constructor-arg ref="configuration" />

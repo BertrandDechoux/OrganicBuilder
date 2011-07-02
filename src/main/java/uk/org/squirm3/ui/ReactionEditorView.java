@@ -9,6 +9,7 @@ import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -16,20 +17,27 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
-import uk.org.squirm3.Resource;
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Reaction;
 
 public class ReactionEditorView extends AView {
+    private final MessageSource messageSource;
+    private final ImageIcon addIcon;
+    
     private JCheckBox bondedBefore, bondedAfter;
     private JComboBox aType, aState, bType, bState, futureAState, futureBState;
     private JLabel futureAType, futureBType;
     private JButton addReaction;
     private final JPanel editorPanel;
 
-    public ReactionEditorView(final ApplicationEngine applicationEngine) {
+    public ReactionEditorView(final ApplicationEngine applicationEngine,
+            final MessageSource messageSource, final ImageIcon addIcon) {
         super(applicationEngine);
+        this.messageSource = messageSource;
+        this.addIcon = addIcon;
         editorPanel = createEditorPanel();
     }
 
@@ -42,7 +50,7 @@ public class ReactionEditorView extends AView {
         jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.PAGE_AXIS));
         jPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-                GUI.localize("reactions.editor")));
+                Messages.localize("reactions.editor", messageSource)));
         final JPanel reactionPanel = new JPanel();
         reactionPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         final ActionListener l = new ActionListener() {
@@ -81,9 +89,9 @@ public class ReactionEditorView extends AView {
         futureBState.addActionListener(l);
         reactionPanel.add(futureBState);
         jPanel.add(reactionPanel);
-        addReaction = new JButton(Resource.getIcon("add"));
+        addReaction = new JButton(addIcon);
         addReaction.setMargin(new Insets(0, 0, 0, 0));
-        addReaction.setToolTipText(GUI.localize("reactions.add.tooltip"));
+        addReaction.setToolTipText(Messages.localize("reactions.add.tooltip", messageSource));
         addReaction.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

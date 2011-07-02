@@ -6,14 +6,14 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.Resource;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.Files;
+import com.google.common.io.Resources;
 
 public class ResourceToStringConverter implements Converter<Resource, String> {
 
     @Override
     public String convert(final Resource source) {
         try {
-            return Files.toString(source.getFile(), Charsets.UTF_8);
+            return Resources.toString(source.getURL(), Charsets.UTF_8);
         } catch (final IOException e) {
             throw new RuntimeException("Unable to convert resource "
                     + source.getFilename(), e);

@@ -5,11 +5,11 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComboBox;
 
-import uk.org.squirm3.Resource;
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
@@ -17,19 +17,19 @@ import uk.org.squirm3.model.level.Level;
 
 public class LevelNavigatorView extends AView {
 
-    private final Action intro, previous, next, last;
+    private final Action introAction, previousAction, nextAction, lastAction;
     private final JComboBox levelComboBox;
 
     private boolean update;
 
-    public LevelNavigatorView(final ApplicationEngine applicationEngine) {
+    public LevelNavigatorView(final MessageSource messageSource, final ApplicationEngine applicationEngine, final Action introAction, final Action previousAction, final Action nextAction, final Action lastAction) {
         super(applicationEngine);
 
-        intro = createIntroAction();
-        previous = createPreviousAction();
-        levelComboBox = createLevelComboBox();
-        next = createNextAction();
-        last = createLastAction();
+        this.introAction = introAction;
+        this.previousAction = previousAction;
+        this.nextAction = nextAction;
+        this.lastAction = lastAction;
+        levelComboBox = createLevelComboBox(messageSource);
         update = true;
 
         final IListener levelListener = new IListener() {
@@ -43,12 +43,12 @@ public class LevelNavigatorView extends AView {
                                 .getCurrentLevel());
 
                 final boolean firstLevel = levelNumber == 0;
-                intro.setEnabled(!firstLevel);
-                previous.setEnabled(!firstLevel);
+                introAction.setEnabled(!firstLevel);
+                previousAction.setEnabled(!firstLevel);
 
                 final boolean lastLevel = levelNumber == levelList.size() - 1;
-                last.setEnabled(!lastLevel);
-                next.setEnabled(!lastLevel);
+                lastAction.setEnabled(!lastLevel);
+                nextAction.setEnabled(!lastLevel);
 
                 update = true;
                 levelComboBox.setSelectedIndex(levelNumber);
@@ -62,26 +62,26 @@ public class LevelNavigatorView extends AView {
     }
 
     public Action getIntroAction() {
-        return intro;
+        return introAction;
     }
 
     public Action getPreviousAction() {
-        return previous;
+        return previousAction;
     }
 
     public Action getNextAction() {
-        return next;
+        return nextAction;
     }
 
     public Action getLastAction() {
-        return last;
+        return lastAction;
     }
 
     public JComboBox getLevelComboBox() {
         return levelComboBox;
     }
 
-    private JComboBox createLevelComboBox() {
+    private JComboBox createLevelComboBox(final MessageSource messageSource) {
         final List<? extends Level> levelList = getApplicationEngine()
                 .getLevelManager().getLevels();
         final String[] levelsLabels = new String[levelList.size()];
@@ -106,79 +106,8 @@ public class LevelNavigatorView extends AView {
                 update = false;
             }
         });
-        cb.setToolTipText(GUI.localize("navigation.selected"));
+        cb.setToolTipText(Messages.localize("navigation.selected", messageSource));
         return cb;
     }
 
-    private Action createIntroAction() {
-        final Action action = new AbstractAction() {
-            /**
-			 * 
-			 */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                getApplicationEngine().goToFirstLevel();
-            }
-        };
-        action.putValue(Action.SHORT_DESCRIPTION,
-                GUI.localize("navigation.first"));
-        action.putValue(Action.SMALL_ICON, Resource.getIcon("first"));
-        return action;
-    }
-
-    private Action createPreviousAction() {
-        final Action action = new AbstractAction() {
-            /**
-			 * 
-			 */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                getApplicationEngine().goToPreviousLevel();
-            }
-        };
-        action.putValue(Action.SHORT_DESCRIPTION,
-                GUI.localize("navigation.previous"));
-        action.putValue(Action.SMALL_ICON, Resource.getIcon("previous"));
-        return action;
-    }
-
-    private Action createNextAction() {
-        final Action action = new AbstractAction() {
-            /**
-			 * 
-			 */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                getApplicationEngine().goToNextLevel();
-            }
-        };
-        action.putValue(Action.SHORT_DESCRIPTION,
-                GUI.localize("navigation.next"));
-        action.putValue(Action.SMALL_ICON, Resource.getIcon("next"));
-        return action;
-    }
-
-    private Action createLastAction() {
-        final Action action = new AbstractAction() {
-            /**
-			 * 
-			 */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                getApplicationEngine().goToLastLevel();
-            }
-        };
-        action.putValue(Action.SHORT_DESCRIPTION,
-                GUI.localize("navigation.last"));
-        action.putValue(Action.SMALL_ICON, Resource.getIcon("last"));
-        return action;
-    }
 }

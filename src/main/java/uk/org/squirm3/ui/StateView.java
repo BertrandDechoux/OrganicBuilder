@@ -1,11 +1,7 @@
 package uk.org.squirm3.ui;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 
-import uk.org.squirm3.Resource;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
@@ -13,21 +9,21 @@ import uk.org.squirm3.listener.IListener;
 public class StateView extends AView {
 
     // Actions controlling the simulation
-    private final Action stop, run, reset;
+    private final Action stopAction, runAction, resetAction;
 
-    public StateView(final ApplicationEngine applicationEngine) {
+    public StateView(final ApplicationEngine applicationEngine, final Action stopAction, final Action runAction, final Action resetAction) {
         super(applicationEngine);
-        stop = createStopAction();
-        run = createRunAction();
-        reset = createResetAction();
+        this.stopAction = stopAction;
+        this.runAction = runAction;
+        this.resetAction = resetAction;
 
         final IListener stateListener = new IListener() {
             @Override
             public void propertyHasChanged() {
                 final boolean isRunning = getApplicationEngine()
                         .simulationIsRunning();
-                stop.setEnabled(isRunning);
-                run.setEnabled(!isRunning);
+                stopAction.setEnabled(isRunning);
+                runAction.setEnabled(!isRunning);
             }
         };
         stateListener.propertyHasChanged();
@@ -37,72 +33,14 @@ public class StateView extends AView {
     }
 
     public Action getRunAction() {
-        return run;
+        return runAction;
     }
 
     public Action getStopAction() {
-        return stop;
+        return stopAction;
     }
 
     public Action getResetAction() {
-        return reset;
-    }
-
-    private Action createRunAction() {
-        final Action action = new AbstractAction() {
-            /**
-			 * 
-			 */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                getApplicationEngine().runSimulation();
-            }
-        };
-        action.putValue(Action.SHORT_DESCRIPTION,
-                GUI.localize("simulation.run"));
-        // action.putValue(Action.LONG_DESCRIPTION,
-        // "Context-Sensitive Help Text"); TODO and for the others actions too
-        action.putValue(Action.SMALL_ICON, Resource.getIcon("play"));
-        // action.putValue(Action.MNEMONIC_KEY, new
-        // Integer(java.awt.event.KeyEvent.VK_A)); TODO
-        return action;
-    }
-
-    private Action createStopAction() {
-        final Action action = new AbstractAction() {
-            /**
-			 * 
-			 */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                getApplicationEngine().pauseSimulation();
-            }
-        };
-        action.putValue(Action.SHORT_DESCRIPTION,
-                GUI.localize("simulation.stop"));
-        action.putValue(Action.SMALL_ICON, Resource.getIcon("pause"));
-        return action;
-    }
-
-    private Action createResetAction() {
-        final Action action = new AbstractAction() {
-            /**
-			 * 
-			 */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                getApplicationEngine().restartLevel(null);
-            }
-        };
-        action.putValue(Action.SHORT_DESCRIPTION,
-                GUI.localize("simulation.reset"));
-        action.putValue(Action.SMALL_ICON, Resource.getIcon("reset"));
-        return action;
+        return resetAction;
     }
 }

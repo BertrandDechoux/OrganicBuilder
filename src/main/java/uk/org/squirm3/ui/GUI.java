@@ -14,47 +14,34 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import org.springframework.context.MessageSource;
 
-import uk.org.squirm3.Resource;
 import uk.org.squirm3.engine.ApplicationEngine;
 
 public class GUI {
 
     private static MessageSource messageSource;
 
-    public static void createGUI(final ApplicationEngine applicationEngine) {
-
-        Resource.loadPictures();
-
+    public static void createGUI(final ApplicationEngine applicationEngine, final Action aboutAction, final LevelNavigatorView levelNavigatorView, final StateView stateView, final ReactionEditorView reactionEditorView, final AtomsView atomsView, final ImageIcon parameterIcon) {
         // frame
         final JFrame frame = new JFrame(GUI.localize("application.title"));
         frame.setSize(1080, 630);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // view
-        final AtomsView atomsView = new AtomsView(applicationEngine);
         final CurrentLevelView currentLevelView = new CurrentLevelView(
                 applicationEngine);
         final ReactionListView reactionListView = new ReactionListView(
-                applicationEngine);
-        final ReactionEditorView reactionEditorView = new ReactionEditorView(
-                applicationEngine);
-        final StateView stateView = new StateView(applicationEngine);
-        final LevelNavigatorView levelNavigatorView = new LevelNavigatorView(
                 applicationEngine);
         final CustomResetView customResetView = new CustomResetView(
                 applicationEngine);
@@ -99,7 +86,7 @@ public class GUI {
                 .add(createIconButton(
                         createParametersAction(customResetView.getPanel(),
                                 speedView.getPanel(),
-                                atomsView.getControlsPanel()), bg));
+                                atomsView.getControlsPanel(), parameterIcon), bg));
         toolBar.add(simControlsPanel);
         toolBar.add(Box.createHorizontalGlue());
         // navigation controls
@@ -123,7 +110,7 @@ public class GUI {
         final JPanel miscControlsPanel = new JPanel();
         miscControlsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 2));
         miscControlsPanel.setBackground(bg);
-        miscControlsPanel.add(createIconButton(createAboutAction(), bg));
+        miscControlsPanel.add(createIconButton(aboutAction, bg));
         toolBar.add(miscControlsPanel);
 
         // rootComponent
@@ -146,28 +133,13 @@ public class GUI {
         frame.setVisible(true);
     }
 
-    public static String selectLanguage(final String[] languages) {
-        final Icon[] icons = new Icon[languages.length];
-        for (int i = 0; i < icons.length; i++) {
-            icons[i] = Resource.getIcon(languages[i]);
-        }
-        final int choice = JOptionPane.showOptionDialog(null, "",
-                "Organic Builder", JOptionPane.YES_NO_OPTION,
-                JOptionPane.PLAIN_MESSAGE, null, icons, null);
-        if (choice == JOptionPane.CLOSED_OPTION) {
-            return null;
-        } else {
-            return languages[choice];
-        }
-    }
-
     public GUI(final MessageSource messageSource,
-            final ApplicationEngine applicationEngine) {
+            final ApplicationEngine applicationEngine, final Action aboutAction, final LevelNavigatorView levelNavigatorView, final StateView stateView, final ReactionEditorView reactionEditorView, final AtomsView atomsView, final ImageIcon parameterIcon) {
         GUI.messageSource = messageSource;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                createGUI(applicationEngine);
+                createGUI(applicationEngine, aboutAction, levelNavigatorView, stateView, reactionEditorView, atomsView, parameterIcon);
             }
         });
     }
@@ -181,7 +153,7 @@ public class GUI {
     }
 
     private static Action createParametersAction(final JPanel p1,
-            final JPanel p2, final JPanel p3) {
+            final JPanel p2, final JPanel p3, final ImageIcon parameterIcon) {
         final JPanel message = new JPanel();
         message.setLayout(new BoxLayout(message, BoxLayout.PAGE_AXIS));
         message.add(p1);
@@ -202,44 +174,8 @@ public class GUI {
         };
         action.putValue(Action.SHORT_DESCRIPTION,
                 GUI.localize("application.parameters"));
-        action.putValue(Action.SMALL_ICON, Resource.getIcon("parameters"));
+        action.putValue(Action.SMALL_ICON, parameterIcon);
         return action;
-    }
-
-    private static Action createAboutAction() { // TODO mise en page des textes
-        final JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab(GUI.localize("application.about"), null,
-                createTextPane("about.html"), null);
-        tabbedPane.addTab(GUI.localize("application.license"), null,
-                createTextPane("license.html"), null);
-
-        final Action action = new AbstractAction() {
-            /**
-			 * 
-			 */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                JOptionPane.showMessageDialog(null, tabbedPane,
-                        GUI.localize("application.about"),
-                        JOptionPane.QUESTION_MESSAGE);
-            }
-        };
-        action.putValue(Action.SHORT_DESCRIPTION,
-                GUI.localize("application.about"));
-        action.putValue(Action.SMALL_ICON, Resource.getIcon("about"));
-        return action;
-    }
-
-    private static JScrollPane createTextPane(final String fileName) {
-        final JEditorPane textPane = new JEditorPane();
-        textPane.setContentType("text/html");
-        textPane.setText(Resource.getFileContent(fileName));
-        textPane.setEditable(false);
-        final JScrollPane sp = new JScrollPane(textPane);
-        sp.setPreferredSize(new Dimension(600, 400));
-        return sp;
     }
 
     public static String localize(final String key) {

@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -32,7 +33,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import uk.org.squirm3.Resource;
+import org.springframework.context.MessageSource;
+
 import uk.org.squirm3.derivative.RoundGradientPaint;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
@@ -66,10 +68,16 @@ public class AtomsView extends AView {
             new Color(0x5f5f5f), new Color(0x0773db), new Color(0xee10ac),
             new Color(0xef160f), new Color(0x00df06)};
     private static final BufferedImage[] atomsImages = new BufferedImage[atomsColors.length];
+    private final Image spikyImage;
+    
+    private final MessageSource messageSource;
 
-    public AtomsView(final ApplicationEngine applicationEngine) {
+    public AtomsView(final ApplicationEngine applicationEngine,
+            final MessageSource messageSource, final Image spikyImage) {
         super(applicationEngine);
         createAtomsImages();
+        this.messageSource = messageSource;
+        this.spikyImage = spikyImage;
         needRepaint = true;
         scale = 100;
         collisionsPanel = createCollisionsPanel();
@@ -184,8 +192,8 @@ public class AtomsView extends AView {
         });
 
         controlsPanel = new JPanel();
-        controlsPanel.add(new JLabel(GUI.localize("scale")));
-        auto = new JCheckBox(GUI.localize("scale.auto"));
+        controlsPanel.add(new JLabel(Messages.localize("scale", messageSource)));
+        auto = new JCheckBox(Messages.localize("scale.auto", messageSource));
         auto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent arg0) {
@@ -205,7 +213,7 @@ public class AtomsView extends AView {
                 }
             }
         });
-        scaleSlider.setToolTipText(GUI.localize("scale.manual"));
+        scaleSlider.setToolTipText(Messages.localize("scale.manual", messageSource));
         scaleSlider.setEnabled(false);
         controlsPanel.add(scaleSlider);
 
@@ -299,10 +307,10 @@ public class AtomsView extends AView {
                             .getPhysicalPoint().getPositionY() + text_offset_y);
                 } else {
                     // draw a special spiky image and no label
-                    g2.drawImage(Resource.getSpikyImage(), (int) atoms[i]
-                            .getPhysicalPoint().getPositionX() - offset_x,
-                            (int) atoms[i].getPhysicalPoint().getPositionY()
-                                    - offset_y, R * 2, R * 2, collisionsPanel);
+                    g2.drawImage(spikyImage, (int) atoms[i].getPhysicalPoint()
+                            .getPositionX() - offset_x, (int) atoms[i]
+                            .getPhysicalPoint().getPositionY() - offset_y,
+                            R * 2, R * 2, collisionsPanel);
                 }
             }
         }
@@ -311,9 +319,9 @@ public class AtomsView extends AView {
         g2.setPaint(new Color(0, 0, 0, 50));
         if (atoms != null) {
             for (final Atom atom : atoms) {
-                final Iterator it = atom.getBonds().iterator();
+                final Iterator<Atom> it = atom.getBonds().iterator();
                 while (it.hasNext()) {
-                    final Atom other = (Atom) it.next();
+                    final Atom other = it.next();
                     final float x1 = atom.getPhysicalPoint().getPositionX();
                     final float y1 = atom.getPhysicalPoint().getPositionY();
                     final float dx = other.getPhysicalPoint().getPositionX()
