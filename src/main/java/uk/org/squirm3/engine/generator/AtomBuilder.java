@@ -8,21 +8,20 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+
+import org.springframework.core.convert.converter.Converter;
 
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.FixedPoint;
 import uk.org.squirm3.model.IPhysicalPoint;
 import uk.org.squirm3.model.MobilePoint;
-import uk.org.squirm3.model.type.ChemicalType;
-import uk.org.squirm3.model.type.def.BasicType;
-import uk.org.squirm3.model.type.def.RandomBasicType;
-import uk.org.squirm3.model.type.def.RandomBuilderType;
-import uk.org.squirm3.model.type.def.SpecialType;
+import uk.org.squirm3.model.type.AtomType;
+import uk.org.squirm3.model.type.BuilderType;
+import uk.org.squirm3.springframework.converter.BuilderTypeToAtomTypeConverter;
+import uk.org.squirm3.springframework.converter.CharacterToBuilderTypeConverter;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public class AtomBuilder {
     private static final char[] NO_ATOM = "......".toCharArray();
@@ -36,30 +35,15 @@ public class AtomBuilder {
     private static final char HORIZONTAL_BOND = '⇠';
     private static final char VERTICAL_BOND = '⇡';
 
-    private final Map<Character, ChemicalType> typeMapping = Maps.newHashMap();
+    private final Converter<Character, BuilderType> builderTypeConverter;
 
     public AtomBuilder() {
-        for (final ChemicalType chemicalType : BasicType.values()) {
-            typeMapping
-                    .put(chemicalType.getCharacterIdentifier(), chemicalType);
-        }
-        for (final ChemicalType chemicalType : RandomBuilderType.values()) {
-            typeMapping
-                    .put(chemicalType.getCharacterIdentifier(), chemicalType);
-        }
-        for (final ChemicalType chemicalType : RandomBasicType.values()) {
-            typeMapping
-                    .put(chemicalType.getCharacterIdentifier(), chemicalType);
-        }
-        for (final ChemicalType chemicalType : SpecialType.values()) {
-            typeMapping
-                    .put(chemicalType.getCharacterIdentifier(), chemicalType);
-        }
+        builderTypeConverter = new CharacterToBuilderTypeConverter();
     }
 
     public Collection<Atom> build(final String levelDescription,
             final Configuration configuration) throws BuilderException {
-        String randomizerConfiguration = "af";
+        String randomizerConfiguration = "abcdef";
         final BufferedReader descriptionReader = new BufferedReader(
                 new StringReader(levelDescription));
 
@@ -74,7 +58,8 @@ public class AtomBuilder {
             ArrayList<Atom> previousAtomLine = Lists.newArrayList();
             ArrayList<Atom> currentAtomLine = Lists.newArrayList();
 
-            final AtomRandomizer levelRandomizer = new AtomRandomizer();
+            final Converter<BuilderType, AtomType> atomTypeConverter = new BuilderTypeToAtomTypeConverter(
+                    randomizerConfiguration);
             int x = 0;
             int y = 0;
             int maxX = 0;
@@ -93,10 +78,8 @@ public class AtomBuilder {
                         final char atomState = atomDescription[3];
 
                         final Atom atom = new Atom(getPhysicalPoint(x, y,
-                                atomStart, levelRandomizer), getAtomType(
-                                atomType, levelRandomizer,
-                                randomizerConfiguration),
-                                getAtomState(atomState));
+                                atomStart), getAtomType(atomType,
+                                atomTypeConverter), getAtomState(atomState));
 
                         currentAtomLine.add(atom);
 
@@ -139,7 +122,8 @@ public class AtomBuilder {
 
     }
 
-    private void checkConfiguration(Configuration configuration, int x, int y) throws BuilderException {
+    private void checkConfiguration(Configuration configuration, int x, int y)
+            throws BuilderException {
         final double horizontalSpace = Atom.getAtomSize() * (x * 2 + 1);
         if (horizontalSpace > configuration.getWidth()) {
             throw new BuilderException(
@@ -151,8 +135,7 @@ public class AtomBuilder {
         if (verticalSpace > configuration.getHeight()) {
             throw new BuilderException(
                     "Map vertical space is greater than the configuration's height : "
-                            + verticalSpace + " > "
-                            + configuration.getHeight());
+                            + verticalSpace + " > " + configuration.getHeight());
         }
     }
     private boolean isHorizontalBondActivated(final char[] atomDescription)
@@ -214,14 +197,16 @@ public class AtomBuilder {
         }
     }
     private IPhysicalPoint getPhysicalPoint(final int x, final int y,
-            final char atomStart, final AtomRandomizer levelRandomizer) {
+            final char atomStart) {
         final float xCoordinate = 2 * x * Atom.getAtomSize();
         final float yCoordinate = 2 * y * Atom.getAtomSize();
 
         if (atomStart == MOBILE_ATOM_START) {
             final IPhysicalPoint mobilePoint = new MobilePoint(xCoordinate,
                     yCoordinate, 0, 0, 0, 0);
-            levelRandomizer.setRandomSpeed(mobilePoint);
+            final float ms = Atom.getAtomSize() / 3;
+            mobilePoint.setSpeedX((float) (Math.random() * ms - ms / 2.0));
+            mobilePoint.setSpeedY((float) (Math.random() * ms - ms / 2.0));
             return mobilePoint;
         } else if (atomStart == FIXED_ATOM_START) {
             return new FixedPoint(xCoordinate, yCoordinate);
@@ -230,18 +215,15 @@ public class AtomBuilder {
     }
 
     private int getAtomType(final char atomType,
-            final AtomRandomizer levelRandomizer,
-            final String randomizerConfiguration) throws BuilderException {
-        final ChemicalType type = typeMapping.get(atomType);
+            final Converter<BuilderType, AtomType> atomTypeConverter)
+            throws BuilderException {
+        final BuilderType builderType = builderTypeConverter.convert(atomType);
+        if (builderType == null) {
+            throw new BuilderException("Incorrect BuilderType : " + atomType);
+        }
+        final AtomType type = atomTypeConverter.convert(builderType);
         if (type == null) {
-            throw new BuilderException("Incorrect type : " + atomType);
-        }
-        if (type instanceof RandomBuilderType) {
-            return levelRandomizer.getIntegerIdentifier(
-                    (RandomBuilderType) type, randomizerConfiguration);
-        }
-        if (type instanceof RandomBasicType) {
-            return levelRandomizer.getIntegerIdentifier((RandomBasicType) type);
+            throw new BuilderException("No AtomType for : " + builderType);
         }
         return type.getIntegerIndentifier();
     }

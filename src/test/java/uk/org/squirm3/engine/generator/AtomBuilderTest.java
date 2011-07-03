@@ -64,7 +64,6 @@ public class AtomBuilderTest {
         final Collection<Atom> atoms = levelBuilder.build("(_A1_)",
                 configuration);
         assertThat(atoms).hasSize(1);
-        assertThat(atoms.iterator().next().getType()).isEqualTo(0);
         assertThat(atoms.iterator().next().getState()).isEqualTo(1);
     }
 

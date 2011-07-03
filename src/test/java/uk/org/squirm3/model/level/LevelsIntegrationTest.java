@@ -28,7 +28,7 @@ public class LevelsIntegrationTest {
     @Parameters
     public static Collection<Object[]> parameters() {
         final ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
-                "nogui-context.xml");
+                "engine-context.xml");
         final Configuration configuration = applicationContext
                 .getBean(Configuration.class);
 
