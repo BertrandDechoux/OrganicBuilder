@@ -1,12 +1,12 @@
 package uk.org.squirm3.engine;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
 import uk.org.squirm3.model.Atom;
@@ -19,8 +19,9 @@ final class Collider {
     private final List<? extends Atom> atoms;
 
     // structures for space-division speed-up:
-    private final List buckets[][]; // each bucket has a list of the indices of
-                                    // the sq3Atoms contained within it
+    private final List<List<List<Integer>>> buckets; // each bucket has a list of
+                                                  // the indices of
+    // the sq3Atoms contained within it
     private final int n_buckets_x, n_buckets_y; // the horizontal and vertical
                                                 // dimensions are divided into
                                                 // this many buckets
@@ -43,14 +44,16 @@ final class Collider {
         n_buckets_x = Math.round(w / (1.0f * R));
         n_buckets_y = Math.round(h / (1.0f * R));
         // (else div0 error)
-        buckets = new LinkedList[n_buckets_x][n_buckets_y]; // (garbage
-                                                            // collection takes
-                                                            // care of old
-                                                            // array)
+        buckets = new ArrayList<List<List<Integer>>>(); // (garbage
+                                                     // collection takes
+                                                     // care of old
+                                                     // array)
         // allocate each
         for (int x = 0; x < n_buckets_x; x++) {
+            List<List<Integer>> list = new ArrayList<List<Integer>>();
+            buckets.add(list);
             for (int y = 0; y < n_buckets_y; y++) {
-                buckets[x][y] = new LinkedList();
+                list.add(new LinkedList<Integer>());
             }
         }
         width = w;
@@ -63,7 +66,7 @@ final class Collider {
             int bucket_x, bucket_y;
             bucket_x = whichBucketX(a.getPhysicalPoint().getPositionX());
             bucket_y = whichBucketY(a.getPhysicalPoint().getPositionY());
-            buckets[bucket_x][bucket_y].add(new Integer(i));
+            buckets.get(bucket_x).get(bucket_y).add(new Integer(i));
         }
     }
 
@@ -173,9 +176,9 @@ final class Collider {
                 for (int y = Math.max(0, wy - ry); y <= Math.min(
                         n_buckets_y - 1, wy + ry); y++) {
                     // add each atom that is in this bucket
-                    final Iterator it = buckets[x][y].listIterator();
+                    final Iterator<Integer> it = buckets.get(x).get(y).listIterator();
                     while (it.hasNext()) {
-                        final int iOther = ((Integer) it.next()).intValue();
+                        final int iOther =  it.next().intValue();
                         if (iOther <= i) {
                             continue; // using Newton's "action&reaction" as a
                         }
@@ -339,14 +342,14 @@ final class Collider {
             if (new_bucket_x != current_bucket_x
                     || new_bucket_y != current_bucket_y) {
                 // remove the atom index from the list
-                final java.util.List list = buckets[current_bucket_x][current_bucket_y];
-                final ListIterator it = list.listIterator(0);
+                final List<Integer> list = buckets.get(current_bucket_x).get(current_bucket_y);
+                final Iterator<Integer> it = list.listIterator(0);
                 while (it.hasNext()) {
                     if (((Integer) it.next()).intValue() == i) {
                         it.remove();
                     }
                 }
-                buckets[new_bucket_x][new_bucket_y].add(new Integer(i));
+                buckets.get(new_bucket_x).get(new_bucket_y).add(new Integer(i));
             }
         }
 
