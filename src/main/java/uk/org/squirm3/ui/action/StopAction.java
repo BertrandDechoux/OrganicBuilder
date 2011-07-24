@@ -9,7 +9,9 @@ import javax.swing.ImageIcon;
 import org.springframework.context.MessageSource;
 
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.ui.Messages;
+import uk.org.squirm3.listener.EventDispatcher;
+import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.springframework.Messages;
 
 public class StopAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
@@ -22,6 +24,18 @@ public class StopAction extends AbstractAction {
         putValue(Action.SHORT_DESCRIPTION,
                 Messages.localize("simulation.stop", messageSource));
         putValue(Action.SMALL_ICON, previousIcon);
+
+        final IListener simulationStateListener = new IListener() {
+            @Override
+            public void propertyHasChanged() {
+                StopAction.this.setEnabled(applicationEngine
+                        .simulationIsRunning());
+            }
+        };
+        
+        simulationStateListener.propertyHasChanged();
+        applicationEngine.getEventDispatcher().addListener(simulationStateListener,
+                EventDispatcher.Event.SIMULATION_STATE);
     }
 
     @Override

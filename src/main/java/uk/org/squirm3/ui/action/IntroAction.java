@@ -9,7 +9,7 @@ import javax.swing.ImageIcon;
 import org.springframework.context.MessageSource;
 
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.ui.Messages;
+import uk.org.squirm3.springframework.Messages;
 
 public class IntroAction extends AbstractAction {
     private static final long serialVersionUID = 1L;

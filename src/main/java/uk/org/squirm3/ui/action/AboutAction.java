@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
 
 import org.springframework.context.MessageSource;
 
-import uk.org.squirm3.ui.Messages;
+import uk.org.squirm3.springframework.Messages;
 
 public class AboutAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
