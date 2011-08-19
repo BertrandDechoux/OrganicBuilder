@@ -2,7 +2,9 @@ package uk.org.squirm3.model.level;
 
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.FixedPoint;
@@ -19,6 +21,9 @@ public class AtomSelectorTest {
             new Atom(FixedPoint.ORIGIN, 1, 1),//
             new Atom(FixedPoint.ORIGIN, 1, 1));
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void shouldReturnNullWhenUnniqueNotFound() {
         assertThat(AtomSelector.findUnique("f0", atoms)).isNull();
@@ -29,8 +34,11 @@ public class AtomSelectorTest {
         assertThat(AtomSelector.findUnique("a0", atoms)).isNotNull();
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void shouldFailWhenNotUnique() {
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("There are 2 atoms matching b1");
+
         AtomSelector.findUnique("b1", atoms);
     }
 

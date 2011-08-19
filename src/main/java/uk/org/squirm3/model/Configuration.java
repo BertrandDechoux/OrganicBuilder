@@ -5,6 +5,7 @@ import com.google.common.base.Objects;
 public final class Configuration {
     private final float width, height;
     private final int[] types;
+    public static final int MAX_NUMBER_OF_STATUS = 50;
     public static final int[] TYPES = {0, 1, 2, 3, 4, 5};
 
     public Configuration(final float width, final float height) {

@@ -25,19 +25,6 @@ public class ReactionTest {
     }
 
     /**
-     * Test of the 'parse' method. *
-     */
-    @Test
-    public void testParse() {
-        Reaction r = new Reaction(1, 2, false, 3, 4, 5, true, 6);
-        Reaction parsedReaction = Reaction.parse(r.toString());
-        assertTrue(r.toString().equals(parsedReaction.toString()));
-        r = new Reaction(6, 20345, true, 7, 4234, 5, false, 6);
-        parsedReaction = Reaction.parse("x20345y4234-> \tx5   +  y6");
-        assertTrue(r.toString().equals(parsedReaction.toString()));
-    }
-
-    /**
      * Test of the reaction process. *
      */
     @Test

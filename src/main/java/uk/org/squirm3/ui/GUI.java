@@ -1,14 +1,10 @@
 package uk.org.squirm3.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Frame;
-import java.awt.Insets;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,20 +14,21 @@ import javax.swing.SwingUtilities;
 import org.springframework.context.MessageSource;
 
 import uk.org.squirm3.springframework.Messages;
-import uk.org.squirm3.ui.view.AtomsView;
+import uk.org.squirm3.ui.collider.AtomsPanel;
+import uk.org.squirm3.ui.level.CurrentLevelPanel;
+import uk.org.squirm3.ui.reaction.ReactionEditorPanel;
+import uk.org.squirm3.ui.reaction.ReactionListPanel;
+import uk.org.squirm3.ui.toolbar.ToolBarPanel;
 
 public class GUI {
-    public static final Color BACKGROUND = new Color(255, 255, 225);
 
     public GUI(final MessageSource messageSource,
             final CurrentLevelPanel currentLevelPanel,
             final ReactionListPanel reactionListPanel,
-            final LevelsControlPanel levelsControlPanel,
             final ReactionEditorPanel reactionEditorPanel,
-            final AtomsView atomsView, final ToolBarPanel toolBarPanel) {
+            final AtomsPanel collisionsPanel, final ToolBarPanel toolBarPanel) {
 
         // main panels
-        final JComponent collisionsPanel = atomsView.getCollisionsPanel();
         final JSplitPane reactionsPane = new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT, true, reactionEditorPanel,
                 reactionListPanel);
@@ -83,14 +80,6 @@ public class GUI {
         frame.setContentPane(contentPane);
         SwingUtilities.updateComponentTreeUI(frame);
         frame.setVisible(true);
-    }
-
-    public static JButton createIconButton(final Action action) {
-        final JButton button = new JButton(action);
-        button.setMargin(new Insets(-3, -3, -3, -3));
-        button.setBorderPainted(false);
-        button.setBackground(BACKGROUND);
-        return button;
     }
 
 }

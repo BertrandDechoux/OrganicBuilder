@@ -30,6 +30,14 @@ public final class LevelManager {
     public int getNumberOfLevel() {
         return levels.size();
     }
+    
+    public boolean isCurrentLevelFirstLevel() {
+        return levelIndex == 0;
+    }
+    
+    public boolean isCurrentLevelLastLevel() {
+        return levelIndex == levels.size() - 1;
+    }
 
     protected void setLevel(int index) {
         // TODO exception if index out of bounds

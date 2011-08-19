@@ -10,38 +10,19 @@
 		<constructor-arg ref="messageSource" />
 		<constructor-arg ref="currentLevelPanel" />
 		<constructor-arg ref="reactionListPanel" />
-		<constructor-arg ref="levelsControlPanel" />
 		<constructor-arg ref="reactionEditorPanel" />
-		<constructor-arg ref="atomsView" />
+		<constructor-arg ref="atomsPanel" />
 		<constructor-arg ref="toolBarPanel" />
 	</bean>
 
-	<bean id="simulationControlPanel" class="uk.org.squirm3.ui.SimulationControlPanel">
-		<constructor-arg ref="stopAction" />
-		<constructor-arg ref="runAction" />
-		<constructor-arg ref="resetAction" />
-		<constructor-arg ref="atomsView" />
-		<constructor-arg>
-			<bean factory-bean="graphicsFactory" factory-method="createIcon">
-				<constructor-arg value="/graphics/parameters.png" />
-			</bean>
-		</constructor-arg>
-		<constructor-arg ref="speedPanel" />
-		<constructor-arg ref="messageSource" />
-	</bean>
-
-	<bean id="toolBarPanel" class="uk.org.squirm3.ui.ToolBarPanel"
-		autowire="constructor" />
-	<bean id="levelsControlPanel" class="uk.org.squirm3.ui.LevelsControlPanel"
-		autowire="constructor" />
-	<bean id="aboutPanel" class="uk.org.squirm3.ui.AboutPanel"
+	<bean id="toolBarPanel" class="uk.org.squirm3.ui.toolbar.ToolBarPanel"
 		autowire="constructor" />
 	<bean id="graphicsFactory" class="uk.org.squirm3.GraphicsFactory" />
 	<bean id="abstractAction" abstract="true">
 		<constructor-arg ref="applicationEngine" />
 		<constructor-arg ref="messageSource" />
 	</bean>
-	<bean id="aboutAction" class="uk.org.squirm3.ui.action.AboutAction">
+	<bean id="aboutAction" class="uk.org.squirm3.ui.toolbar.actions.AboutAction">
 		<constructor-arg value="${about.url}" />
 		<constructor-arg ref="messageSource" />
 		<constructor-arg>
@@ -50,7 +31,7 @@
 			</bean>
 		</constructor-arg>
 	</bean>
-	<bean id="resetAction" class="uk.org.squirm3.ui.action.ResetAction"
+	<bean id="resetSimulationAction" class="uk.org.squirm3.ui.toolbar.actions.ResetSimulationAction"
 		parent="abstractAction">
 		<constructor-arg>
 			<bean factory-bean="graphicsFactory" factory-method="createIcon">
@@ -58,7 +39,7 @@
 			</bean>
 		</constructor-arg>
 	</bean>
-	<bean id="runAction" class="uk.org.squirm3.ui.action.RunAction"
+	<bean id="runSimulationAction" class="uk.org.squirm3.ui.toolbar.actions.RunSimulationAction"
 		parent="abstractAction">
 		<constructor-arg>
 			<bean factory-bean="graphicsFactory" factory-method="createIcon">
@@ -66,7 +47,7 @@
 			</bean>
 		</constructor-arg>
 	</bean>
-	<bean id="stopAction" class="uk.org.squirm3.ui.action.StopAction"
+	<bean id="stopSimulationAction" class="uk.org.squirm3.ui.toolbar.actions.StopSimulationAction"
 		parent="abstractAction">
 		<constructor-arg>
 			<bean factory-bean="graphicsFactory" factory-method="createIcon">
@@ -76,19 +57,18 @@
 	</bean>
 
 
-	<bean id="atomsView" class="uk.org.squirm3.ui.view.AtomsView">
+	<bean id="atomsPanel" class="uk.org.squirm3.ui.collider.AtomsPanel">
 		<constructor-arg ref="applicationEngine" />
-		<constructor-arg ref="messageSource" />
 		<constructor-arg>
 			<bean factory-bean="graphicsFactory" factory-method="createImage">
 				<constructor-arg value="/graphics/spiky.png" />
 			</bean>
 		</constructor-arg>
 	</bean>
-	<bean id="currentLevelPanel" class="uk.org.squirm3.ui.CurrentLevelPanel"
+	<bean id="currentLevelPanel" class="uk.org.squirm3.ui.level.CurrentLevelPanel"
 		autowire="constructor" />
 
-	<bean id="introAction" class="uk.org.squirm3.ui.action.IntroAction"
+	<bean id="firstLevelAction" class="uk.org.squirm3.ui.toolbar.actions.FirstLevelAction"
 		parent="abstractAction">
 		<constructor-arg>
 			<bean factory-bean="graphicsFactory" factory-method="createIcon">
@@ -97,7 +77,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="previousAction" class="uk.org.squirm3.ui.action.PreviousAction"
+	<bean id="previousLevelAction" class="uk.org.squirm3.ui.toolbar.actions.PreviousLevelAction"
 		parent="abstractAction">
 		<constructor-arg>
 			<bean factory-bean="graphicsFactory" factory-method="createIcon">
@@ -106,7 +86,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="nextAction" class="uk.org.squirm3.ui.action.NextAction"
+	<bean id="nextLevelAction" class="uk.org.squirm3.ui.toolbar.actions.NextLevelAction"
 		parent="abstractAction">
 		<constructor-arg>
 			<bean factory-bean="graphicsFactory" factory-method="createIcon">
@@ -115,7 +95,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="lastAction" class="uk.org.squirm3.ui.action.LastAction"
+	<bean id="lastLevelAction" class="uk.org.squirm3.ui.toolbar.actions.LastLevelAction"
 		parent="abstractAction">
 		<constructor-arg>
 			<bean factory-bean="graphicsFactory" factory-method="createIcon">
@@ -124,7 +104,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="reactionEditorPanel" class="uk.org.squirm3.ui.ReactionEditorPanel">
+	<bean id="reactionEditorPanel" class="uk.org.squirm3.ui.reaction.ReactionEditorPanel">
 		<constructor-arg ref="applicationEngine" />
 		<constructor-arg ref="messageSource" />
 		<constructor-arg>
@@ -133,9 +113,24 @@
 			</bean>
 		</constructor-arg>
 	</bean>
-	<bean id="reactionListPanel" class="uk.org.squirm3.ui.ReactionListPanel"
+	<bean id="reactionListPanel" class="uk.org.squirm3.ui.reaction.ReactionListPanel"
 		autowire="constructor" />
-	<bean id="speedPanel" class="uk.org.squirm3.ui.SpeedPanel"
+	<bean id="speedPanel" class="uk.org.squirm3.ui.toolbar.SpeedPanel"
 		autowire="constructor" />
+
+	<bean id="parametersAction" class="uk.org.squirm3.ui.toolbar.actions.ParametersAction"
+		parent="abstractAction">
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/parameters.png" />
+			</bean>
+		</constructor-arg>
+		<constructor-arg ref="speedPanel" />
+	</bean>
+
+	<bean id="levelPicker" class="uk.org.squirm3.ui.toolbar.LevelPicker"
+		autowire="constructor" />
+
+
 
 </beans>

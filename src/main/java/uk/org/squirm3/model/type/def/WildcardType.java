@@ -3,7 +3,7 @@ package uk.org.squirm3.model.type.def;
 import uk.org.squirm3.model.type.ReactionType;
 
 public enum WildcardType implements ReactionType {
-    X('x', 30), Y('y', 31), Z('z', 32);
+    X('x', 6), Y('y', 7); // , Z('z', 8);
 
     private char character;
     private int integer;

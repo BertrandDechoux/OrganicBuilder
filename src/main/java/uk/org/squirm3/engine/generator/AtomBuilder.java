@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 
 import uk.org.squirm3.model.Atom;
@@ -19,7 +20,6 @@ import uk.org.squirm3.model.MobilePoint;
 import uk.org.squirm3.model.type.AtomType;
 import uk.org.squirm3.model.type.BuilderType;
 import uk.org.squirm3.springframework.converter.BuilderTypeToAtomTypeConverter;
-import uk.org.squirm3.springframework.converter.CharacterToBuilderTypeConverter;
 
 import com.google.common.collect.Lists;
 
@@ -35,10 +35,10 @@ public class AtomBuilder {
     private static final char HORIZONTAL_BOND = '⇠';
     private static final char VERTICAL_BOND = '⇡';
 
-    private final Converter<Character, BuilderType> builderTypeConverter;
+    private final ConversionService conversionService;
 
-    public AtomBuilder() {
-        builderTypeConverter = new CharacterToBuilderTypeConverter();
+    public AtomBuilder(final ConversionService conversionService) {
+        this.conversionService = conversionService;
     }
 
     public Collection<Atom> build(final String levelDescription,
@@ -217,7 +217,7 @@ public class AtomBuilder {
     private int getAtomType(final char atomType,
             final Converter<BuilderType, AtomType> atomTypeConverter)
             throws BuilderException {
-        final BuilderType builderType = builderTypeConverter.convert(atomType);
+        final BuilderType builderType = conversionService.convert(atomType, BuilderType.class);
         if (builderType == null) {
             throw new BuilderException("Incorrect BuilderType : " + atomType);
         }
