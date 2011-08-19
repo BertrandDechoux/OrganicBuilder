@@ -1,4 +1,4 @@
-package uk.org.squirm3.ui;
+package uk.org.squirm3.ui.reaction;
 
 import java.awt.FlowLayout;
 import java.awt.Insets;
@@ -20,10 +20,15 @@ import javax.swing.border.EtchedBorder;
 import org.springframework.context.MessageSource;
 
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.model.Atom;
+import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.Reaction;
+import uk.org.squirm3.model.type.ReactionType;
+import uk.org.squirm3.model.type.Types;
+import uk.org.squirm3.springframework.Messages;
 
-public class ReactionEditorView extends AView {
+public class ReactionEditorPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
+
     private final MessageSource messageSource;
     private final ImageIcon addIcon;
 
@@ -31,24 +36,18 @@ public class ReactionEditorView extends AView {
     private JComboBox aType, aState, bType, bState, futureAState, futureBState;
     private JLabel futureAType, futureBType;
     private JButton addReaction;
-    private final JPanel editorPanel;
 
-    public ReactionEditorView(final ApplicationEngine applicationEngine,
+    public ReactionEditorPanel(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final ImageIcon addIcon) {
-        super(applicationEngine);
         this.messageSource = messageSource;
         this.addIcon = addIcon;
-        editorPanel = createEditorPanel();
+        createEditorPanel(applicationEngine);
+        setMaximumSize(getMinimumSize());
     }
 
-    public JPanel getEditorPanel() {
-        return editorPanel;
-    }
-
-    private JPanel createEditorPanel() {
-        final JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.PAGE_AXIS));
-        jPanel.setBorder(BorderFactory.createTitledBorder(
+    private void createEditorPanel(final ApplicationEngine applicationEngine) {
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
                 Messages.localize("reactions.editor", messageSource)));
         final JPanel reactionPanel = new JPanel();
@@ -88,7 +87,7 @@ public class ReactionEditorView extends AView {
         futureBState = createStateComboBox();
         futureBState.addActionListener(l);
         reactionPanel.add(futureBState);
-        jPanel.add(reactionPanel);
+        add(reactionPanel);
         addReaction = new JButton(addIcon);
         addReaction.setMargin(new Insets(0, 0, 0, 0));
         addReaction.setToolTipText(Messages.localize("reactions.add.tooltip",
@@ -98,12 +97,11 @@ public class ReactionEditorView extends AView {
             public void actionPerformed(final ActionEvent e) {
                 final Collection<Reaction> c = new ArrayList<Reaction>(1);
                 c.add(createReactionFromEditor());
-                getApplicationEngine().addReactions(c);
+                applicationEngine.addReactions(c);
             }
         });
-        jPanel.add(addReaction);
+        add(addReaction);
         l.actionPerformed(null); // init button's text
-        return jPanel;
     }
 
     private Reaction createReactionFromEditor() {
@@ -116,15 +114,15 @@ public class ReactionEditorView extends AView {
 
     private JComboBox createTypeComboBox() {
         final JComboBox jComboBox = new JComboBox();
-        for (int i = 0; i < 8; i++) {
-            jComboBox.addItem(String.valueOf(Atom.type_code.charAt(i)));
+        for (ReactionType reactionType : Types.getReactionTypes()) {
+            jComboBox.addItem(reactionType.getCharacterIdentifier());
         }
         return jComboBox;
     }
 
     private JComboBox createStateComboBox() {
         final JComboBox jComboBox = new JComboBox();
-        for (int i = 0; i < 50; i++) { // TODO no hardcoded value!
+        for (int i = 0; i < Configuration.MAX_NUMBER_OF_STATUS; i++) {
             jComboBox.addItem(String.valueOf(i));
         }
         return jComboBox;

@@ -31,9 +31,19 @@
 			<list>
 				<bean
 					class="uk.org.squirm3.springframework.converter.ResourceToStringConverter" />
+				<bean
+					class="uk.org.squirm3.springframework.converter.CharacterToBuilderTypeConverter" />
+				<ref bean="characterToReactionTypeConverter" />
+				<bean
+					class="uk.org.squirm3.springframework.converter.StringToReactionConverter">
+					<constructor-arg ref="characterToReactionTypeConverter" />
+				</bean>
 			</list>
 		</property>
 	</bean>
+
+	<bean id="characterToReactionTypeConverter"
+		class="uk.org.squirm3.springframework.converter.CharacterToReactionTypeConverter" />
 
 	<bean id="configuration" class="uk.org.squirm3.model.Configuration">
 		<constructor-arg name="width" value="650" />
@@ -53,7 +63,9 @@
 		<constructor-arg ref="conversionService" />
 		<constructor-arg ref="messageSource" />
 		<constructor-arg>
-			<bean class="uk.org.squirm3.engine.generator.AtomBuilder" />
+			<bean class="uk.org.squirm3.engine.generator.AtomBuilder">
+				<constructor-arg ref="conversionService" />
+			</bean>
 		</constructor-arg>
 	</bean>
 

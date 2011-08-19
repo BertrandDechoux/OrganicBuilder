@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="gui" class="uk.org.squirm3.ui.GUI">
+		<constructor-arg ref="messageSource" />
+		<constructor-arg ref="currentLevelPanel" />
+		<constructor-arg ref="reactionListPanel" />
+		<constructor-arg ref="reactionEditorPanel" />
+		<constructor-arg ref="atomsPanel" />
+		<constructor-arg ref="toolBarPanel" />
+	</bean>
+
+	<bean id="toolBarPanel" class="uk.org.squirm3.ui.toolbar.ToolBarPanel"
+		autowire="constructor" />
+	<bean id="graphicsFactory" class="uk.org.squirm3.GraphicsFactory" />
+	<bean id="abstractAction" abstract="true">
+		<constructor-arg ref="applicationEngine" />
+		<constructor-arg ref="messageSource" />
+	</bean>
+	<bean id="aboutAction" class="uk.org.squirm3.ui.toolbar.actions.AboutAction">
+		<constructor-arg value="${about.url}" />
+		<constructor-arg ref="messageSource" />
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/about.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	<bean id="resetSimulationAction" class="uk.org.squirm3.ui.toolbar.actions.ResetSimulationAction"
+		parent="abstractAction">
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/reset.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	<bean id="runSimulationAction" class="uk.org.squirm3.ui.toolbar.actions.RunSimulationAction"
+		parent="abstractAction">
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/play.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	<bean id="stopSimulationAction" class="uk.org.squirm3.ui.toolbar.actions.StopSimulationAction"
+		parent="abstractAction">
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/pause.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="atomsPanel" class="uk.org.squirm3.ui.collider.AtomsPanel">
+		<constructor-arg ref="applicationEngine" />
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createImage">
+				<constructor-arg value="/graphics/spiky.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	<bean id="currentLevelPanel" class="uk.org.squirm3.ui.level.CurrentLevelPanel"
+		autowire="constructor" />
+
+	<bean id="firstLevelAction" class="uk.org.squirm3.ui.toolbar.actions.FirstLevelAction"
+		parent="abstractAction">
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/first.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+
+	<bean id="previousLevelAction" class="uk.org.squirm3.ui.toolbar.actions.PreviousLevelAction"
+		parent="abstractAction">
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/previous.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+
+	<bean id="nextLevelAction" class="uk.org.squirm3.ui.toolbar.actions.NextLevelAction"
+		parent="abstractAction">
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/next.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+
+	<bean id="lastLevelAction" class="uk.org.squirm3.ui.toolbar.actions.LastLevelAction"
+		parent="abstractAction">
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/last.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+
+	<bean id="reactionEditorPanel" class="uk.org.squirm3.ui.reaction.ReactionEditorPanel">
+		<constructor-arg ref="applicationEngine" />
+		<constructor-arg ref="messageSource" />
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/add.png" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	<bean id="reactionListPanel" class="uk.org.squirm3.ui.reaction.ReactionListPanel"
+		autowire="constructor" />
+	<bean id="speedPanel" class="uk.org.squirm3.ui.toolbar.SpeedPanel"
+		autowire="constructor" />
+
+	<bean id="parametersAction" class="uk.org.squirm3.ui.toolbar.actions.ParametersAction"
+		parent="abstractAction">
+		<constructor-arg>
+			<bean factory-bean="graphicsFactory" factory-method="createIcon">
+				<constructor-arg value="/graphics/parameters.png" />
+			</bean>
+		</constructor-arg>
+		<constructor-arg ref="speedPanel" />
+	</bean>
+
+	<bean id="levelPicker" class="uk.org.squirm3.ui.toolbar.LevelPicker"
+		autowire="constructor" />
+
+
+
+</beans>

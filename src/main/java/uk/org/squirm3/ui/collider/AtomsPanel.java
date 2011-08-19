@@ -1,39 +1,22 @@
-package uk.org.squirm3.ui;
+package uk.org.squirm3.ui.collider;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.springframework.context.MessageSource;
 
 import uk.org.squirm3.derivative.RoundGradientPaint;
 import uk.org.squirm3.engine.ApplicationEngine;
@@ -43,25 +26,20 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
 
-public class AtomsView extends AView {
-    private DraggingPoint draggingPoint;
-    private Atom[] latestAtomsCopy;
+public class AtomsPanel extends JScrollPane {
+    private static final long serialVersionUID = 1L;
+
+    DraggingPoint draggingPoint;
+    Atom[] latestAtomsCopy;
 
     private int simulationWidth;
     private int simulationHeight;
 
-    private BufferedImage bimg;
+    BufferedImage bimg;
     private boolean needRepaint = true;
-    private byte scale;
-
-    private JCheckBox auto;
-    private JSlider scaleSlider;
+    byte scale;
 
     private JPanel imagePanel;
-    private JPanel controlsPanel;
-
-    private final JComponent collisionsPanel;
-    private JScrollPane scrollPane;
 
     // yellow, grey, blue, purple, red, green
     private static final Color atomsColors[] = {new Color(0xbdcf00),
@@ -70,19 +48,38 @@ public class AtomsView extends AView {
     private static final BufferedImage[] atomsImages = new BufferedImage[atomsColors.length];
     private final Image spikyImage;
 
-    private final MessageSource messageSource;
+    final ApplicationEngine applicationEngine;
 
-    public AtomsView(final ApplicationEngine applicationEngine,
-            final MessageSource messageSource, final Image spikyImage) {
-        super(applicationEngine);
+    public AtomsPanel(final ApplicationEngine applicationEngine,
+            final Image spikyImage) {
+        imagePanel = new ImagePanel(this);
+        setViewportView(imagePanel);
+
+        this.applicationEngine = applicationEngine;
         createAtomsImages();
-        this.messageSource = messageSource;
         this.spikyImage = spikyImage;
         needRepaint = true;
         scale = 100;
-        collisionsPanel = createCollisionsPanel();
+        addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(final ComponentEvent arg0) {
+                imageSizeHasChanged();
+            }
 
-        final Configuration configuration = getApplicationEngine()
+            @Override
+            public void componentHidden(final ComponentEvent arg0) {
+            }
+
+            @Override
+            public void componentMoved(final ComponentEvent arg0) {
+            }
+
+            @Override
+            public void componentShown(final ComponentEvent arg0) {
+            }
+        });
+
+        final Configuration configuration = applicationEngine
                 .getConfiguration();
         simulationHeight = (int) configuration.getHeight();
         simulationWidth = (int) configuration.getWidth();
@@ -91,7 +88,7 @@ public class AtomsView extends AView {
         final IListener atomsListener = new IListener() {
             @Override
             public void propertyHasChanged() {
-                final Collection<? extends Atom> c = getApplicationEngine()
+                final Collection<? extends Atom> c = applicationEngine
                         .getAtoms();
                 final Iterator<? extends Atom> it = c.iterator();
                 latestAtomsCopy = new Atom[c.size()];
@@ -110,8 +107,7 @@ public class AtomsView extends AView {
         final IListener draggingPointListener = new IListener() {
             @Override
             public void propertyHasChanged() {
-                draggingPoint = getApplicationEngine()
-                        .getCurrentDraggingPoint();
+                draggingPoint = applicationEngine.getCurrentDraggingPoint();
                 imageHasChanged();
             }
         };
@@ -155,86 +151,19 @@ public class AtomsView extends AView {
         }
     }
 
-    public JComponent getCollisionsPanel() {
-        return collisionsPanel;
-    }
-
-    private JComponent createCollisionsPanel() {
-        imagePanel = new ImagePanel();
-        scrollPane = new JScrollPane(imagePanel);
-        scrollPane.addComponentListener(new ComponentListener() {
-            @Override
-            public void componentResized(final ComponentEvent arg0) {
-                imageSizeHasChanged();
-            }
-
-            @Override
-            public void componentHidden(final ComponentEvent arg0) {
-            }
-
-            @Override
-            public void componentMoved(final ComponentEvent arg0) {
-            }
-
-            @Override
-            public void componentShown(final ComponentEvent arg0) {
-            }
-        });
-
-        controlsPanel = new JPanel();
-        controlsPanel
-                .add(new JLabel(Messages.localize("scale", messageSource)));
-        auto = new JCheckBox(Messages.localize("scale.auto", messageSource));
-        auto.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                scaleSlider.setEnabled(!auto.isSelected());
-                imageSizeHasChanged();
-            }
-        });
-        auto.setSelected(true);
-        controlsPanel.add(auto);
-        scaleSlider = new JSlider(30, 100, scale);
-        scaleSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(final ChangeEvent e) {
-                if (!scaleSlider.getValueIsAdjusting()) {
-                    scale = (byte) scaleSlider.getValue();
-                    imageSizeHasChanged();
-                }
-            }
-        });
-        scaleSlider.setToolTipText(Messages.localize("scale.manual",
-                messageSource));
-        scaleSlider.setEnabled(false);
-        controlsPanel.add(scaleSlider);
-
-        return scrollPane;
-    }
-
-    public JPanel getControlsPanel() {
-        return controlsPanel;
-    }
-
     private void imageSizeHasChanged() {
-        if (auto != null) {
-            if (auto.isSelected()) {
-                if (imagePanel != null) {
-                    final Dimension d = scrollPane.getSize();
-                    final int pseudoScale = (int) (Math.min(
-                            (d.height * 0.99 / simulationHeight),
-                            (d.width * 0.99 / simulationWidth)) * 100);
-                    scale = pseudoScale >= 100 ? 100 : (byte) pseudoScale;
-                }
-            } else {
-                scale = (byte) scaleSlider.getValue();
-            }
+        if (imagePanel != null) {
+            final Dimension d = getSize();
+            final int pseudoScale = (int) (Math.min(
+                    (d.height * 0.99 / simulationHeight),
+                    (d.width * 0.99 / simulationWidth)) * 100);
+            scale = pseudoScale >= 100 ? 100 : (byte) pseudoScale;
         }
         final float zoom = (float) scale / 100;
         imagePanel
                 .setPreferredSize(new Dimension((int) (simulationWidth * zoom),
                         (int) (simulationHeight * zoom)));
-        SwingUtilities.updateComponentTreeUI(scrollPane);
+        SwingUtilities.updateComponentTreeUI(this);
         imageHasChanged();
     }
 
@@ -246,7 +175,7 @@ public class AtomsView extends AView {
         imagePanel.repaint();
     }
 
-    private void updateImage() {
+    void updateImage() {
         if (!needRepaint) {
             return;
         }
@@ -261,7 +190,7 @@ public class AtomsView extends AView {
 
         // do we have a correct bimg ?
         if (bimg == null || bimg.getWidth() != w || bimg.getHeight() != h) {
-            bimg = (BufferedImage) collisionsPanel.createImage(w, h);
+            bimg = (BufferedImage) createImage(w, h);
         }
         if (bimg == null) {
             return;// collisionsPanel is not displayable
@@ -291,7 +220,7 @@ public class AtomsView extends AView {
                             (int) atoms[i].getPhysicalPoint().getPositionX()
                                     - offset_x, (int) atoms[i]
                                     .getPhysicalPoint().getPositionY()
-                                    - offset_y, R * 2, R * 2, collisionsPanel);
+                                    - offset_y, R * 2, R * 2, this);
                     final String label = atoms[i].toString();
                     final int width = g2.getFontMetrics().stringWidth(label);
                     g2.drawString(label, (int) atoms[i].getPhysicalPoint()
@@ -302,7 +231,7 @@ public class AtomsView extends AView {
                     g2.drawImage(spikyImage, (int) atoms[i].getPhysicalPoint()
                             .getPositionX() - offset_x, (int) atoms[i]
                             .getPhysicalPoint().getPositionY() - offset_y,
-                            R * 2, R * 2, collisionsPanel);
+                            R * 2, R * 2, this);
                 }
             }
         }
@@ -344,8 +273,8 @@ public class AtomsView extends AView {
         }
 
         // draw the dragging point used
-        if (getApplicationEngine().getLastUsedDraggingPoint() != null) {
-            final DraggingPoint lastUsedDraggingPoint = getApplicationEngine()
+        if (applicationEngine.getLastUsedDraggingPoint() != null) {
+            final DraggingPoint lastUsedDraggingPoint = applicationEngine
                     .getLastUsedDraggingPoint();
             g2.setStroke(new BasicStroke(1));
             g2.setPaint(new Color(200, 0, 0, 100));
@@ -364,120 +293,6 @@ public class AtomsView extends AView {
         g2.setPaint(new Color(100, 100, 200));
         g2.drawRoundRect(2, 1, simulationWidth - 4, simulationHeight - 4, 9, 9);
         g2.dispose();
-    }
-
-    class ImagePanel extends JPanel implements Scrollable {
-
-        /**
-		 * 
-		 */
-        private static final long serialVersionUID = 1L;
-
-        public ImagePanel() {
-            addMouseListener(new MouseListener() {
-                @Override
-                public void mouseClicked(final MouseEvent event) {
-                }
-
-                @Override
-                public void mouseEntered(final MouseEvent event) {
-                }
-
-                @Override
-                public void mouseExited(final MouseEvent event) {
-                }
-
-                @Override
-                public void mousePressed(final MouseEvent event) {
-                    // who did we click on?
-                    final Point p = event.getPoint();
-                    final int R = (int) Atom.getAtomSize();
-                    final float zoom = (float) scale / 100;
-                    final Point2D.Float p1 = new Point2D.Float();
-                    final Point2D.Float p2 = new Point2D.Float(p.x / zoom, p.y
-                            / zoom);
-                    for (int i = 0; i < latestAtomsCopy.length; i++) {
-                        p1.x = latestAtomsCopy[i].getPhysicalPoint()
-                                .getPositionX();
-                        p1.y = latestAtomsCopy[i].getPhysicalPoint()
-                                .getPositionY();
-                        if (p2.distanceSq(p1) < R * R) {
-                            getApplicationEngine().setDraggingPoint(
-                                    new DraggingPoint((long) p2.x, (long) p2.y,
-                                            i));
-                            break;
-                        }
-                    }
-                }
-
-                @Override
-                public void mouseReleased(final MouseEvent event) {
-                    getApplicationEngine().setDraggingPoint(null);
-                }
-            });
-            addMouseMotionListener(new MouseMotionListener() {
-                @Override
-                public void mouseDragged(final MouseEvent event) {
-                    if (draggingPoint != null) {
-                        final float zoom = (float) scale / 100;
-                        getApplicationEngine().setDraggingPoint(
-                                new DraggingPoint(
-                                        (long) (event.getPoint().x / zoom),
-                                        (long) (event.getPoint().y / zoom),
-                                        draggingPoint.getWhichBeingDragging()));
-                    }
-                }
-
-                @Override
-                public void mouseMoved(final MouseEvent event) {
-                    if (draggingPoint != null) {
-                        final float zoom = (float) scale / 100;
-                        getApplicationEngine().setDraggingPoint(
-                                new DraggingPoint(
-                                        (long) (event.getPoint().x / zoom),
-                                        (long) (event.getPoint().y / zoom),
-                                        draggingPoint.getWhichBeingDragging()));
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void paint(final Graphics g) {
-            super.paint(g);
-            updateImage();
-            final float zoom = (float) scale / 100;
-            g.drawImage(bimg, 0, 0, (int) (bimg.getWidth() * zoom),
-                    (int) (bimg.getHeight() * zoom), this);
-        }
-
-        @Override
-        public Dimension getPreferredScrollableViewportSize() {
-            return getPreferredSize();
-        }
-
-        @Override
-        public int getScrollableBlockIncrement(final Rectangle arg0,
-                final int arg1, final int arg2) {
-            return 1; // TODO
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportHeight() {
-            return false;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportWidth() {
-            return false;
-        }
-
-        @Override
-        public int getScrollableUnitIncrement(final Rectangle arg0,
-                final int arg1, final int arg2) {
-            return 1; // TODO
-        }
-
     }
 
 }

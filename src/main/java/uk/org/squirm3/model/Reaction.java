@@ -1,14 +1,6 @@
 package uk.org.squirm3.model;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public final class Reaction {
-    private static final String types = "abcdefxy";
-    private static final Pattern pattern = Pattern.compile("([" + types
-            + "])(\\d{1,})" + "(\\s*\\+\\s*|\\s*)" + "([" + types
-            + "])(\\d{1,})" + "\\s*[=\\-]>\\s*" + "\\1(\\d{1,})"
-            + "(\\s*\\+\\s*|\\s*)" + "\\4(\\d{1,})$");
     private final int a_type, b_type, a_state, b_state; // for type:
                                                         // 0=a..5=f,6=x,7=y
     private final boolean bonded_before, bonded_after;
@@ -45,25 +37,6 @@ public final class Reaction {
                     + String.valueOf(future_b_state);
         }
         return s;
-    }
-
-    public static Reaction parse(final String description) {
-        final Matcher m = pattern.matcher(description);
-        final boolean b = m.matches();
-        if (!b) {
-            return null;
-        }
-        final int a_type = types.indexOf(m.group(1).charAt(0));
-        final int a_state = Integer.parseInt(m.group(2));
-        final boolean bonded_before = !m.group(3).contains("+");
-        final int b_type = types.indexOf(m.group(4).charAt(0));
-        final int b_state = Integer.parseInt(m.group(5));
-        final int future_a_state = Integer.parseInt(m.group(6));
-        final boolean bonded_after = !m.group(7).contains("+");
-        final int future_b_state = Integer.parseInt(m.group(8));
-        final Reaction r = new Reaction(a_type, a_state, bonded_before, b_type,
-                b_state, future_a_state, bonded_after, future_b_state);
-        return r;
     }
 
     public boolean tryOn(final Atom a, final Atom b) { // TODO remove test of

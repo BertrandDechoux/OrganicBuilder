@@ -1,4 +1,4 @@
-package uk.org.squirm3.ui.action;
+package uk.org.squirm3.ui.toolbar.actions;
 
 import java.awt.Component;
 import java.awt.Desktop;
@@ -7,28 +7,20 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import org.springframework.context.MessageSource;
 
-import uk.org.squirm3.ui.Messages;
-
-public class AboutAction extends AbstractAction {
+public class AboutAction extends SquirmAction {
     private static final long serialVersionUID = 1L;
 
     private final String siteUrl;
-    private final MessageSource messageSource;
 
     public AboutAction(final String siteUrl, final MessageSource messageSource,
             final ImageIcon aboutIcon) {
+        super(messageSource, null, "about.tooltip", aboutIcon);
         this.siteUrl = siteUrl;
-        this.messageSource = messageSource;
-        putValue(Action.SHORT_DESCRIPTION,
-                Messages.localize("about.tooltip", messageSource));
-        putValue(Action.SMALL_ICON, aboutIcon);
     }
 
     @Override
@@ -49,10 +41,8 @@ public class AboutAction extends AbstractAction {
         final Component component = (Component) (event.getSource() instanceof Component
                 ? event.getSource()
                 : null);
-        JOptionPane.showMessageDialog(component,
-                Messages.localize("about.text", messageSource),
-                Messages.localize("about.title", messageSource),
-                JOptionPane.QUESTION_MESSAGE);
+        JOptionPane.showMessageDialog(component, localize("about.text"),
+                localize("about.title"), JOptionPane.QUESTION_MESSAGE);
     }
 
 }

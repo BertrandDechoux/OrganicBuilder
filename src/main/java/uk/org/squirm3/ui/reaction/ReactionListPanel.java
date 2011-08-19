@@ -1,4 +1,4 @@
-package uk.org.squirm3.ui;
+package uk.org.squirm3.ui.reaction;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -8,8 +8,8 @@ import java.awt.event.MouseEvent;
 import java.beans.EventHandler;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -22,12 +22,21 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionListener;
 
+import org.springframework.context.MessageSource;
+import org.springframework.core.convert.ConversionService;
+
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.listener.EventDispatcher;
 import uk.org.squirm3.listener.IListener;
 import uk.org.squirm3.model.Reaction;
+import uk.org.squirm3.springframework.Messages;
 
-public class ReactionListView extends AView {
+// TODO remove EventHandler use : compile time error are useful
+public class ReactionListPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
+
+    private final ApplicationEngine applicationEngine;
+
     // list mode
     private JButton editButton, deleteButton, clearButton;
     private JList reactionsList;
@@ -39,11 +48,18 @@ public class ReactionListView extends AView {
     private JPanel buttonParentPanel;
     private JScrollPane scrollPanel;
     private TitledBorder border;
-    private final JPanel listPanel;
 
-    public ReactionListView(final ApplicationEngine applicationEngine) {
-        super(applicationEngine);
-        listPanel = createListPanel();
+    private final MessageSource messageSource;
+    private final ConversionService conversionService;
+
+    public ReactionListPanel(final ApplicationEngine applicationEngine,
+            final MessageSource messageSource,
+            final ConversionService conversionService) {
+        this.applicationEngine = applicationEngine;
+        this.messageSource = messageSource;
+        this.conversionService = conversionService;
+
+        createListPanel();
         textArea = new JTextArea();
 
         final IListener reactionListener = new IListener() {
@@ -53,56 +69,55 @@ public class ReactionListView extends AView {
             }
         };
         reactionListener.propertyHasChanged();
-        getApplicationEngine().getEventDispatcher().addListener(
-                reactionListener, EventDispatcher.Event.REACTIONS);
+        applicationEngine.getEventDispatcher().addListener(reactionListener,
+                EventDispatcher.Event.REACTIONS);
 
         updateDeleteButton();
     }
 
-    public JPanel getListPanel() {
-        return listPanel;
-    }
-
-    private JPanel createListPanel() {
-        final JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BorderLayout());
+    private void createListPanel() {
+        setLayout(new BorderLayout());
         border = BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-                GUI.localize("reactions.current"));
-        jPanel.setBorder(border);
+                Messages.localize("reactions.current", messageSource));
+        setBorder(border);
         listButtonsPanel = new JPanel();
         listButtonsPanel.setLayout(new GridLayout(4, 1));
 
-        editButton = new JButton(GUI.localize("reactions.edit"));
+        editButton = new JButton(Messages.localize("reactions.edit",
+                messageSource));
         editButton.addActionListener(EventHandler.create(ActionListener.class,
-                ReactionListView.this, "editReactions"));
+                ReactionListPanel.this, "editReactions"));
         listButtonsPanel.add(editButton);
 
-        updateButton = new JButton(GUI.localize("reactions.update"));
-        updateButton
-                .addActionListener(EventHandler.create(ActionListener.class,
-                        ReactionListView.this, "updateReactions"));
+        updateButton = new JButton(Messages.localize("reactions.update",
+                messageSource));
+        updateButton.addActionListener(EventHandler
+                .create(ActionListener.class, ReactionListPanel.this,
+                        "updateReactions"));
 
-        deleteButton = new JButton(GUI.localize("reactions.delete"));
+        deleteButton = new JButton(Messages.localize("reactions.delete",
+                messageSource));
         deleteButton.addActionListener(EventHandler.create(
-                ActionListener.class, ReactionListView.this,
+                ActionListener.class, ReactionListPanel.this,
                 "deleteSelectedReactions"));
         listButtonsPanel.add(deleteButton);
 
-        clearButton = new JButton(GUI.localize("reactions.clear"));
+        clearButton = new JButton(Messages.localize("reactions.clear",
+                messageSource));
         clearButton.addActionListener(EventHandler.create(ActionListener.class,
-                getApplicationEngine(), "clearReactions"));
+                applicationEngine, "clearReactions"));
         listButtonsPanel.add(clearButton);
 
         buttonParentPanel = new JPanel();
         buttonParentPanel.setLayout(new BorderLayout());
         buttonParentPanel.add(listButtonsPanel, BorderLayout.NORTH);
-        jPanel.add(buttonParentPanel, BorderLayout.EAST);
+        add(buttonParentPanel, BorderLayout.EAST);
 
         reactionsList = new JList();
         reactionsList.getSelectionModel().addListSelectionListener(
                 EventHandler.create(ListSelectionListener.class,
-                        ReactionListView.this, "updateDeleteButton"));
+                        ReactionListPanel.this, "updateDeleteButton"));
         reactionsList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
@@ -112,16 +127,14 @@ public class ReactionListView extends AView {
             }
         });
         scrollPanel = new JScrollPane(reactionsList);
-        jPanel.add(scrollPanel, BorderLayout.CENTER);
-        return jPanel;
+        add(scrollPanel, BorderLayout.CENTER);
     }
 
     public void editReactions() {
         buttonParentPanel.remove(listButtonsPanel);
         buttonParentPanel.add(updateButton, BorderLayout.NORTH);
         buttonParentPanel.updateUI();
-        final Object[] reactions = getApplicationEngine().getReactions()
-                .toArray();
+        final Object[] reactions = applicationEngine.getReactions().toArray();
         String content = "";
         for (final Object reaction : reactions) {
             content += reaction.toString() + "\n";
@@ -132,7 +145,7 @@ public class ReactionListView extends AView {
 
     public void updateReactions() {
         String result = null;
-        final Vector<Reaction> v = new Vector<Reaction>();
+        final List<Reaction> v = new ArrayList<Reaction>();
         // System.out.println("Input: "+text); // DEBUG
         // for each line in the text
         final StringTokenizer lines = new StringTokenizer(textArea.getText(),
@@ -150,7 +163,7 @@ public class ReactionListView extends AView {
                 continue; // this line contains a comment, skip it
             }
             // System.out.println("Parsing line: "+line+" (length "+String.valueOf(line.length())+")");
-            final Reaction r = Reaction.parse(line);
+            final Reaction r = conversionService.convert(line, Reaction.class);
             // System.out.println(r.getString()+"\n"); // DEBUG
             if (r != null) {
                 v.add(r);
@@ -160,11 +173,12 @@ public class ReactionListView extends AView {
         }
 
         if (result != null) {
-            JOptionPane.showMessageDialog(listPanel, result,
-                    GUI.localize("reactions.parsing.error"),
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane
+                    .showMessageDialog(this, result, Messages.localize(
+                            "reactions.parsing.error", messageSource),
+                            JOptionPane.ERROR_MESSAGE);
         } else {
-            getApplicationEngine().setReactions(v);
+            applicationEngine.setReactions(v);
             reactionsHaveChanged();
             buttonParentPanel.remove(updateButton);
             buttonParentPanel.add(listButtonsPanel, BorderLayout.NORTH);
@@ -178,7 +192,7 @@ public class ReactionListView extends AView {
         for (final Object reaction : reactions) {
             c.add((Reaction) reaction);
         }
-        getApplicationEngine().removeReactions(c);
+        applicationEngine.removeReactions(c);
     }
 
     public void updateDeleteButton() {
@@ -186,12 +200,11 @@ public class ReactionListView extends AView {
     }
 
     public void reactionsHaveChanged() {
-        final Object[] reactions = getApplicationEngine().getReactions()
-                .toArray();
-        border.setTitle(GUI.localize("reactions.current") + " ("
-                + reactions.length + ")");
+        final Object[] reactions = applicationEngine.getReactions().toArray();
+        border.setTitle(Messages.localize("reactions.current", messageSource)
+                + " (" + reactions.length + ")");
         clearButton.setEnabled(reactions.length != 0);
         reactionsList.setListData(reactions);
-        listPanel.repaint();
+        this.repaint();
     }
 }

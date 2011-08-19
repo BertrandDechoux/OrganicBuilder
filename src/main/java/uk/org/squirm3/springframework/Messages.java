@@ -1,4 +1,4 @@
-package uk.org.squirm3.ui;
+package uk.org.squirm3.springframework;
 
 import java.util.Locale;
 
