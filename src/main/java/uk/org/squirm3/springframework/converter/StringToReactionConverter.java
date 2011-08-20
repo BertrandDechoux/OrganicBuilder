@@ -4,10 +4,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.util.StringUtils;
 
 import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.model.type.ReactionType;
-import uk.org.squirm3.springframework.util.StringUtils;
 
 public class StringToReactionConverter implements Converter<String, Reaction> {
     // the basic parts of a reaction pattern
@@ -49,7 +49,7 @@ public class StringToReactionConverter implements Converter<String, Reaction> {
 
     private Matcher match(String source) {
         final Matcher m = pattern
-                .matcher(StringUtils.removeWhitespaces(source));
+                .matcher(StringUtils.trimAllWhitespace(source));
         m.matches();
         return m;
     }

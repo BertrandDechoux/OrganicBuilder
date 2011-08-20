@@ -4,6 +4,8 @@ import uk.org.squirm3.model.type.AtomType;
 import uk.org.squirm3.model.type.ReactionType;
 import uk.org.squirm3.model.type.def.WildcardType;
 
+import static com.google.common.base.Preconditions.*;
+
 public final class Reaction {
     private final ReactionType aType, bType;
     private final int aState, bState;
@@ -15,10 +17,10 @@ public final class Reaction {
             final boolean bondedBefore, final ReactionType bType,
             final int bState, final int futureAState,
             final boolean bondedAfter, final int futureBState) {
-        this.aType = aType;
+        this.aType = checkNotNull(aType);
         this.aState = aState;
         this.bondedBefore = bondedBefore;
-        this.bType = bType;
+        this.bType = checkNotNull(bType);
         this.bState = bState;
         this.futureAState = futureAState;
         this.bondedAfter = bondedAfter;

@@ -10,7 +10,7 @@
 		<constructor-arg ref="messageSource" />
 		<constructor-arg ref="currentLevelPanel" />
 		<constructor-arg ref="reactionListPanel" />
-		<constructor-arg ref="reactionEditorPanel" />
+		<constructor-arg ref="reactionConstructorPanel" />
 		<constructor-arg ref="atomsPanel" />
 		<constructor-arg ref="toolBarPanel" />
 	</bean>
@@ -104,7 +104,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="reactionEditorPanel" class="uk.org.squirm3.ui.reaction.ReactionEditorPanel">
+	<bean id="reactionConstructorPanel" class="uk.org.squirm3.ui.reaction.ReactionConstructorPanel">
 		<constructor-arg ref="applicationEngine" />
 		<constructor-arg ref="messageSource" />
 		<constructor-arg>
