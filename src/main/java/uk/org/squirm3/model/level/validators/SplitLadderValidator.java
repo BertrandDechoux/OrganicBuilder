@@ -5,6 +5,7 @@ import java.util.Collection;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.def.BasicType;
 
 import com.google.common.collect.Lists;
 
@@ -16,7 +17,7 @@ public class SplitLadderValidator implements AtomValidator {
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
         for (final Atom atom : atoms) {
-            if (atom.getType() != 1 && atom.getType() != 2) {
+            if (atom.getType() != BasicType.B && atom.getType() != BasicType.C) {
                 continue;
             }
             if (atom.getBonds().size() == 2) {

@@ -1,23 +1,28 @@
 package uk.org.squirm3.model.level.validators;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomSelector;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.AtomType;
+import uk.org.squirm3.model.type.def.BasicType;
 
 public class MakeLadderValidator implements AtomValidator {
 
     private Atom chainStart;
-    private final int[] chainTypesCount = {0, 0, 0, 0, 0, 0};
+    private final Map<AtomType, Integer> atomTypeCount = new HashMap<AtomType, Integer>();
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
         final Collection<? extends Atom> potentialStarts = AtomSelector
-                .findAll("e1", atoms);
+                .findAll(BasicType.E, 1, atoms);
         for (final Atom atom : potentialStarts) {
             if (atom.getBonds().size() == 1) {
                 chainStart = atom;
@@ -28,7 +33,12 @@ public class MakeLadderValidator implements AtomValidator {
         Atom atom = chainStart;
         for (int i = 0; i < 6; i++) {
             atom = chainStart.getBonds().getFirst();
-            chainTypesCount[atom.getType()]++;
+            if (atomTypeCount.containsKey(atom.getType())) {
+                atomTypeCount.put(atom.getType(),
+                        atomTypeCount.get(atom.getType()) + 1);
+            } else {
+                atomTypeCount.put(atom.getType(), 1);
+            }
         }
 
     }
@@ -44,20 +54,27 @@ public class MakeLadderValidator implements AtomValidator {
             return messages.getError(2);
         }
         // are the types matching?
-        final int[] new_type_count = {0, 0, 0, 0, 0, 0};
+        final Map<AtomType, Integer> newAtomTypeCount = new HashMap<AtomType, Integer>();
         Iterator<Atom> it = joined.iterator();
         while (it.hasNext()) {
-            new_type_count[it.next().getType()]++;
+            Atom atom = it.next();
+            if (atomTypeCount.containsKey(atom.getType())) {
+                atomTypeCount.put(atom.getType(),
+                        atomTypeCount.get(atom.getType()) + 1);
+            } else {
+                atomTypeCount.put(atom.getType(), 1);
+            }
         }
-        for (int i = 0; i < 6; i++) {
-            if (new_type_count[i] != chainTypesCount[i] * 2) {
+        for (Entry<AtomType,Integer> entry : atomTypeCount.entrySet()) {
+            if(!newAtomTypeCount.containsKey(entry.getKey()) ||  newAtomTypeCount.get(entry.getKey()) != entry.getValue() * 2) {
                 return messages.getError(3);
             }
+            
         }
         it = joined.iterator();
         while (it.hasNext()) {
             final Atom a = it.next();
-            if (a.getType() == 4 || a.getType() == 5) {
+            if (a.getType() == BasicType.E || a.getType() == BasicType.F) {
                 // 'e' and 'f'
                 if (a.getBonds().size() != 2) {
                     return messages.getError(4);

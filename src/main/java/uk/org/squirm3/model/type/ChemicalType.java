@@ -4,5 +4,4 @@ public interface ChemicalType {
 
     char getCharacterIdentifier();
 
-    int getIntegerIndentifier();
 }

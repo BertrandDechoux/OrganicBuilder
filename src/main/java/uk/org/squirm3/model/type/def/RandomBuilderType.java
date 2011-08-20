@@ -7,11 +7,7 @@ public enum RandomBuilderType implements BuilderType {
 
     @Override
     public char getCharacterIdentifier() {
-        return 'R';
+        return name().charAt(0);
     }
 
-    @Override
-    public int getIntegerIndentifier() {
-        return 20 + ordinal();
-    }
 }

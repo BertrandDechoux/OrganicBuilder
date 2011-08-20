@@ -8,6 +8,8 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomSelector;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.AtomType;
+import uk.org.squirm3.model.type.def.BasicType;
 
 public class InsertAtomValidator implements AtomValidator {
 
@@ -15,7 +17,7 @@ public class InsertAtomValidator implements AtomValidator {
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
-        chainStart = AtomSelector.findUnique("a4", atoms);
+        chainStart = AtomSelector.findUnique(BasicType.A, 4, atoms);
     }
 
     @Override
@@ -27,7 +29,9 @@ public class InsertAtomValidator implements AtomValidator {
             return messages.getError(1);
         }
         final int n_bonds[] = {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1};
-        final int types[] = {4, 4, 4, 4, 4, 1, 4, 4, 4, 4, 4};
+        final AtomType types[] = {BasicType.E, BasicType.E, BasicType.E,
+                BasicType.E, BasicType.E, BasicType.B, BasicType.E,
+                BasicType.E, BasicType.E, BasicType.E, BasicType.E};
         int i = 0;
         final Iterator<Atom> it = joined.iterator();
         while (it.hasNext()) {

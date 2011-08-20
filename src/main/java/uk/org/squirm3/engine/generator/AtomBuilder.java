@@ -13,10 +13,8 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 
 import uk.org.squirm3.model.Atom;
+import uk.org.squirm3.model.Atoms;
 import uk.org.squirm3.model.Configuration;
-import uk.org.squirm3.model.FixedPoint;
-import uk.org.squirm3.model.IPhysicalPoint;
-import uk.org.squirm3.model.MobilePoint;
 import uk.org.squirm3.model.type.AtomType;
 import uk.org.squirm3.model.type.BuilderType;
 import uk.org.squirm3.springframework.converter.BuilderTypeToAtomTypeConverter;
@@ -77,9 +75,13 @@ public class AtomBuilder {
                         final char atomType = atomDescription[2];
                         final char atomState = atomDescription[3];
 
-                        final Atom atom = new Atom(getPhysicalPoint(x, y,
-                                atomStart), getAtomType(atomType,
-                                atomTypeConverter), getAtomState(atomState));
+                        final float xCoordinate = 2 * x * Atom.getAtomSize();
+                        final float yCoordinate = 2 * y * Atom.getAtomSize();
+
+                        final Atom atom = Atoms.createAtom(
+                                getAtomType(atomType, atomTypeConverter),
+                                getAtomState(atomState), xCoordinate,
+                                yCoordinate, atomStart == FIXED_ATOM_START);
 
                         currentAtomLine.add(atom);
 
@@ -121,7 +123,6 @@ public class AtomBuilder {
         }
 
     }
-
     private void checkConfiguration(Configuration configuration, int x, int y)
             throws BuilderException {
         final double horizontalSpace = Atom.getAtomSize() * (x * 2 + 1);
@@ -196,28 +197,12 @@ public class AtomBuilder {
                     e);
         }
     }
-    private IPhysicalPoint getPhysicalPoint(final int x, final int y,
-            final char atomStart) {
-        final float xCoordinate = 2 * x * Atom.getAtomSize();
-        final float yCoordinate = 2 * y * Atom.getAtomSize();
 
-        if (atomStart == MOBILE_ATOM_START) {
-            final IPhysicalPoint mobilePoint = new MobilePoint(xCoordinate,
-                    yCoordinate, 0, 0, 0, 0);
-            final float ms = Atom.getAtomSize() / 3;
-            mobilePoint.setSpeedX((float) (Math.random() * ms - ms / 2.0));
-            mobilePoint.setSpeedY((float) (Math.random() * ms - ms / 2.0));
-            return mobilePoint;
-        } else if (atomStart == FIXED_ATOM_START) {
-            return new FixedPoint(xCoordinate, yCoordinate);
-        }
-        return null;
-    }
-
-    private int getAtomType(final char atomType,
+    private AtomType getAtomType(final char atomType,
             final Converter<BuilderType, AtomType> atomTypeConverter)
             throws BuilderException {
-        final BuilderType builderType = conversionService.convert(atomType, BuilderType.class);
+        final BuilderType builderType = conversionService.convert(atomType,
+                BuilderType.class);
         if (builderType == null) {
             throw new BuilderException("Incorrect BuilderType : " + atomType);
         }
@@ -225,7 +210,7 @@ public class AtomBuilder {
         if (type == null) {
             throw new BuilderException("No AtomType for : " + builderType);
         }
-        return type.getIntegerIndentifier();
+        return type;
     }
 
     private int getAtomState(final char atomState) throws BuilderException {

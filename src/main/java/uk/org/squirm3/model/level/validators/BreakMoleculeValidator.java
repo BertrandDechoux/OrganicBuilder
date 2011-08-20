@@ -6,6 +6,7 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomSelector;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.def.BasicType;
 
 import com.google.common.collect.Lists;
 
@@ -16,8 +17,8 @@ public class BreakMoleculeValidator implements AtomValidator {
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
-        setupMemory(AtomSelector.findAll("a1", atoms));
-        setupMemory(AtomSelector.findAll("d1", atoms));
+        setupMemory(AtomSelector.findAll(BasicType.A, 1, atoms));
+        setupMemory(AtomSelector.findAll(BasicType.D, 1, atoms));
     }
 
     private void setupMemory(final Collection<? extends Atom> atoms) {

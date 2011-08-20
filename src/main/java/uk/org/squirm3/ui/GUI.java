@@ -16,7 +16,7 @@ import org.springframework.context.MessageSource;
 import uk.org.squirm3.springframework.Messages;
 import uk.org.squirm3.ui.collider.AtomsPanel;
 import uk.org.squirm3.ui.level.CurrentLevelPanel;
-import uk.org.squirm3.ui.reaction.ReactionEditorPanel;
+import uk.org.squirm3.ui.reaction.ReactionConstructorPanel;
 import uk.org.squirm3.ui.reaction.ReactionListPanel;
 import uk.org.squirm3.ui.toolbar.ToolBarPanel;
 
@@ -25,12 +25,12 @@ public class GUI {
     public GUI(final MessageSource messageSource,
             final CurrentLevelPanel currentLevelPanel,
             final ReactionListPanel reactionListPanel,
-            final ReactionEditorPanel reactionEditorPanel,
+            final ReactionConstructorPanel reactionConstructorPanel,
             final AtomsPanel collisionsPanel, final ToolBarPanel toolBarPanel) {
 
         // main panels
         final JSplitPane reactionsPane = new JSplitPane(
-                JSplitPane.VERTICAL_SPLIT, true, reactionEditorPanel,
+                JSplitPane.VERTICAL_SPLIT, true, reactionConstructorPanel,
                 reactionListPanel);
         reactionsPane.addPropertyChangeListener(new PropertyChangeListener() {
             @Override

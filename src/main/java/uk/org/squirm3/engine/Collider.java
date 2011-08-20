@@ -12,6 +12,7 @@ import java.util.Set;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.DraggingPoint;
 import uk.org.squirm3.model.Reaction;
+import uk.org.squirm3.model.type.def.BasicType;
 
 final class Collider {
 
@@ -19,8 +20,9 @@ final class Collider {
     private final List<? extends Atom> atoms;
 
     // structures for space-division speed-up:
-    private final List<List<List<Integer>>> buckets; // each bucket has a list of
-                                                  // the indices of
+    private final List<List<List<Integer>>> buckets; // each bucket has a list
+                                                     // of
+                                                     // the indices of
     // the sq3Atoms contained within it
     private final int n_buckets_x, n_buckets_y; // the horizontal and vertical
                                                 // dimensions are divided into
@@ -45,9 +47,9 @@ final class Collider {
         n_buckets_y = Math.round(h / (1.0f * R));
         // (else div0 error)
         buckets = new ArrayList<List<List<Integer>>>(); // (garbage
-                                                     // collection takes
-                                                     // care of old
-                                                     // array)
+                                                        // collection takes
+                                                        // care of old
+                                                        // array)
         // allocate each
         for (int x = 0; x < n_buckets_x; x++) {
             List<List<Integer>> list = new ArrayList<List<Integer>>();
@@ -176,9 +178,10 @@ final class Collider {
                 for (int y = Math.max(0, wy - ry); y <= Math.min(
                         n_buckets_y - 1, wy + ry); y++) {
                     // add each atom that is in this bucket
-                    final Iterator<Integer> it = buckets.get(x).get(y).listIterator();
+                    final Iterator<Integer> it = buckets.get(x).get(y)
+                            .listIterator();
                     while (it.hasNext()) {
-                        final int iOther =  it.next().intValue();
+                        final int iOther = it.next().intValue();
                         if (iOther <= i) {
                             continue; // using Newton's "action&reaction" as a
                         }
@@ -215,11 +218,11 @@ final class Collider {
                                 // the killer atom breaks the other atoms bonds
                                 // (unless other is an 'a' atom)
                                 if (a.isKiller()) {
-                                    if (b.getType() != 0) {
+                                    if (b.getType() != BasicType.A) {
                                         b.breakAllBonds();
                                     }
                                 } else {
-                                    if (a.getType() != 0) {
+                                    if (a.getType() != BasicType.A) {
                                         a.breakAllBonds();
                                     }
                                 }
@@ -342,7 +345,8 @@ final class Collider {
             if (new_bucket_x != current_bucket_x
                     || new_bucket_y != current_bucket_y) {
                 // remove the atom index from the list
-                final List<Integer> list = buckets.get(current_bucket_x).get(current_bucket_y);
+                final List<Integer> list = buckets.get(current_bucket_x).get(
+                        current_bucket_y);
                 final Iterator<Integer> it = list.listIterator(0);
                 while (it.hasNext()) {
                     if (((Integer) it.next()).intValue() == i) {

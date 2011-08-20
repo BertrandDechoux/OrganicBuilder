@@ -1,26 +1,15 @@
 package uk.org.squirm3.ui.reaction;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.beans.EventHandler;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionListener;
 
 import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
@@ -31,180 +20,92 @@ import uk.org.squirm3.listener.IListener;
 import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.springframework.Messages;
 
-// TODO remove EventHandler use : compile time error are useful
 public class ReactionListPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private final ApplicationEngine applicationEngine;
+    private final MessageSource messageSource;
 
-    // list mode
-    private JButton editButton, deleteButton, clearButton;
-    private JList reactionsList;
-    private JPanel listButtonsPanel;
-    // edit mode
-    private JButton updateButton;
-    private final JTextArea textArea;
-    // main components
     private JPanel buttonParentPanel;
     private JScrollPane scrollPanel;
     private TitledBorder border;
 
-    private final MessageSource messageSource;
-    private final ConversionService conversionService;
+    private final ReactionsListMode defaultMode;
+    private ReactionsListMode currentMode;
 
     public ReactionListPanel(final ApplicationEngine applicationEngine,
             final MessageSource messageSource,
             final ConversionService conversionService) {
         this.applicationEngine = applicationEngine;
         this.messageSource = messageSource;
-        this.conversionService = conversionService;
+
+        currentMode = new JTextAreaMode(this, conversionService);
+        defaultMode = new JListMode(this, currentMode);
 
         createListPanel();
-        textArea = new JTextArea();
+        setCurrentModeTo(defaultMode);
 
-        final IListener reactionListener = new IListener() {
-            @Override
-            public void propertyHasChanged() {
-                reactionsHaveChanged();
-            }
-        };
+        final IListener reactionListener = new ReactionsChangedListener();
         reactionListener.propertyHasChanged();
         applicationEngine.getEventDispatcher().addListener(reactionListener,
                 EventDispatcher.Event.REACTIONS);
+    }
 
-        updateDeleteButton();
+    public void setCurrentModeTo(final ReactionsListMode futureMode) {
+        buttonParentPanel.remove(currentMode.getMenu());
+        buttonParentPanel.add(futureMode.getMenu(), BorderLayout.NORTH);
+        buttonParentPanel.updateUI();
+        scrollPanel.setViewportView(futureMode.getReactionsList());
+        currentMode = futureMode;
+        currentMode.reactionsHaveChanged(applicationEngine.getReactions());
+    }
+
+    public JButton createJButton(String key, ActionListener actionListener) {
+        final JButton jButton = new JButton(Messages.localize(key,
+                messageSource));
+        jButton.addActionListener(actionListener);
+        return jButton;
+    }
+    
+    public void setReactions(final Collection<Reaction> reactions) {
+        applicationEngine.setReactions(reactions);
+    }
+    
+    public void removeReactions(final Collection<Reaction> reactions) {
+        applicationEngine.removeReactions(reactions);
+    }
+    
+    public void clearReactions() {
+        applicationEngine.clearReactions();
+    }
+
+    public String localize(final String key) {
+        return Messages.localize("reactions.current", messageSource);
+    }
+
+    private final class ReactionsChangedListener implements IListener {
+        @Override
+        public void propertyHasChanged() {
+            final Collection<Reaction> reactions = applicationEngine
+                    .getReactions();
+            border.setTitle(localize("reactions.current") + " ("
+                    + reactions.size() + ")");
+            setCurrentModeTo(defaultMode);
+            ReactionListPanel.this.repaint();
+        }
     }
 
     private void createListPanel() {
         setLayout(new BorderLayout());
         border = BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-                Messages.localize("reactions.current", messageSource));
+                localize("reactions.current"));
         setBorder(border);
-        listButtonsPanel = new JPanel();
-        listButtonsPanel.setLayout(new GridLayout(4, 1));
-
-        editButton = new JButton(Messages.localize("reactions.edit",
-                messageSource));
-        editButton.addActionListener(EventHandler.create(ActionListener.class,
-                ReactionListPanel.this, "editReactions"));
-        listButtonsPanel.add(editButton);
-
-        updateButton = new JButton(Messages.localize("reactions.update",
-                messageSource));
-        updateButton.addActionListener(EventHandler
-                .create(ActionListener.class, ReactionListPanel.this,
-                        "updateReactions"));
-
-        deleteButton = new JButton(Messages.localize("reactions.delete",
-                messageSource));
-        deleteButton.addActionListener(EventHandler.create(
-                ActionListener.class, ReactionListPanel.this,
-                "deleteSelectedReactions"));
-        listButtonsPanel.add(deleteButton);
-
-        clearButton = new JButton(Messages.localize("reactions.clear",
-                messageSource));
-        clearButton.addActionListener(EventHandler.create(ActionListener.class,
-                applicationEngine, "clearReactions"));
-        listButtonsPanel.add(clearButton);
 
         buttonParentPanel = new JPanel();
         buttonParentPanel.setLayout(new BorderLayout());
-        buttonParentPanel.add(listButtonsPanel, BorderLayout.NORTH);
         add(buttonParentPanel, BorderLayout.EAST);
-
-        reactionsList = new JList();
-        reactionsList.getSelectionModel().addListSelectionListener(
-                EventHandler.create(ListSelectionListener.class,
-                        ReactionListPanel.this, "updateDeleteButton"));
-        reactionsList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    editReactions();
-                }
-            }
-        });
-        scrollPanel = new JScrollPane(reactionsList);
+        scrollPanel = new JScrollPane();
         add(scrollPanel, BorderLayout.CENTER);
-    }
-
-    public void editReactions() {
-        buttonParentPanel.remove(listButtonsPanel);
-        buttonParentPanel.add(updateButton, BorderLayout.NORTH);
-        buttonParentPanel.updateUI();
-        final Object[] reactions = applicationEngine.getReactions().toArray();
-        String content = "";
-        for (final Object reaction : reactions) {
-            content += reaction.toString() + "\n";
-        }
-        textArea.setText(content);
-        scrollPanel.setViewportView(textArea);
-    }
-
-    public void updateReactions() {
-        String result = null;
-        final List<Reaction> v = new ArrayList<Reaction>();
-        // System.out.println("Input: "+text); // DEBUG
-        // for each line in the text
-        final StringTokenizer lines = new StringTokenizer(textArea.getText(),
-                "\n", true);
-        String line = new String();
-        while (lines.hasMoreTokens()) {
-            line = lines.nextToken();
-            line = line.trim(); // remove leading and trailing whitespace and
-                                // control chars
-            if (line.length() == 0) {
-                continue; // nothing doing
-            }
-            if (line.length() > 2 && line.charAt(0) == '/'
-                    && line.charAt(1) == '/') {
-                continue; // this line contains a comment, skip it
-            }
-            // System.out.println("Parsing line: "+line+" (length "+String.valueOf(line.length())+")");
-            final Reaction r = conversionService.convert(line, Reaction.class);
-            // System.out.println(r.getString()+"\n"); // DEBUG
-            if (r != null) {
-                v.add(r);
-            } else {
-                result = line;
-            }
-        }
-
-        if (result != null) {
-            JOptionPane
-                    .showMessageDialog(this, result, Messages.localize(
-                            "reactions.parsing.error", messageSource),
-                            JOptionPane.ERROR_MESSAGE);
-        } else {
-            applicationEngine.setReactions(v);
-            reactionsHaveChanged();
-            buttonParentPanel.remove(updateButton);
-            buttonParentPanel.add(listButtonsPanel, BorderLayout.NORTH);
-            scrollPanel.setViewportView(reactionsList);
-        }
-    }
-
-    public void deleteSelectedReactions() {
-        final Object[] reactions = reactionsList.getSelectedValues();
-        final Collection<Reaction> c = new ArrayList<Reaction>(reactions.length);
-        for (final Object reaction : reactions) {
-            c.add((Reaction) reaction);
-        }
-        applicationEngine.removeReactions(c);
-    }
-
-    public void updateDeleteButton() {
-        deleteButton.setEnabled(reactionsList.getSelectedValues().length != 0);
-    }
-
-    public void reactionsHaveChanged() {
-        final Object[] reactions = applicationEngine.getReactions().toArray();
-        border.setTitle(Messages.localize("reactions.current", messageSource)
-                + " (" + reactions.length + ")");
-        clearButton.setEnabled(reactions.length != 0);
-        reactionsList.setListData(reactions);
-        this.repaint();
     }
 }
