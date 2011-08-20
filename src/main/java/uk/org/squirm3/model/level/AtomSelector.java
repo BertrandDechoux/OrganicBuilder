@@ -3,15 +3,23 @@ package uk.org.squirm3.model.level;
 import java.util.Collection;
 
 import uk.org.squirm3.model.Atom;
-import uk.org.squirm3.model.FixedPoint;
-
-import com.google.common.collect.Lists;
+import uk.org.squirm3.model.type.AtomType;
+import static ch.lambdaj.Lambda.filter;
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
 
 public class AtomSelector {
 
-    public static Atom findUnique(final String atomDescription,
+    @SuppressWarnings("unchecked")
+    public static Collection<? extends Atom> findAll(final AtomType atomType, final int state, final Collection<? extends Atom> atoms) {
+        return filter(allOf(having(on(Atom.class).getType(), is(atomType)),having(on(Atom.class).getState(), is(state))) , atoms);
+    }
+    
+    public static Atom findUnique(final AtomType atomType, final int state,
             final Collection<? extends Atom> atoms) {
-        final Collection<? extends Atom> targets = findAll(atomDescription,
+        final Collection<? extends Atom> targets = findAll(atomType, state,
                 atoms);
         if (targets.isEmpty()) {
             return null;
@@ -20,29 +28,7 @@ public class AtomSelector {
             return targets.iterator().next();
         }
         throw new RuntimeException("There are " + targets.size()
-                + " atoms matching " + atomDescription);
-    }
-
-    public static Collection<? extends Atom> findAll(
-            final String atomDescription, final Collection<? extends Atom> atoms) {
-        final Atom protoAtom = getProtoAtom(atomDescription);
-        final Collection<Atom> targets = Lists.newArrayList();
-        for (final Atom atom : atoms) {
-            if (atom.getType() == protoAtom.getType()
-                    && atom.getState() == protoAtom.getState()) {
-                targets.add(atom);
-            }
-        }
-        return targets;
-    }
-
-    private static Atom getProtoAtom(final String atomDescription) {
-        if (atomDescription == null || atomDescription.length() != 2) {
-            throw new RuntimeException(
-                    "AtomDescription should be composed of 2 characters : type and state");
-        }
-        return new Atom(FixedPoint.ORIGIN, atomDescription.charAt(0) - 'a',
-                atomDescription.charAt(1) - '0');
+                + " atoms matching " + atomType.getCharacterIdentifier() + state);
     }
 
 }

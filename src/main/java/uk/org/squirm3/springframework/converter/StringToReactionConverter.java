@@ -7,50 +7,63 @@ import org.springframework.core.convert.converter.Converter;
 
 import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.model.type.ReactionType;
+import uk.org.squirm3.springframework.util.StringUtils;
 
 public class StringToReactionConverter implements Converter<String, Reaction> {
+    // the basic parts of a reaction pattern
+    private static final String ATOM = "(\\p{Lower})(\\d{1,})";
+    private static final String BOND = "(\\+?)";
 
-    private static final String types = "abcdefxy";
-    private static final Pattern pattern = Pattern.compile("([" + types
-            + "])(\\d{1,})" + "(\\s*\\+\\s*|\\s*)" + "([" + types
-            + "])(\\d{1,})" + "\\s*[=\\-]>\\s*" + "\\1(\\d{1,})"
-            + "(\\s*\\+\\s*|\\s*)" + "\\4(\\d{1,})$");
+    // the three main parts of a reaction pattern
+    private static final String EVENT = "^" + ATOM + BOND + ATOM;
+    private static final String TO = "[=\\-]>";
+    private static final String RESULT = //
+    "\\1(\\d{1,})" + BOND + "\\4(\\d{1,})$";
+
+    // full reaction pattern
+    private static final String REACTION = EVENT + TO + RESULT;
+
+    private static final Pattern pattern = Pattern.compile(REACTION);
 
     private final Converter<Character, ReactionType> characterToReactionTypeConverter;
 
-    public StringToReactionConverter(final Converter<Character, ReactionType> characterToReactionTypeConverter) {
+    public StringToReactionConverter(
+            final Converter<Character, ReactionType> characterToReactionTypeConverter) {
         this.characterToReactionTypeConverter = characterToReactionTypeConverter;
     }
 
     @Override
     public Reaction convert(String source) {
-        final Matcher m = pattern.matcher(source);
-        final boolean b = m.matches();
-        if (!b) {
-            return null;
-        }
-        final ReactionType aReactionType = characterToReactionTypeConverter.convert(m.group(1).charAt(0));
-        if(aReactionType == null) {
-            return null;
-        }
-        final int a_type = aReactionType.getIntegerIndentifier();
-        
-        final int a_state = Integer.parseInt(m.group(2));
-        final boolean bonded_before = !m.group(3).contains("+");
-        
-        final ReactionType bReactionType = characterToReactionTypeConverter.convert(m.group(4).charAt(0));
-        if(bReactionType == null) {
-            return null;
-        }
-        final int b_type = bReactionType.getIntegerIndentifier();
-        
-        final int b_state = Integer.parseInt(m.group(5));
-        final int future_a_state = Integer.parseInt(m.group(6));
-        final boolean bonded_after = !m.group(7).contains("+");
-        final int future_b_state = Integer.parseInt(m.group(8));
-        final Reaction r = new Reaction(a_type, a_state, bonded_before, b_type,
-                b_state, future_a_state, bonded_after, future_b_state);
-        return r;
+        final Matcher m = match(source);
+        final ReactionType a_type = toReactionType(m.group(1));
+        final int a_state = toState(m.group(2));
+        final boolean bonded_before = isBonded(m.group(3));
+        final ReactionType b_type = toReactionType(m.group(4));
+        final int b_state = toState(m.group(5));
+        final int future_a_state = toState(m.group(6));
+        final boolean bonded_after = isBonded(m.group(7));
+        final int future_b_state = toState(m.group(8));
+        return new Reaction(a_type, a_state, bonded_before, b_type, b_state,
+                future_a_state, bonded_after, future_b_state);
+    }
+
+    private Matcher match(String source) {
+        final Matcher m = pattern
+                .matcher(StringUtils.removeWhitespaces(source));
+        m.matches();
+        return m;
+    }
+
+    private int toState(String group) {
+        return Integer.parseInt(group);
+    }
+
+    private boolean isBonded(String group) {
+        return !group.contains("+");
+    }
+
+    private ReactionType toReactionType(String group) {
+        return characterToReactionTypeConverter.convert(group.charAt(0));
     }
 
 }

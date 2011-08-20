@@ -89,7 +89,7 @@ public class AtomBuilderTest {
         final Collection<Atom> atoms = atomBuilder.build("(_a0_)",
                 configuration);
         assertThat(atoms).hasSize(1);
-        assertThat(atoms.iterator().next().getType()).isEqualTo(0);
+        assertThat(atoms.iterator().next().getType()).isEqualTo(BasicType.A);
         assertThat(atoms.iterator().next().getState()).isEqualTo(0);
     }
 
@@ -123,7 +123,7 @@ public class AtomBuilderTest {
         final Collection<Atom> atoms = atomBuilder.build("(_K0_)",
                 configuration);
         assertThat(atoms).hasSize(1);
-        assertThat(atoms.iterator().next().getType()).isEqualTo(-1);
+        assertThat(atoms.iterator().next().getType()).isEqualTo(SpecialType.KILLER);
         assertThat(atoms.iterator().next().getState()).isEqualTo(0);
     }
 

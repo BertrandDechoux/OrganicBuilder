@@ -10,6 +10,7 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomSelector;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.def.BasicType;
 
 public class MembraneTransportValidator implements AtomValidator {
 
@@ -18,8 +19,8 @@ public class MembraneTransportValidator implements AtomValidator {
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
-        prisoner = AtomSelector.findUnique("f1", atoms);
-        membraneSeed = AtomSelector.findUnique("a4", atoms);
+        prisoner = AtomSelector.findUnique(BasicType.F, 1, atoms);
+        membraneSeed = AtomSelector.findUnique(BasicType.A, 4, atoms);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class MembraneTransportValidator implements AtomValidator {
         int i = 0;
         while (it.hasNext()) {
             final Atom a = it.next();
-            if (a.getType() != 0 || a.getBonds().size() != 2) {
+            if (a.getType() != BasicType.A || a.getBonds().size() != 2) {
                 return messages.getError(1);
             }
             x_points[i] = (int) a.getPhysicalPoint().getPositionX(); // (need
@@ -58,12 +59,12 @@ public class MembraneTransportValidator implements AtomValidator {
         }
         // check the other atoms (want: f's inside, other's outside)
         for (final Atom a : atoms) {
-            if (a.getType() == 5
+            if (a.getType() == BasicType.F
                     && !poly.contains(new Point2D.Float(a.getPhysicalPoint()
                             .getPositionX(), a.getPhysicalPoint()
                             .getPositionY()))) {
                 return messages.getError(3);
-            } else if (a.getType() != 5
+            } else if (a.getType() != BasicType.F
                     && poly.contains(new Point2D.Float(a.getPhysicalPoint()
                             .getPositionX(), a.getPhysicalPoint()
                             .getPositionY()))) {

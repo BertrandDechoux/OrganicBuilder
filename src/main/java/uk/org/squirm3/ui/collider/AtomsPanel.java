@@ -12,7 +12,10 @@ import java.awt.event.ComponentListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -25,6 +28,8 @@ import uk.org.squirm3.listener.IListener;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
+import uk.org.squirm3.model.type.AtomType;
+import uk.org.squirm3.model.type.def.BasicType;
 
 public class AtomsPanel extends JScrollPane {
     private static final long serialVersionUID = 1L;
@@ -42,10 +47,17 @@ public class AtomsPanel extends JScrollPane {
     private JPanel imagePanel;
 
     // yellow, grey, blue, purple, red, green
-    private static final Color atomsColors[] = {new Color(0xbdcf00),
-            new Color(0x5f5f5f), new Color(0x0773db), new Color(0xee10ac),
-            new Color(0xef160f), new Color(0x00df06)};
-    private static final BufferedImage[] atomsImages = new BufferedImage[atomsColors.length];
+    private static final Map<BasicType, Color> atomColors;
+    static {
+        atomColors = new HashMap<BasicType, Color>();
+        atomColors.put(BasicType.A, new Color(0xbdcf00));
+        atomColors.put(BasicType.B, new Color(0x5f5f5f));
+        atomColors.put(BasicType.C, new Color(0x0773db));
+        atomColors.put(BasicType.D, new Color(0xee10ac));
+        atomColors.put(BasicType.E, new Color(0xef160f));
+        atomColors.put(BasicType.F, new Color(0x00df06));
+    }
+    private static final Map<AtomType, BufferedImage> atomsImages = new HashMap<AtomType, BufferedImage>();
     private final Image spikyImage;
 
     final ApplicationEngine applicationEngine;
@@ -122,16 +134,17 @@ public class AtomsPanel extends JScrollPane {
         final float R = Atom.getAtomSize() - 2;
         final int w = (int) (2 * R);
         final int h = (int) (2 * R);
-        for (int i = 0; i < atomsColors.length; i++) {
+        for (Entry<BasicType, Color> entry : atomColors.entrySet()) {
             // creation of the image
-            atomsImages[i] = new BufferedImage(w, h,
+            final BufferedImage image = new BufferedImage(w, h,
                     BufferedImage.TYPE_INT_ARGB);
+            atomsImages.put(entry.getKey(), image);
             // creation of the graphic
-            final Graphics2D g2 = atomsImages[i].createGraphics();
+            final Graphics2D g2 = image.createGraphics();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
             // creation of the colors
-            final Color baseColor = atomsColors[i];
+            final Color baseColor = entry.getValue();
             final int colorOffset = 220;
             final int red = baseColor.getRed() < 255 - colorOffset ? baseColor
                     .getRed() + colorOffset : 255;
@@ -150,7 +163,6 @@ public class AtomsPanel extends JScrollPane {
             g2.fillOval(0, 0, w, h);
         }
     }
-
     private void imageSizeHasChanged() {
         if (imagePanel != null) {
             final Dimension d = getSize();
@@ -216,7 +228,7 @@ public class AtomsPanel extends JScrollPane {
             for (int i = 0; i < atoms.length; i++) {
                 if (!atoms[i].isKiller()) {
                     // draw the normal colour atom image and label it
-                    g2.drawImage(atomsImages[atoms[i].getType()],
+                    g2.drawImage(atomsImages.get(atoms[i].getType()),
                             (int) atoms[i].getPhysicalPoint().getPositionX()
                                     - offset_x, (int) atoms[i]
                                     .getPhysicalPoint().getPositionY()

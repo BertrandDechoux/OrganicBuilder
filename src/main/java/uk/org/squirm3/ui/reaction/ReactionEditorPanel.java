@@ -1,11 +1,11 @@
 package uk.org.squirm3.ui.reaction;
 
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -14,7 +14,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 import javax.swing.border.EtchedBorder;
 
 import org.springframework.context.MessageSource;
@@ -27,10 +29,8 @@ import uk.org.squirm3.model.type.Types;
 import uk.org.squirm3.springframework.Messages;
 
 public class ReactionEditorPanel extends JPanel {
-    private static final long serialVersionUID = 1L;
 
-    private final MessageSource messageSource;
-    private final ImageIcon addIcon;
+    private static final long serialVersionUID = 1L;
 
     private JCheckBox bondedBefore, bondedAfter;
     private JComboBox aType, aState, bType, bState, futureAState, futureBState;
@@ -39,55 +39,42 @@ public class ReactionEditorPanel extends JPanel {
 
     public ReactionEditorPanel(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final ImageIcon addIcon) {
-        this.messageSource = messageSource;
-        this.addIcon = addIcon;
-        createEditorPanel(applicationEngine);
+        setupLayoutAndBorder(messageSource);
+        final ActionListener updateReactionListener = new UpdateReactionListener();
+        setupReactionForm(updateReactionListener);
+        setupAddReactionButton(applicationEngine, messageSource, addIcon);
+        updateReactionListener.actionPerformed(null);
         setMaximumSize(getMinimumSize());
     }
 
-    private void createEditorPanel(final ApplicationEngine applicationEngine) {
+    private void setupLayoutAndBorder(final MessageSource messageSource) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
                 Messages.localize("reactions.editor", messageSource)));
-        final JPanel reactionPanel = new JPanel();
-        reactionPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        final ActionListener l = new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                addReaction.setText(createReactionFromEditor().toString());
-            }
-        };
-        aType = createTypeComboBox();
-        aType.addActionListener(l);
-        reactionPanel.add(aType);
-        aState = createStateComboBox();
-        aState.addActionListener(l);
-        reactionPanel.add(aState);
-        bondedBefore = new JCheckBox();
-        bondedBefore.addActionListener(l);
-        reactionPanel.add(bondedBefore);
-        bType = createTypeComboBox();
-        bType.addActionListener(l);
-        reactionPanel.add(bType);
-        bState = createStateComboBox();
-        bState.addActionListener(l);
-        reactionPanel.add(bState);
-        reactionPanel.add(new JLabel(" => "));
-        futureAType = new JLabel();
-        reactionPanel.add(futureAType);
-        futureAState = createStateComboBox();
-        futureAState.addActionListener(l);
-        reactionPanel.add(futureAState);
-        bondedAfter = new JCheckBox();
-        bondedAfter.addActionListener(l);
-        reactionPanel.add(bondedAfter);
-        futureBType = new JLabel();
-        reactionPanel.add(futureBType);
-        futureBState = createStateComboBox();
-        futureBState.addActionListener(l);
-        reactionPanel.add(futureBState);
-        add(reactionPanel);
+    }
+
+    private void setupReactionForm(final ActionListener updateReactionListener) {
+        final JPanel reactionForm = new JPanel(
+                new FlowLayout(FlowLayout.CENTER));
+        aType = createTypeComboBox(updateReactionListener, reactionForm);
+        aState = createStateComboBox(updateReactionListener, reactionForm);
+        bondedBefore = createBondedCheckBox(updateReactionListener,
+                reactionForm);
+        bType = createTypeComboBox(updateReactionListener, reactionForm);
+        bState = createStateComboBox(updateReactionListener, reactionForm);
+        createJLabel(" => ", reactionForm);
+        futureAType = createJLabel("", reactionForm);
+        futureAState = createStateComboBox(updateReactionListener, reactionForm);
+        bondedAfter = createBondedCheckBox(updateReactionListener, reactionForm);
+        futureBType = createJLabel("", reactionForm);
+        futureBState = createStateComboBox(updateReactionListener, reactionForm);
+        add(reactionForm);
+    }
+
+    private void setupAddReactionButton(
+            final ApplicationEngine applicationEngine,
+            final MessageSource messageSource, final ImageIcon addIcon) {
         addReaction = new JButton(addIcon);
         addReaction.setMargin(new Insets(0, 0, 0, 0));
         addReaction.setToolTipText(Messages.localize("reactions.add.tooltip",
@@ -95,36 +82,78 @@ public class ReactionEditorPanel extends JPanel {
         addReaction.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                final Collection<Reaction> c = new ArrayList<Reaction>(1);
-                c.add(createReactionFromEditor());
-                applicationEngine.addReactions(c);
+                applicationEngine.addReactions(Collections.singleton(createReactionFromEditor()));
             }
         });
         add(addReaction);
-        l.actionPerformed(null); // init button's text
     }
 
     private Reaction createReactionFromEditor() {
-        return new Reaction(aType.getSelectedIndex(),
+        return new Reaction((ReactionType) aType.getSelectedItem(),
                 aState.getSelectedIndex(), bondedBefore.isSelected(),
-                bType.getSelectedIndex(), bState.getSelectedIndex(),
-                futureAState.getSelectedIndex(), bondedAfter.isSelected(),
-                futureBState.getSelectedIndex());
+                (ReactionType) bType.getSelectedItem(),
+                bState.getSelectedIndex(), futureAState.getSelectedIndex(),
+                bondedAfter.isSelected(), futureBState.getSelectedIndex());
     }
 
-    private JComboBox createTypeComboBox() {
+    private JComboBox createTypeComboBox(final ActionListener actionListener,
+            final JPanel parent) {
         final JComboBox jComboBox = new JComboBox();
+        jComboBox.setRenderer(new ReactionTypeListCellRenderer());
         for (ReactionType reactionType : Types.getReactionTypes()) {
-            jComboBox.addItem(reactionType.getCharacterIdentifier());
+            jComboBox.addItem(reactionType);
         }
+        jComboBox.addActionListener(actionListener);
+        parent.add(jComboBox);
         return jComboBox;
     }
 
-    private JComboBox createStateComboBox() {
+    private JComboBox createStateComboBox(final ActionListener actionListener,
+            final JPanel parent) {
         final JComboBox jComboBox = new JComboBox();
         for (int i = 0; i < Configuration.MAX_NUMBER_OF_STATUS; i++) {
             jComboBox.addItem(String.valueOf(i));
         }
+        jComboBox.addActionListener(actionListener);
+        parent.add(jComboBox);
         return jComboBox;
     }
+
+    private JCheckBox createBondedCheckBox(final ActionListener actionListener,
+            final JPanel parent) {
+        final JCheckBox jCheckBox = new JCheckBox();
+        jCheckBox.addActionListener(actionListener);
+        parent.add(jCheckBox);
+        return jCheckBox;
+    }
+    
+    private JLabel createJLabel(final String label, final JPanel parent) {
+        final JLabel jLabel = new JLabel(label);
+        parent.add(jLabel);
+        return jLabel;
+    }
+
+    private final class UpdateReactionListener implements ActionListener {
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            futureAType.setText(toStringIdentifier(aType.getSelectedItem()));
+            futureBType.setText(toStringIdentifier(bType.getSelectedItem()));
+            addReaction.setText(createReactionFromEditor().toString());
+        }
+    }
+
+    private static final class ReactionTypeListCellRenderer
+            implements
+                ListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value,
+                int index, boolean isSelected, boolean cellHasFocus) {
+            return new JLabel(toStringIdentifier(value));
+        }
+    }
+    
+    private static String toStringIdentifier(final Object reactionType) {
+        return ""+((ReactionType)reactionType).getCharacterIdentifier();
+    }
+
 }

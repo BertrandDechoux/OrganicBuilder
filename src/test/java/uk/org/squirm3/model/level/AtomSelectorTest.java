@@ -7,7 +7,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import uk.org.squirm3.model.Atom;
-import uk.org.squirm3.model.FixedPoint;
+import uk.org.squirm3.model.Atoms;
+import uk.org.squirm3.model.type.def.BasicType;
 
 import com.google.common.collect.Lists;
 
@@ -15,23 +16,23 @@ import static org.fest.assertions.Assertions.assertThat;
 
 public class AtomSelectorTest {
     private final Collection<? extends Atom> atoms = Lists.newArrayList(//
-            new Atom(FixedPoint.ORIGIN, 0, 0),//
-            new Atom(FixedPoint.ORIGIN, 0, 1),//
-            new Atom(FixedPoint.ORIGIN, 1, 0),//
-            new Atom(FixedPoint.ORIGIN, 1, 1),//
-            new Atom(FixedPoint.ORIGIN, 1, 1));
+            Atoms.createAtom(BasicType.A, 0),//
+            Atoms.createAtom(BasicType.A, 1),//
+            Atoms.createAtom(BasicType.B, 0),//
+            Atoms.createAtom(BasicType.B, 1), //
+            Atoms.createAtom(BasicType.B, 1));
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void shouldReturnNullWhenUnniqueNotFound() {
-        assertThat(AtomSelector.findUnique("f0", atoms)).isNull();
+    public void shouldReturnNullWhenUniqueNotFound() {
+        assertThat(AtomSelector.findUnique(BasicType.F, 0, atoms)).isNull();
     }
 
     @Test
     public void shouldReturnUnique() {
-        assertThat(AtomSelector.findUnique("a0", atoms)).isNotNull();
+        assertThat(AtomSelector.findUnique(BasicType.A, 0, atoms)).isNotNull();
     }
 
     @Test
@@ -39,17 +40,17 @@ public class AtomSelectorTest {
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("There are 2 atoms matching b1");
 
-        AtomSelector.findUnique("b1", atoms);
+        AtomSelector.findUnique(BasicType.B, 1, atoms);
     }
 
     @Test
     public void shouldFindAllMatchingAtoms() {
-        assertThat(AtomSelector.findAll("b1", atoms)).hasSize(2);
+        assertThat(AtomSelector.findAll(BasicType.B, 1, atoms)).hasSize(2);
     }
 
     @Test
     public void shouldFindNoMatchingAtoms() {
-        assertThat(AtomSelector.findAll("f0", atoms)).isEmpty();
+        assertThat(AtomSelector.findAll(BasicType.F, 0, atoms)).isEmpty();
     }
 
 }

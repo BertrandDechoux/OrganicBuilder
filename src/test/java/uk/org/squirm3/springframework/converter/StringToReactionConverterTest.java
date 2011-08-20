@@ -33,7 +33,7 @@ public class StringToReactionConverterTest {
         mapCharacterToReactionType('b', BasicType.B);
         mapCharacterToReactionType('d', BasicType.D);
 
-        Reaction originalReaction = new Reaction(1, 2, false, 3, 4, 5, true, 6);
+        Reaction originalReaction = new Reaction(BasicType.B, 2, false, BasicType.D, 4, 5, true, 6);
         Reaction parsedReaction = stringToReactionConverter
                 .convert(originalReaction.toString());
         assertThat(originalReaction.toString()).isEqualTo(
@@ -45,7 +45,7 @@ public class StringToReactionConverterTest {
         mapCharacterToReactionType('x', WildcardType.X);
         mapCharacterToReactionType('y', WildcardType.Y);
 
-        Reaction originalReaction = new Reaction(6, 20345, true, 7, 4234, 5,
+        Reaction originalReaction = new Reaction(WildcardType.X, 20345, true, WildcardType.Y, 4234, 5,
                 false, 6);
         Reaction parsedReaction = stringToReactionConverter
                 .convert("x20345y4234-> \tx5   +  y6");

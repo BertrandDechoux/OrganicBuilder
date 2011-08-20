@@ -3,24 +3,22 @@ package uk.org.squirm3.model;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import uk.org.squirm3.model.type.AtomType;
+import uk.org.squirm3.model.type.def.SpecialType;
+
 public class Atom {
     // TODO should not be hardcoded, properties file ?
     static private final float R = 22.0f;
 
     private final IPhysicalPoint iPhysicalPoint;
-    private int state; // type: 0=a,..5=f
-    private final int type;
+    private int state;
+    private final AtomType type;
     private final LinkedList<Atom> bonds;
-    static final public String type_code = "abcdefxy";
 
-    public static final int KILLER_TYPE = -1; // special marker for atoms that
-                                              // have a special caustic effect
-    private static final char killer_char = 'K';
-
-    public Atom(final IPhysicalPoint iPhysicalPoint, final int t, final int s) {
+    public Atom(final IPhysicalPoint iPhysicalPoint, final AtomType type, final int state) {
         this.iPhysicalPoint = iPhysicalPoint.copy();
-        type = t;
-        setState(s);
+        this.type = type;
+        this.state = state;
         bonds = new LinkedList<Atom>();
     }
 
@@ -71,10 +69,7 @@ public class Atom {
 
     @Override
     public String toString() {
-        if (type == KILLER_TYPE) {
-            return killer_char + String.valueOf(getState());
-        }
-        return type_code.charAt(getType()) + String.valueOf(getState());
+        return "" + type.getCharacterIdentifier() + state;
     }
 
     // TODO find a better way
@@ -88,7 +83,7 @@ public class Atom {
     }
 
     public boolean isKiller() {
-        return type == KILLER_TYPE;
+        return type == SpecialType.KILLER;
     }
 
     public void setState(final int state) {
@@ -99,7 +94,7 @@ public class Atom {
         return state;
     }
 
-    public int getType() {
+    public AtomType getType() {
         return type;
     }
 

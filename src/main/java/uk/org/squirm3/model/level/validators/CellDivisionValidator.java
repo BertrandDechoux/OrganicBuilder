@@ -10,6 +10,7 @@ import java.util.List;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.def.BasicType;
 
 public class CellDivisionValidator implements AtomValidator {
 
@@ -100,7 +101,7 @@ public class CellDivisionValidator implements AtomValidator {
         final Iterator<? extends Atom> iterator = atoms.iterator();
         while (iterator.hasNext() && n_found < 2) {
             final Atom a = iterator.next();
-            if (a.getType() == 4 && a.getState() != 0
+            if (a.getType() == BasicType.E && a.getState() != 0
                     && a.getBonds().size() == 2) {
                 heads[n_found++] = a;
             }
@@ -133,7 +134,7 @@ public class CellDivisionValidator implements AtomValidator {
                     break;
                 }
                 // append the type letter (a-f) to the string
-                sequence[iCell] += Atom.type_code.charAt(current.getType());
+                sequence[iCell] += current.getType().getCharacterIdentifier();
                 // add the current atom to the list so that we will know we have
                 // seen it before
                 seen.add(current);
