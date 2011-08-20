@@ -20,7 +20,6 @@ public class TypesTest {
     private final Collection<? extends ChemicalType> chemicalTypes;
     private final int expectedSize;
     final Set<Character> characterIdentifiers = Sets.newHashSet();
-    final Set<Integer> integerIdentifiers = Sets.newHashSet();
 
     public TypesTest(Collection<? extends ChemicalType> chemicalTypes,
             final int expectedSize) {
@@ -29,7 +28,6 @@ public class TypesTest {
 
         for (final ChemicalType chemicalType : chemicalTypes) {
             characterIdentifiers.add(chemicalType.getCharacterIdentifier());
-            integerIdentifiers.add(chemicalType.getIntegerIndentifier());
         }
     }
     
@@ -46,11 +44,6 @@ public class TypesTest {
     @Test
     public void shouldHaveNoCharacterIdentifierCollision() {
         assertThat(characterIdentifiers).hasSize(chemicalTypes.size());
-    }
-
-    @Test
-    public void shouldHaveNoIntegerIdentifierCollision() {
-        assertThat(integerIdentifiers).hasSize(chemicalTypes.size());
     }
 
     @Test
