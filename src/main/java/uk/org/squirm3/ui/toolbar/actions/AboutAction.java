@@ -3,15 +3,16 @@ package uk.org.squirm3.ui.toolbar.actions;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import org.springframework.context.MessageSource;
 
+/**
+ * Display information about the application.
+ */
 public class AboutAction extends SquirmAction {
     private static final long serialVersionUID = 1L;
 
@@ -23,6 +24,12 @@ public class AboutAction extends SquirmAction {
         this.siteUrl = siteUrl;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
     @Override
     public void actionPerformed(final ActionEvent event) {
         if (Desktop.isDesktopSupported()) {
@@ -31,9 +38,7 @@ public class AboutAction extends SquirmAction {
                 try {
                     desktop.browse(new URI(siteUrl));
                     return;
-                } catch (final IOException e) {
-                    // on error show the message
-                } catch (final URISyntaxException e) {
+                } catch (final Exception e) {
                     // on error show the message
                 }
             }

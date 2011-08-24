@@ -40,7 +40,7 @@ public class BuilderTypeToAtomTypeConverter
     }
 
     @Override
-    public AtomType convert(BuilderType source) {
+    public AtomType convert(final BuilderType source) {
         if (source instanceof AtomType) {
             return (AtomType) source;
         }
@@ -59,13 +59,13 @@ public class BuilderTypeToAtomTypeConverter
     private AtomType findRandomAtomType() {
         final List<? extends AtomType> types = Lists.newArrayList(basicTypes);
         Collections.shuffle(types);
-        
+
         AtomType type = types.iterator().next();
         while (configuration.indexOf(type.getCharacterIdentifier()) == -1) {
             type = types.iterator().next();
             types.remove(type);
         }
-        
+
         return type;
     }
 

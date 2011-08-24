@@ -2,9 +2,9 @@ package uk.org.squirm3.engine;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
 import uk.org.squirm3.listener.EventDispatcher;
+import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
@@ -27,17 +27,15 @@ public class ApplicationEngine {
     private final LevelManager levelManager;
     private final ReactionManager reactionManager;
 
-    private final EventDispatcher eventDispatcher;
-    private final Configuration configuration;
+    private final EventDispatcher<ApplicationEngineEvent> eventDispatcher;
+    private Configuration configuration;
 
-    public ApplicationEngine(final LevelManager levelManager,
-            final Configuration configuration) throws Exception {
-        this.configuration = configuration;
+    public ApplicationEngine(final LevelManager levelManager) throws Exception {
         // load levels
         this.levelManager = levelManager;
         reactionManager = new ReactionManager();
         // manager of the listeners
-        eventDispatcher = new EventDispatcher();
+        eventDispatcher = new EventDispatcher<ApplicationEngineEvent>();
         sleepPeriod = 50;
         // start the challenge by the introduction
         try {
@@ -68,7 +66,7 @@ public class ApplicationEngine {
                                     new LinkedList<Reaction>(reactionManager
                                             .getReactions()));
                             eventDispatcher
-                                    .dispatchEvent(EventDispatcher.Event.ATOMS);
+                                    .dispatchEvent(ApplicationEngineEvent.ATOMS);
                             try {
                                 Thread.sleep(sleepPeriod);
                             } catch (final InterruptedException e) {
@@ -102,13 +100,15 @@ public class ApplicationEngine {
                 if (!reactionManager.getReactions().isEmpty()) {
                     reactionManager.clearReactions();
                     eventDispatcher
-                            .dispatchEvent(EventDispatcher.Event.REACTIONS);
+                            .dispatchEvent(ApplicationEngineEvent.REACTIONS);
                 }
             }
         });
     }
 
     public Collection<? extends Atom> getAtoms() {
+        // TODO synchronize correctly : atoms should not be iterated while the
+        // collider is working on theù
         synchronized (colliderExecution) {
             return collider.getAtoms();
         }
@@ -142,7 +142,7 @@ public class ApplicationEngine {
                     if (isRunning) {
                         isRunning = false;
                         eventDispatcher
-                                .dispatchEvent(EventDispatcher.Event.SIMULATION_STATE);
+                                .dispatchEvent(ApplicationEngineEvent.SIMULATION_STATE);
                     }
                 }
             }
@@ -154,7 +154,7 @@ public class ApplicationEngine {
             @Override
             public void execute() {
                 reactionManager.addReactions(reactions);
-                eventDispatcher.dispatchEvent(EventDispatcher.Event.REACTIONS);
+                eventDispatcher.dispatchEvent(ApplicationEngineEvent.REACTIONS);
             }
         });
     }
@@ -164,29 +164,40 @@ public class ApplicationEngine {
             @Override
             public void execute() {
                 reactionManager.removeReactions(reactions);
-                eventDispatcher.dispatchEvent(EventDispatcher.Event.REACTIONS);
+                eventDispatcher.dispatchEvent(ApplicationEngineEvent.REACTIONS);
             }
         });
+    }
+
+    private void setLevel(final int levelIndex) {
+        levelManager.setLevel(levelIndex);
+        if (collider != null) {
+            reactionManager.clearReactions();
+            eventDispatcher.dispatchEvent(ApplicationEngineEvent.REACTIONS);
+        }
+        loadCurrentLevel();
+        eventDispatcher.dispatchEvent(ApplicationEngineEvent.LEVEL);
+        return;
+    }
+
+    private void loadCurrentLevel() {
+        final Level currentLevel = levelManager.getCurrentLevel();
+        configuration = currentLevel.construct();
+        collider = new Collider(configuration);
+        eventDispatcher.dispatchEvent(ApplicationEngineEvent.CONFIGURATION);
+        eventDispatcher.dispatchEvent(ApplicationEngineEvent.ATOMS);
     }
 
     public void restartLevel() {
         addCommand(new ICommand() {
             @Override
             public void execute() {
-                final Level currentLevel = levelManager.getCurrentLevel();
-                final List<Atom> atoms = currentLevel
-                        .generateAtoms(configuration);
-                if (atoms == null) {
-                    return;
-                }
-                collider = new Collider(atoms, (int) configuration.getWidth(),
-                        (int) configuration.getHeight());
-                eventDispatcher.dispatchEvent(EventDispatcher.Event.ATOMS);
+                loadCurrentLevel();
                 synchronized (colliderExecution) {
                     if (!isRunning) {
                         isRunning = true;
                         eventDispatcher
-                                .dispatchEvent(EventDispatcher.Event.SIMULATION_STATE);
+                                .dispatchEvent(ApplicationEngineEvent.SIMULATION_STATE);
                     }
                 }
             }
@@ -201,7 +212,7 @@ public class ApplicationEngine {
                     if (!isRunning) {
                         isRunning = true;
                         eventDispatcher
-                                .dispatchEvent(EventDispatcher.Event.SIMULATION_STATE);
+                                .dispatchEvent(ApplicationEngineEvent.SIMULATION_STATE);
                     }
                 }
             }
@@ -215,14 +226,15 @@ public class ApplicationEngine {
         if (draggingPoint == null && newDraggingPoint != null
                 || draggingPoint != null && newDraggingPoint == null) {
             draggingPoint = newDraggingPoint;
-            eventDispatcher.dispatchEvent(EventDispatcher.Event.DRAGGING_POINT);
+            eventDispatcher
+                    .dispatchEvent(ApplicationEngineEvent.DRAGGING_POINT);
             return;
         }
         if (draggingPoint.equals(newDraggingPoint)) {
             return;
         }
         draggingPoint = newDraggingPoint;
-        eventDispatcher.dispatchEvent(EventDispatcher.Event.DRAGGING_POINT);
+        eventDispatcher.dispatchEvent(ApplicationEngineEvent.DRAGGING_POINT);
     }
 
     public void setReactions(final Collection<Reaction> reactions) {
@@ -231,7 +243,7 @@ public class ApplicationEngine {
             public void execute() {
                 reactionManager.clearReactions();
                 reactionManager.addReactions(reactions);
-                eventDispatcher.dispatchEvent(EventDispatcher.Event.REACTIONS);
+                eventDispatcher.dispatchEvent(ApplicationEngineEvent.REACTIONS);
             }
         });
     }
@@ -241,7 +253,7 @@ public class ApplicationEngine {
             @Override
             public void execute() {
                 sleepPeriod = newSleepPeriod;
-                eventDispatcher.dispatchEvent(EventDispatcher.Event.SPEED);
+                eventDispatcher.dispatchEvent(ApplicationEngineEvent.SPEED);
             }
         });
     }
@@ -250,26 +262,10 @@ public class ApplicationEngine {
         return isRunning;
     }
 
-    public EventDispatcher getEventDispatcher() {
-        return eventDispatcher;
-    }
-
-    private void setLevel(final int levelIndex) {
-        levelManager.setLevel(levelIndex);
-        if (collider != null) {
-            reactionManager.clearReactions();
-            eventDispatcher.dispatchEvent(EventDispatcher.Event.REACTIONS);
-        }
-        final Level currentLevel = levelManager.getCurrentLevel();
-        final List<Atom> atoms = currentLevel.generateAtoms(configuration);
-        if (atoms == null) {
-            return;
-        }
-        collider = new Collider(atoms, (int) configuration.getWidth(),
-                (int) configuration.getHeight());
-        eventDispatcher.dispatchEvent(EventDispatcher.Event.ATOMS);
-        eventDispatcher.dispatchEvent(EventDispatcher.Event.LEVEL);
-        return;
+    public final void addListener(final Listener listener,
+            final ApplicationEngineEvent event) {
+        listener.propertyHasChanged();
+        eventDispatcher.addListener(listener, event);
     }
 
     public void goToLevel(final int levelIndex) {

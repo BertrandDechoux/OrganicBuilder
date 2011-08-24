@@ -21,7 +21,7 @@ public class TypesTest {
     private final int expectedSize;
     final Set<Character> characterIdentifiers = Sets.newHashSet();
 
-    public TypesTest(Collection<? extends ChemicalType> chemicalTypes,
+    public TypesTest(final Collection<? extends ChemicalType> chemicalTypes,
             final int expectedSize) {
         this.chemicalTypes = chemicalTypes;
         this.expectedSize = expectedSize;
@@ -30,14 +30,14 @@ public class TypesTest {
             characterIdentifiers.add(chemicalType.getCharacterIdentifier());
         }
     }
-    
+
     @Parameters
     public static Collection<Object[]> getParameters() {
         final Collection<Object[]> parameters = new ArrayList<Object[]>();
-        parameters.add(new Object[] {Types.getAtomTypes(), 7});
-        parameters.add(new Object[] {Types.getReactionTypes(), 8});
-        parameters.add(new Object[] {Types.getBuilderTypes(), 14});
-        parameters.add(new Object[] {Types.getChemicalTypes(), 16});
+        parameters.add(new Object[]{Types.getAtomTypes(), 7});
+        parameters.add(new Object[]{Types.getReactionTypes(), 8});
+        parameters.add(new Object[]{Types.getBuilderTypes(), 14});
+        parameters.add(new Object[]{Types.getChemicalTypes(), 16});
         return parameters;
     }
 

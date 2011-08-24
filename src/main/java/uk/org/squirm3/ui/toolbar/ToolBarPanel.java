@@ -21,32 +21,36 @@ import uk.org.squirm3.ui.toolbar.actions.ResetSimulationAction;
 import uk.org.squirm3.ui.toolbar.actions.RunSimulationAction;
 import uk.org.squirm3.ui.toolbar.actions.StopSimulationAction;
 
-
 public class ToolBarPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private static final Color BACKGROUND = new Color(255, 255, 225);
 
-    public ToolBarPanel(final StopSimulationAction stopSimulationAction, final RunSimulationAction runSimulationAction,
+    public ToolBarPanel(final StopSimulationAction stopSimulationAction,
+            final RunSimulationAction runSimulationAction,
             final ResetSimulationAction resetSimulationAction,
             final ParametersAction parametersAction,
-            final FirstLevelAction firstLevelAction, final PreviousLevelAction previousLevelAction,
-            final LevelPicker levelPicker, final NextLevelAction nextLevelAction,
+            final FirstLevelAction firstLevelAction,
+            final PreviousLevelAction previousLevelAction,
+            final LevelPicker levelPicker,
+            final NextLevelAction nextLevelAction,
             final LastLevelAction lastLevelAction, final AboutAction aboutAction) {
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setBackground(ToolBarPanel.BACKGROUND);
 
-        add(createSimulationControlPanel(stopSimulationAction, runSimulationAction, resetSimulationAction,
-                parametersAction));
+        add(createSimulationControlPanel(stopSimulationAction,
+                runSimulationAction, resetSimulationAction, parametersAction));
         add(Box.createHorizontalGlue());
-        add(createLevelsControlPanel(firstLevelAction, previousLevelAction, levelPicker,
-                nextLevelAction, lastLevelAction));
+        add(createLevelsControlPanel(firstLevelAction, previousLevelAction,
+                levelPicker, nextLevelAction, lastLevelAction));
         add(Box.createHorizontalGlue());
         add(createAboutPanel(aboutAction));
     }
 
-    private JPanel createSimulationControlPanel(final StopSimulationAction stopAction,
-            final RunSimulationAction runAction, final ResetSimulationAction resetAction,
+    private JPanel createSimulationControlPanel(
+            final StopSimulationAction stopAction,
+            final RunSimulationAction runAction,
+            final ResetSimulationAction resetAction,
             final ParametersAction parametersAction) {
         final JPanel simulationControlPanel = new JPanel();
         simulationControlPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 2));
@@ -54,13 +58,15 @@ public class ToolBarPanel extends JPanel {
         simulationControlPanel.add(ToolBarPanel.createIconButton(stopAction));
         simulationControlPanel.add(ToolBarPanel.createIconButton(runAction));
         simulationControlPanel.add(ToolBarPanel.createIconButton(resetAction));
-        simulationControlPanel.add(ToolBarPanel.createIconButton(parametersAction));
+        simulationControlPanel.add(ToolBarPanel
+                .createIconButton(parametersAction));
         return simulationControlPanel;
     }
 
     private JPanel createLevelsControlPanel(final FirstLevelAction introAction,
-            final PreviousLevelAction previousAction, final LevelPicker levelPicker,
-            final NextLevelAction nextAction, final LastLevelAction lastAction) {
+            final PreviousLevelAction previousAction,
+            final LevelPicker levelPicker, final NextLevelAction nextAction,
+            final LastLevelAction lastAction) {
         final JPanel levelsControlPanel = new JPanel();
         levelsControlPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 2));
         levelsControlPanel.setBackground(ToolBarPanel.BACKGROUND);

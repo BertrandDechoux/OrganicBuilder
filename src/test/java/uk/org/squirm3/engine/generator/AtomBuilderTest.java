@@ -1,6 +1,5 @@
 package uk.org.squirm3.engine.generator;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.junit.Before;
@@ -24,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AtomBuilderTest {
-    
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -32,31 +31,28 @@ public class AtomBuilderTest {
     private ConversionService conversionService;
     private AtomBuilder atomBuilder;
 
-    private static final Configuration configuration = new Configuration(500f,
-            500f);
-
     @Before
     public void setup() {
         atomBuilder = new AtomBuilder(conversionService);
     }
 
     @Test
-    public void shouldSupportEmptyDescription() throws BuilderException {
-        final Collection<Atom> atoms = atomBuilder.build("", configuration);
-        assertThat(atoms).isEmpty();
+    public void shouldFirstLineConfigureSize() throws BuilderException {
+        final Configuration configuration = atomBuilder.build("#13x13");
+        assertThat(configuration).isNotNull();
+        assertThat(configuration.getAtoms()).isEmpty();
     }
 
     @Test
     public void shouldSupportEmptyLine() throws BuilderException {
-        final Collection<Atom> atoms = atomBuilder.build("\n", configuration);
-        assertThat(atoms).isEmpty();
+        final Configuration configuration = atomBuilder.build("#13x13\n\n");
+        assertThat(configuration.getAtoms()).isEmpty();
     }
 
     @Test
     public void shouldSupportEmptyCell() throws BuilderException {
-        final Collection<Atom> atoms = atomBuilder.build("......",
-                configuration);
-        assertThat(atoms).isEmpty();
+        final Configuration configuration = atomBuilder.build("#13x13\n......");
+        assertThat(configuration.getAtoms()).isEmpty();
     }
 
     @Test
@@ -64,10 +60,10 @@ public class AtomBuilderTest {
         when(conversionService.convert('a', BuilderType.class)).thenReturn(
                 BasicType.A);
 
-        final Collection<Atom> atoms = atomBuilder.build("[_a0_]",
-                configuration);
-        assertThat(atoms).hasSize(1);
-        assertThat(atoms.iterator().next().isStuck()).isTrue();
+        final Configuration configuration = atomBuilder.build("#13x13\n[_a0_]");
+        assertThat(configuration.getAtoms()).hasSize(1);
+        assertThat(configuration.getAtoms().iterator().next().isStuck())
+                .isTrue();
     }
 
     @Test
@@ -75,10 +71,10 @@ public class AtomBuilderTest {
         when(conversionService.convert('a', BuilderType.class)).thenReturn(
                 BasicType.A);
 
-        final Collection<Atom> atoms = atomBuilder.build("(_a0_)",
-                configuration);
-        assertThat(atoms).hasSize(1);
-        assertThat(atoms.iterator().next().isStuck()).isFalse();
+        final Configuration configuration = atomBuilder.build("#13x13\n(_a0_)");
+        assertThat(configuration.getAtoms()).hasSize(1);
+        assertThat(configuration.getAtoms().iterator().next().isStuck())
+                .isFalse();
     }
 
     @Test
@@ -86,11 +82,12 @@ public class AtomBuilderTest {
         when(conversionService.convert('a', BuilderType.class)).thenReturn(
                 BasicType.A);
 
-        final Collection<Atom> atoms = atomBuilder.build("(_a0_)",
-                configuration);
-        assertThat(atoms).hasSize(1);
-        assertThat(atoms.iterator().next().getType()).isEqualTo(BasicType.A);
-        assertThat(atoms.iterator().next().getState()).isEqualTo(0);
+        final Configuration configuration = atomBuilder.build("#13x13\n(_a0_)");
+        assertThat(configuration.getAtoms()).hasSize(1);
+        assertThat(configuration.getAtoms().iterator().next().getType())
+                .isEqualTo(BasicType.A);
+        assertThat(configuration.getAtoms().iterator().next().getState())
+                .isEqualTo(0);
     }
 
     @Test
@@ -98,10 +95,10 @@ public class AtomBuilderTest {
         when(conversionService.convert('A', BuilderType.class)).thenReturn(
                 RandomBasicType.A);
 
-        final Collection<Atom> atoms = atomBuilder.build("(_A1_)",
-                configuration);
-        assertThat(atoms).hasSize(1);
-        assertThat(atoms.iterator().next().getState()).isEqualTo(1);
+        final Configuration configuration = atomBuilder.build("#13x13\n(_A1_)");
+        assertThat(configuration.getAtoms()).hasSize(1);
+        assertThat(configuration.getAtoms().iterator().next().getState())
+                .isEqualTo(1);
     }
 
     @Test
@@ -109,10 +106,10 @@ public class AtomBuilderTest {
         when(conversionService.convert('R', BuilderType.class)).thenReturn(
                 RandomBuilderType.RANDOM);
 
-        final Collection<Atom> atoms = atomBuilder.build("(_R1_)",
-                configuration);
-        assertThat(atoms).hasSize(1);
-        assertThat(atoms.iterator().next().getState()).isEqualTo(1);
+        final Configuration configuration = atomBuilder.build("#13x13\n(_R1_)");
+        assertThat(configuration.getAtoms()).hasSize(1);
+        assertThat(configuration.getAtoms().iterator().next().getState())
+                .isEqualTo(1);
     }
 
     @Test
@@ -120,11 +117,12 @@ public class AtomBuilderTest {
         when(conversionService.convert('K', BuilderType.class)).thenReturn(
                 SpecialType.KILLER);
 
-        final Collection<Atom> atoms = atomBuilder.build("(_K0_)",
-                configuration);
-        assertThat(atoms).hasSize(1);
-        assertThat(atoms.iterator().next().getType()).isEqualTo(SpecialType.KILLER);
-        assertThat(atoms.iterator().next().getState()).isEqualTo(0);
+        final Configuration configuration = atomBuilder.build("#13x13\n(_K0_)");
+        assertThat(configuration.getAtoms()).hasSize(1);
+        assertThat(configuration.getAtoms().iterator().next().getType())
+                .isEqualTo(SpecialType.KILLER);
+        assertThat(configuration.getAtoms().iterator().next().getState())
+                .isEqualTo(0);
     }
 
     @Test
@@ -134,10 +132,10 @@ public class AtomBuilderTest {
         when(conversionService.convert('b', BuilderType.class)).thenReturn(
                 BasicType.B);
 
-        final Collection<Atom> atoms = atomBuilder.build("(_a0_)(⇠b1_)",
-                configuration);
-        assertThat(atoms).hasSize(2);
-        final Iterator<Atom> atomIterator = atoms.iterator();
+        final Configuration configuration = atomBuilder
+                .build("#13x13\n(_a0_)(⇠b1_)");
+        assertThat(configuration.getAtoms()).hasSize(2);
+        final Iterator<Atom> atomIterator = configuration.getAtoms().iterator();
         final Atom firstAtom = atomIterator.next();
         final Atom secondAtom = atomIterator.next();
         assertThat(firstAtom.getBonds()).hasSize(1);
@@ -153,10 +151,10 @@ public class AtomBuilderTest {
         when(conversionService.convert('b', BuilderType.class)).thenReturn(
                 BasicType.B);
 
-        final Collection<Atom> atoms = atomBuilder.build("(_a0_)\n(_b1⇡)",
-                configuration);
-        assertThat(atoms).hasSize(2);
-        final Iterator<Atom> atomIterator = atoms.iterator();
+        final Configuration configuration = atomBuilder
+                .build("#13x13\n(_a0_)\n(_b1⇡)");
+        assertThat(configuration.getAtoms()).hasSize(2);
+        final Iterator<Atom> atomIterator = configuration.getAtoms().iterator();
         final Atom firstAtom = atomIterator.next();
         final Atom secondAtom = atomIterator.next();
         assertThat(firstAtom.getBonds()).hasSize(1);
@@ -176,47 +174,56 @@ public class AtomBuilderTest {
         when(conversionService.convert('d', BuilderType.class)).thenReturn(
                 BasicType.D);
 
-        final Collection<Atom> atoms = atomBuilder.build(
-                "(_a0_)(_b1_)\n(_c3_)(_d4_)", configuration);
-        assertThat(atoms).hasSize(4);
-        for (final Atom atom : atoms) {
+        final Configuration configuration = atomBuilder
+                .build("#13x13\n(_a0_)(_b1_)\n(_c3_)(_d4_)");
+        assertThat(configuration.getAtoms()).hasSize(4);
+        for (final Atom atom : configuration.getAtoms()) {
             assertThat(atom.getBonds()).isEmpty();
         }
+    }
+
+    @Test
+    public void shouldFailIfFirstLineIsNoSizeConfiguration()
+            throws BuilderException {
+        thrown.expect(BuilderException.class);
+        thrown.expectMessage("First line should indicate the size of the level : lol");
+
+        atomBuilder.build("lol");
     }
 
     @Test
     public void shouldFailWithIncorrectAtomStart() throws BuilderException {
         thrown.expect(BuilderException.class);
         thrown.expectMessage("Illegal description of atom : {_x2_}");
-        
-        atomBuilder.build("{_x2_}", configuration);
+
+        atomBuilder.build("#13x13\n{_x2_}");
     }
 
     @Test
     public void shouldFailWithIncorrectAtomStop() throws BuilderException {
         thrown.expect(BuilderException.class);
         thrown.expectMessage("Illegal end of mobile atom : (_x2_]");
-        
-        atomBuilder.build("(_x2_]", configuration);
+
+        atomBuilder.build("#13x13\n(_x2_]");
     }
 
     @Test
     public void shouldFailWithWildcardType() throws BuilderException {
         thrown.expect(BuilderException.class);
         thrown.expectMessage("Incorrect BuilderType : x");
-        
-        atomBuilder.build("(_x2_)", configuration);
+
+        atomBuilder.build("#13x13\n(_x2_)");
     }
 
     @Test
     public void shouldFailWithIncorrectAtomState() throws BuilderException {
         thrown.expect(BuilderException.class);
         thrown.expectMessage("Incorrect state : a");
-        
+
         when(conversionService.convert('a', BuilderType.class)).thenReturn(
                 BasicType.A);
-        
-        atomBuilder.build("(_aa_)", configuration);
+
+        atomBuilder.build("#13x13\n(_aa_)");
     }
 
     @Test
@@ -224,11 +231,11 @@ public class AtomBuilderTest {
             throws BuilderException {
         thrown.expect(BuilderException.class);
         thrown.expectMessage("Incorrect setting for horizontal bond : there is no previous atom!");
-        
+
         when(conversionService.convert('a', BuilderType.class)).thenReturn(
                 BasicType.A);
-        
-        atomBuilder.build("(⇠a0_)", configuration);
+
+        atomBuilder.build("#13x13\n(⇠a0_)");
     }
 
     @Test
@@ -236,11 +243,11 @@ public class AtomBuilderTest {
             throws BuilderException {
         thrown.expect(BuilderException.class);
         thrown.expectMessage("Incorrect setting for horizontal bond : there is no previous atom!");
-        
+
         when(conversionService.convert('a', BuilderType.class)).thenReturn(
                 BasicType.A);
-        
-        atomBuilder.build("......(⇠a0_)", configuration);
+
+        atomBuilder.build("#13x13\n......(⇠a0_)");
     }
 
     @Test
@@ -248,37 +255,35 @@ public class AtomBuilderTest {
             throws BuilderException {
         thrown.expect(BuilderException.class);
         thrown.expectMessage("Incorrect setting for vertical bond : there is no upper atom!");
-        
+
         when(conversionService.convert('a', BuilderType.class)).thenReturn(
                 BasicType.A);
-        
-        atomBuilder.build("......\n(_a0⇡)", configuration);
+
+        atomBuilder.build("#13x13\n......\n(_a0⇡)");
     }
 
     @Test
     public void shouldFailWhenNotEnoughHorizontalSpace()
             throws BuilderException {
         thrown.expect(BuilderException.class);
-        thrown.expectMessage("Map horizontal space is greater than the configuration's width : 374.0 > 100.0");
-        
+        thrown.expectMessage("Map horizontal space is greater than the configuration's width : 374.0 > 44.0");
+
         when(conversionService.convert('a', BuilderType.class)).thenReturn(
                 BasicType.A);
-        
-        atomBuilder.build("(_a0_)(_a0_)(_a0_)(_a0_)(_a0_)(_a0_)(_a0_)",
-                new Configuration(100, 500));
+
+        atomBuilder.build("#1x13\n(_a0_)(_a0_)(_a0_)(_a0_)(_a0_)(_a0_)(_a0_)");
     }
 
     @Test
     public void shouldFailWhenNotEnoughVerticalSpace() throws BuilderException {
         thrown.expect(BuilderException.class);
-        thrown.expectMessage("Map vertical space is greater than the configuration's height : 330.0 > 100.0");
-        
+        thrown.expectMessage("Map vertical space is greater than the configuration's height : 330.0 > 44.0");
+
         when(conversionService.convert('a', BuilderType.class)).thenReturn(
                 BasicType.A);
-        
-        atomBuilder.build(
-                "(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n",
-                new Configuration(500, 100));
+
+        atomBuilder
+                .build("#13x1\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n(_a0_)\n");
     }
 
 }

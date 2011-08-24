@@ -57,7 +57,7 @@ public class MakeLadderValidator implements AtomValidator {
         final Map<AtomType, Integer> newAtomTypeCount = new HashMap<AtomType, Integer>();
         Iterator<Atom> it = joined.iterator();
         while (it.hasNext()) {
-            Atom atom = it.next();
+            final Atom atom = it.next();
             if (atomTypeCount.containsKey(atom.getType())) {
                 atomTypeCount.put(atom.getType(),
                         atomTypeCount.get(atom.getType()) + 1);
@@ -65,11 +65,12 @@ public class MakeLadderValidator implements AtomValidator {
                 atomTypeCount.put(atom.getType(), 1);
             }
         }
-        for (Entry<AtomType,Integer> entry : atomTypeCount.entrySet()) {
-            if(!newAtomTypeCount.containsKey(entry.getKey()) ||  newAtomTypeCount.get(entry.getKey()) != entry.getValue() * 2) {
+        for (final Entry<AtomType, Integer> entry : atomTypeCount.entrySet()) {
+            if (!newAtomTypeCount.containsKey(entry.getKey())
+                    || newAtomTypeCount.get(entry.getKey()) != entry.getValue() * 2) {
                 return messages.getError(3);
             }
-            
+
         }
         it = joined.iterator();
         while (it.hasNext()) {

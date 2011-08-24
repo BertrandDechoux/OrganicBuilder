@@ -1,25 +1,21 @@
 package uk.org.squirm3.model.level;
 
 import java.util.Collection;
-import java.util.List;
 
-import uk.org.squirm3.engine.generator.AtomGenerator;
 import uk.org.squirm3.engine.generator.GeneratorException;
+import uk.org.squirm3.engine.generator.LevelConstructor;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 
-import com.google.common.collect.Lists;
-
 public class ComposedLevel implements Level {
 
-    private final AtomGenerator atomGenerator;
+    private final LevelConstructor levelConstructor;
     private final LevelMessages messages;
     private final AtomValidator atomValidator;
 
-    public ComposedLevel(final AtomGenerator atomGenerator,
-            final LevelMessages messages,
-            final AtomValidator atomValidator) {
-        this.atomGenerator = atomGenerator;
+    public ComposedLevel(final LevelConstructor levelConstructor,
+            final LevelMessages messages, final AtomValidator atomValidator) {
+        this.levelConstructor = levelConstructor;
         this.messages = messages;
         this.atomValidator = atomValidator;
     }
@@ -40,12 +36,11 @@ public class ComposedLevel implements Level {
     }
 
     @Override
-    public List<Atom> generateAtoms(final Configuration configuration) {
+    public Configuration construct() {
         try {
-            final List<Atom> atoms = Lists.newArrayList(atomGenerator
-                    .generate(configuration));
-            atomValidator.setup(atoms);
-            return atoms;
+            final Configuration configuration = levelConstructor.construct();
+            atomValidator.setup(configuration.getAtoms());
+            return configuration;
         } catch (final GeneratorException e) {
             throw new RuntimeException(e);
         }

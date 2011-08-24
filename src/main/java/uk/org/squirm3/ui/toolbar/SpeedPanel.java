@@ -15,10 +15,10 @@ import javax.swing.event.ChangeListener;
 import org.springframework.context.MessageSource;
 
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.EventDispatcher;
-import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.engine.ApplicationEngineEvent;
+import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.springframework.Messages;
-import uk.org.squirm3.ui.SwingUtils;
+import uk.org.squirm3.swing.SwingUtils;
 
 public class SpeedPanel extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -28,14 +28,8 @@ public class SpeedPanel extends JPanel {
 
         final JSlider speedSelector = createSpeedSelector(applicationEngine);
         final JFormattedTextField speedTF = createSpeedTextField(applicationEngine);
-        applicationEngine.getEventDispatcher().addListener(new IListener() {
-            @Override
-            public void propertyHasChanged() {
-                final int speed = applicationEngine.getSimulationSpeed();
-                speedTF.setValue(new Integer(speed));
-                speedSelector.setValue(speed);
-            }
-        }, EventDispatcher.Event.SPEED);
+        applicationEngine.addListener(new SpeedListener(applicationEngine,
+                speedTF, speedSelector), ApplicationEngineEvent.SPEED);
 
         setLayout(new GridBagLayout());
         add(new JLabel(Messages.localize("parameters.speed", messageSource)),
@@ -49,8 +43,8 @@ public class SpeedPanel extends JPanel {
 
     private JFormattedTextField createSpeedTextField(
             final ApplicationEngine applicationEngine) {
-        final JFormattedTextField speedTF = SwingUtils.createIntegerTextField(1, 100,
-                applicationEngine.getSimulationSpeed(), 5);
+        final JFormattedTextField speedTF = SwingUtils.createIntegerTextField(
+                1, 100, applicationEngine.getSimulationSpeed(), 5);
         speedTF.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(final PropertyChangeEvent e) {
@@ -79,5 +73,23 @@ public class SpeedPanel extends JPanel {
             }
         });
         return speedSelector;
+    }
+
+    private final class SpeedListener implements Listener {
+        private final ApplicationEngine applicationEngine;
+        private final JFormattedTextField speedTF;
+        private final JSlider speedSelector;
+        private SpeedListener(final ApplicationEngine applicationEngine,
+                final JFormattedTextField speedTF, final JSlider speedSelector) {
+            this.applicationEngine = applicationEngine;
+            this.speedTF = speedTF;
+            this.speedSelector = speedSelector;
+        }
+        @Override
+        public void propertyHasChanged() {
+            final int speed = applicationEngine.getSimulationSpeed();
+            speedTF.setValue(new Integer(speed));
+            speedSelector.setValue(speed);
+        }
     }
 }

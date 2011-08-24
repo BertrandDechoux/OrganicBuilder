@@ -13,7 +13,8 @@ import uk.org.squirm3.model.type.def.BasicType;
 public class SelfrepValidator implements AtomValidator {
 
     private Atom chainStart;
-    private final AtomType[] chainTypes = {BasicType.A, BasicType.A, BasicType.A, BasicType.A};
+    private final AtomType[] chainTypes = {BasicType.A, BasicType.A,
+            BasicType.A, BasicType.A};
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {

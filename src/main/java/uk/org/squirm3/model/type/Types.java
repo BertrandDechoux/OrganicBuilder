@@ -19,30 +19,35 @@ public abstract class Types {
     final static Collection<? extends ReactionType> reactionTypes;
 
     static {
-        Collection<AtomType> modifiableAtomTypes = new ArrayList<AtomType>();
+        final Collection<AtomType> modifiableAtomTypes = new ArrayList<AtomType>();
         modifiableAtomTypes.addAll(Arrays.asList(BasicType.values()));
         modifiableAtomTypes.addAll(Arrays.asList(SpecialType.values()));
         atomTypes = Collections.unmodifiableCollection(modifiableAtomTypes);
 
-        Collection<BuilderType> modifiableBuilderTypes = new ArrayList<BuilderType>();
+        final Collection<BuilderType> modifiableBuilderTypes = new ArrayList<BuilderType>();
         modifiableBuilderTypes.addAll(Arrays.asList(BasicType.values()));
         modifiableBuilderTypes.addAll(Arrays.asList(RandomBasicType.values()));
-        modifiableBuilderTypes.addAll(Arrays.asList(RandomBuilderType.values()));
+        modifiableBuilderTypes
+                .addAll(Arrays.asList(RandomBuilderType.values()));
         modifiableBuilderTypes.addAll(Arrays.asList(SpecialType.values()));
-        builderTypes = Collections.unmodifiableCollection(modifiableBuilderTypes);
-        
-        Collection<ChemicalType> modifiableChemicalTypes = new ArrayList<ChemicalType>();
+        builderTypes = Collections
+                .unmodifiableCollection(modifiableBuilderTypes);
+
+        final Collection<ChemicalType> modifiableChemicalTypes = new ArrayList<ChemicalType>();
         modifiableChemicalTypes.addAll(Arrays.asList(BasicType.values()));
         modifiableChemicalTypes.addAll(Arrays.asList(RandomBasicType.values()));
-        modifiableChemicalTypes.addAll(Arrays.asList(RandomBuilderType.values()));
+        modifiableChemicalTypes
+                .addAll(Arrays.asList(RandomBuilderType.values()));
         modifiableChemicalTypes.addAll(Arrays.asList(SpecialType.values()));
         modifiableChemicalTypes.addAll(Arrays.asList(WildcardType.values()));
-        chemicalTypes = Collections.unmodifiableCollection(modifiableChemicalTypes);
-        
-        Collection<ReactionType> modifiableReactionTypes = new ArrayList<ReactionType>();
+        chemicalTypes = Collections
+                .unmodifiableCollection(modifiableChemicalTypes);
+
+        final Collection<ReactionType> modifiableReactionTypes = new ArrayList<ReactionType>();
         modifiableReactionTypes.addAll(Arrays.asList(BasicType.values()));
         modifiableReactionTypes.addAll(Arrays.asList(WildcardType.values()));
-        reactionTypes = Collections.unmodifiableCollection(modifiableReactionTypes);
+        reactionTypes = Collections
+                .unmodifiableCollection(modifiableReactionTypes);
     }
 
     public static final Collection<? extends AtomType> getAtomTypes() {

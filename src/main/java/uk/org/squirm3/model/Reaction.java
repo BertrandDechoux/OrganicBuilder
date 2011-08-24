@@ -3,8 +3,7 @@ package uk.org.squirm3.model;
 import uk.org.squirm3.model.type.AtomType;
 import uk.org.squirm3.model.type.ReactionType;
 import uk.org.squirm3.model.type.def.WildcardType;
-
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class Reaction {
     private final ReactionType aType, bType;
@@ -56,13 +55,11 @@ public final class Reaction {
 
     private boolean rejectReactionOn(final Atom a, final Atom b) {
         // is the type for 'a' specified and correct?
-        if (aType instanceof AtomType
-                && a.getType() != aType) {
+        if (aType instanceof AtomType && a.getType() != aType) {
             return true;
         }
         // is the type for 'b' specified and correct?
-        if (bType instanceof AtomType
-                && b.getType() != bType) {
+        if (bType instanceof AtomType && b.getType() != bType) {
             return true;
         }
         // is the type for 'b' specified as matching that of 'a' and correct?
@@ -81,7 +78,7 @@ public final class Reaction {
         }
         return false;
     }
-    
+
     private void applyReactionOn(final Atom a, final Atom b) {
         if (!bondedBefore && bondedAfter) {
             a.bondWith(b);

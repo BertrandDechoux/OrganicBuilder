@@ -4,11 +4,11 @@ import uk.org.squirm3.model.type.ReactionType;
 import uk.org.squirm3.model.type.Types;
 
 public class CharacterToReactionTypeConverter
-        extends CharacterToChemicalTypeConverter<ReactionType> {
+        extends
+            CharacterToChemicalTypeConverter<ReactionType> {
 
     public CharacterToReactionTypeConverter() {
         super(Types.getReactionTypes());
     }
-
 
 }

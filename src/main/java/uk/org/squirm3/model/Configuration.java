@@ -1,19 +1,25 @@
 package uk.org.squirm3.model;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import com.google.common.base.Objects;
 
 public final class Configuration {
-    private final float width, height;
-    private final int[] types;
     public static final int MAX_NUMBER_OF_STATUS = 50;
-    public static final int[] TYPES = {0, 1, 2, 3, 4, 5};
+    private final float width, height;
+    private final Collection<Atom> atoms;
 
+    @SuppressWarnings("unchecked")
     public Configuration(final float width, final float height) {
-        final int[] types_copy = new int[TYPES.length];
-        System.arraycopy(TYPES, 0, types_copy, 0, TYPES.length);
-        types = types_copy;
+        this(width, height, Collections.EMPTY_LIST);
+    }
+
+    public Configuration(final float width, final float height,
+            final Collection<Atom> atoms) {
         this.width = width;
         this.height = height;
+        this.atoms = atoms;
     }
 
     public float getWidth() {
@@ -24,8 +30,8 @@ public final class Configuration {
         return height;
     }
 
-    public int[] getTypes() {
-        return types;
+    public Collection<Atom> getAtoms() {
+        return atoms;
     }
 
     @Override
@@ -33,4 +39,5 @@ public final class Configuration {
         return Objects.toStringHelper(this).add("width", width)
                 .add("height", height).toString();
     }
+
 }

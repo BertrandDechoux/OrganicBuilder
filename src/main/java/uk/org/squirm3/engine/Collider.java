@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import uk.org.squirm3.model.Atom;
+import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
 import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.model.type.def.BasicType;
@@ -36,8 +37,10 @@ final class Collider {
     private final Set<Atom> reactedAtoms = new HashSet<Atom>();
 
     // ------- methods ---------
-    public Collider(final List<? extends Atom> atoms, final int w, final int h) {
-        this.atoms = atoms;
+    public Collider(final Configuration configuration) {
+        atoms = new ArrayList<Atom>(configuration.getAtoms());
+        final int w = (int) configuration.getWidth();
+        final int h = (int) configuration.getHeight();
         // size the buckets structure so each bucket is approximately R in size
         // (approx 1 atom per bucket)
         final float R = Atom.getAtomSize();
@@ -52,7 +55,7 @@ final class Collider {
                                                         // array)
         // allocate each
         for (int x = 0; x < n_buckets_x; x++) {
-            List<List<Integer>> list = new ArrayList<List<Integer>>();
+            final List<List<Integer>> list = new ArrayList<List<Integer>>();
             buckets.add(list);
             for (int y = 0; y < n_buckets_y; y++) {
                 list.add(new LinkedList<Integer>());
@@ -349,7 +352,7 @@ final class Collider {
                         current_bucket_y);
                 final Iterator<Integer> it = list.listIterator(0);
                 while (it.hasNext()) {
-                    if (((Integer) it.next()).intValue() == i) {
+                    if (it.next().intValue() == i) {
                         it.remove();
                     }
                 }

@@ -17,7 +17,7 @@
 
 	<bean id="toolBarPanel" class="uk.org.squirm3.ui.toolbar.ToolBarPanel"
 		autowire="constructor" />
-	<bean id="graphicsFactory" class="uk.org.squirm3.GraphicsFactory" />
+	<bean id="graphicsFactory" class="uk.org.squirm3.swing.GraphicsFactory" />
 	<bean id="abstractAction" abstract="true">
 		<constructor-arg ref="applicationEngine" />
 		<constructor-arg ref="messageSource" />

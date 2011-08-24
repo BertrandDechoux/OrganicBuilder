@@ -23,8 +23,8 @@ import javax.swing.SwingUtilities;
 
 import uk.org.squirm3.derivative.RoundGradientPaint;
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.EventDispatcher;
-import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.engine.ApplicationEngineEvent;
+import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
@@ -44,7 +44,7 @@ public class AtomsPanel extends JScrollPane {
     private boolean needRepaint = true;
     byte scale;
 
-    private JPanel imagePanel;
+    private final JPanel imagePanel;
 
     // yellow, grey, blue, purple, red, green
     private static final Map<BasicType, Color> atomColors;
@@ -72,69 +72,28 @@ public class AtomsPanel extends JScrollPane {
         this.spikyImage = spikyImage;
         needRepaint = true;
         scale = 100;
-        addComponentListener(new ComponentListener() {
-            @Override
-            public void componentResized(final ComponentEvent arg0) {
-                imageSizeHasChanged();
-            }
-
-            @Override
-            public void componentHidden(final ComponentEvent arg0) {
-            }
-
-            @Override
-            public void componentMoved(final ComponentEvent arg0) {
-            }
-
-            @Override
-            public void componentShown(final ComponentEvent arg0) {
-            }
-        });
-
-        final Configuration configuration = applicationEngine
-                .getConfiguration();
-        simulationHeight = (int) configuration.getHeight();
-        simulationWidth = (int) configuration.getWidth();
+        addComponentListener(new ResizeListener());
         imageSizeHasChanged();
 
-        final IListener atomsListener = new IListener() {
-            @Override
-            public void propertyHasChanged() {
-                final Collection<? extends Atom> c = applicationEngine
-                        .getAtoms();
-                final Iterator<? extends Atom> it = c.iterator();
-                latestAtomsCopy = new Atom[c.size()];
-                int i = 0;
-                while (it.hasNext()) {
-                    latestAtomsCopy[i] = it.next();
-                    i++;
-                }
-                imageHasChanged();
-            }
-        };
-        atomsListener.propertyHasChanged();
-        applicationEngine.getEventDispatcher().addListener(atomsListener,
-                EventDispatcher.Event.ATOMS);
-
-        final IListener draggingPointListener = new IListener() {
-            @Override
-            public void propertyHasChanged() {
-                draggingPoint = applicationEngine.getCurrentDraggingPoint();
-                imageHasChanged();
-            }
-        };
-        draggingPointListener.propertyHasChanged();
-        applicationEngine.getEventDispatcher().addListener(
-                draggingPointListener, EventDispatcher.Event.DRAGGING_POINT);
+        bindToApplicationEngine(applicationEngine);
 
     }
 
+    private void bindToApplicationEngine(
+            final ApplicationEngine applicationEngine) {
+        applicationEngine.addListener(new AtomListener(applicationEngine),
+                ApplicationEngineEvent.ATOMS);
+        applicationEngine.addListener(new SizeListener(),
+                ApplicationEngineEvent.CONFIGURATION);
+        applicationEngine.addListener(new DraggingPointListener(
+                applicationEngine), ApplicationEngineEvent.DRAGGING_POINT);
+    }
     private static void createAtomsImages() {
         // size
         final float R = Atom.getAtomSize() - 2;
         final int w = (int) (2 * R);
         final int h = (int) (2 * R);
-        for (Entry<BasicType, Color> entry : atomColors.entrySet()) {
+        for (final Entry<BasicType, Color> entry : atomColors.entrySet()) {
             // creation of the image
             final BufferedImage image = new BufferedImage(w, h,
                     BufferedImage.TYPE_INT_ARGB);
@@ -164,6 +123,12 @@ public class AtomsPanel extends JScrollPane {
         }
     }
     private void imageSizeHasChanged() {
+        final Configuration configuration = applicationEngine
+                .getConfiguration();
+        if (configuration != null) {
+            simulationHeight = (int) configuration.getHeight();
+            simulationWidth = (int) configuration.getWidth();
+        }
         if (imagePanel != null) {
             final Dimension d = getSize();
             final int pseudoScale = (int) (Math.min(
@@ -305,6 +270,60 @@ public class AtomsPanel extends JScrollPane {
         g2.setPaint(new Color(100, 100, 200));
         g2.drawRoundRect(2, 1, simulationWidth - 4, simulationHeight - 4, 9, 9);
         g2.dispose();
+    }
+
+    private final class SizeListener implements Listener {
+        @Override
+        public void propertyHasChanged() {
+            imageSizeHasChanged();
+        }
+    }
+
+    private final class DraggingPointListener implements Listener {
+        private final ApplicationEngine applicationEngine;
+        private DraggingPointListener(final ApplicationEngine applicationEngine) {
+            this.applicationEngine = applicationEngine;
+        }
+        @Override
+        public void propertyHasChanged() {
+            draggingPoint = applicationEngine.getCurrentDraggingPoint();
+            imageHasChanged();
+        }
+    }
+
+    private final class AtomListener implements Listener {
+        private final ApplicationEngine applicationEngine;
+        private AtomListener(final ApplicationEngine applicationEngine) {
+            this.applicationEngine = applicationEngine;
+        }
+        @Override
+        public void propertyHasChanged() {
+            final Collection<? extends Atom> c = applicationEngine.getAtoms();
+            final Iterator<? extends Atom> it = c.iterator();
+            latestAtomsCopy = new Atom[c.size()];
+            int i = 0;
+            while (it.hasNext()) {
+                latestAtomsCopy[i] = it.next();
+                i++;
+            }
+            imageHasChanged();
+        }
+    }
+
+    private final class ResizeListener implements ComponentListener {
+        @Override
+        public void componentResized(final ComponentEvent arg0) {
+            imageSizeHasChanged();
+        }
+        @Override
+        public void componentHidden(final ComponentEvent arg0) {
+        }
+        @Override
+        public void componentMoved(final ComponentEvent arg0) {
+        }
+        @Override
+        public void componentShown(final ComponentEvent arg0) {
+        }
     }
 
 }

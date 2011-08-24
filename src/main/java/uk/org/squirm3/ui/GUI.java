@@ -20,6 +20,10 @@ import uk.org.squirm3.ui.reaction.ReactionConstructorPanel;
 import uk.org.squirm3.ui.reaction.ReactionListPanel;
 import uk.org.squirm3.ui.toolbar.ToolBarPanel;
 
+/**
+ * Root of the graphical user interface. It setups the injected dependencies
+ * within a layout.
+ */
 public class GUI {
 
     public GUI(final MessageSource messageSource,
@@ -28,7 +32,20 @@ public class GUI {
             final ReactionConstructorPanel reactionConstructorPanel,
             final AtomsPanel collisionsPanel, final ToolBarPanel toolBarPanel) {
 
-        // main panels
+        final JSplitPane reactionsPane = createReactionsPane(reactionListPanel,
+                reactionConstructorPanel);
+        final JSplitPane rootComponent = buildRootComponent(collisionsPanel,
+                currentLevelPanel, reactionsPane);
+        final JPanel contentPane = buildContentPane(toolBarPanel, rootComponent);
+        buildMainFrame(messageSource, contentPane);
+    }
+
+    /**
+     * Bottom-left component.
+     */
+    private JSplitPane createReactionsPane(
+            final ReactionListPanel reactionListPanel,
+            final ReactionConstructorPanel reactionConstructorPanel) {
         final JSplitPane reactionsPane = new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT, true, reactionConstructorPanel,
                 reactionListPanel);
@@ -42,13 +59,12 @@ public class GUI {
             }
         });
         reactionsPane.setOneTouchExpandable(true);
-
-        final JSplitPane rootComponent = buildRootComponent(collisionsPanel,
-                currentLevelPanel, reactionsPane);
-        final JPanel contentPane = buildContentPane(toolBarPanel, rootComponent);
-        buildMainFrame(messageSource, contentPane);
+        return reactionsPane;
     }
 
+    /**
+     * The main component (without the toolbar)
+     */
     private JSplitPane buildRootComponent(final JComponent collisionsPanel,
             final JPanel currentLevelPanel, final JSplitPane reactionsPane) {
         final JSplitPane leftComponent = new JSplitPane(
@@ -62,6 +78,9 @@ public class GUI {
         return rootComponent;
     }
 
+    /**
+     * The whole graphical user interface.
+     */
     private JPanel buildContentPane(final ToolBarPanel toolBarPanel,
             final JSplitPane rootComponent) {
         final JPanel contentPane = new JPanel();
@@ -71,6 +90,9 @@ public class GUI {
         return contentPane;
     }
 
+    /**
+     * Setup the whole GUI, title, size and exit behavior.
+     */
     private void buildMainFrame(final MessageSource messageSource,
             final JPanel contentPane) {
         final JFrame frame = new JFrame(Messages.localize("application.title",
