@@ -40,7 +40,7 @@ public class ActionConfigurer {
      *            what characterize the messages for the provided action with
      *            regards to the others
      */
-    public void configure(final Action action, final String identifier) {
+    public Action configure(final Action action, final String identifier) {
         for (final ActionProperty property : actionProperties) {
             final String messageCode = property.getMessageCode(identifier);
             final String message = messageSource.getMessage(messageCode, null,
@@ -57,6 +57,7 @@ public class ActionConfigurer {
             }
             action.putValue(property.getSwingKey(), value);
         }
+        return action;
     }
 
 }

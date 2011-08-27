@@ -6,6 +6,12 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+	<bean id="actionConfigurer" class="uk.org.squirm3.swing.action.ActionConfigurerFactory"
+		factory-method="createDefaultConfigurer">
+		<constructor-arg ref="messageSource" />
+		<constructor-arg ref="conversionService" />
+	</bean>
+
 	<bean id="gui" class="uk.org.squirm3.ui.GUI">
 		<constructor-arg ref="messageSource" />
 		<constructor-arg ref="currentLevelPanel" />
@@ -22,56 +28,94 @@
 		<constructor-arg ref="applicationEngine" />
 		<constructor-arg ref="messageSource" />
 	</bean>
-	
-	<bean id="aboutAction" class="uk.org.squirm3.ui.toolbar.actions.AboutAction">
-		<constructor-arg value="${about.url}" />
-		<constructor-arg ref="messageSource" />
-		<constructor-arg value="/graphics/about.png" />
-	</bean>
-	
-	<bean id="resetSimulationAction" class="uk.org.squirm3.ui.toolbar.actions.ResetSimulationAction"
-		parent="abstractAction">
-		<constructor-arg value="/graphics/reset.png" />
-	</bean>
-	
-	<bean id="runSimulationAction" class="uk.org.squirm3.ui.toolbar.actions.RunSimulationAction"
-		parent="abstractAction">
-		<constructor-arg value="/graphics/play.png" />
-	</bean>
-	
-	<bean id="stopSimulationAction" class="uk.org.squirm3.ui.toolbar.actions.StopSimulationAction"
-		parent="abstractAction">
-		<constructor-arg value="/graphics/pause.png" />
+
+	<bean id="runSimulationAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.simulation.RunSimulationAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="simulation.run" />
 	</bean>
 
+	<bean id="stopSimulationAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.simulation.StopSimulationAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="simulation.stop" />
+	</bean>
+
+	<bean id="resetSimulationAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.simulation.ResetSimulationAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="simulation.reset" />
+	</bean>
+
+	<bean id="firstLevelAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.navigation.FirstLevelAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="level.first" />
+	</bean>
+
+	<bean id="previousLevelAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.navigation.PreviousLevelAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="level.previous" />
+	</bean>
+
+	<bean id="speedPanel" class="uk.org.squirm3.ui.toolbar.simulation.SpeedPanel"
+		autowire="constructor" />
+
+	<bean id="levelPicker" class="uk.org.squirm3.ui.toolbar.navigation.LevelPicker"
+		autowire="constructor" />
+
+	<bean id="nextLevelAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.navigation.NextLevelAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="level.next" />
+	</bean>
+
+	<bean id="lastLevelAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.navigation.LastLevelAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="level.last" />
+	</bean>
+
+	<bean id="aboutAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.AboutAction">
+				<constructor-arg value="${about.url}" />
+				<constructor-arg ref="messageSource" />
+			</bean>
+		</constructor-arg>
+		<constructor-arg value="about" />
+	</bean>
 
 	<bean id="atomsPanel" class="uk.org.squirm3.ui.collider.AtomsPanel">
 		<constructor-arg ref="applicationEngine" />
 		<constructor-arg value="/graphics/spiky.png" />
 	</bean>
-	
+
 	<bean id="currentLevelPanel" class="uk.org.squirm3.ui.level.CurrentLevelPanel"
 		autowire="constructor" />
-
-	<bean id="firstLevelAction" class="uk.org.squirm3.ui.toolbar.actions.FirstLevelAction"
-		parent="abstractAction">
-		<constructor-arg value="/graphics/first.png" />
-	</bean>
-
-	<bean id="previousLevelAction" class="uk.org.squirm3.ui.toolbar.actions.PreviousLevelAction"
-		parent="abstractAction">
-		<constructor-arg value="/graphics/previous.png" />
-	</bean>
-
-	<bean id="nextLevelAction" class="uk.org.squirm3.ui.toolbar.actions.NextLevelAction"
-		parent="abstractAction">
-		<constructor-arg value="/graphics/next.png" />
-	</bean>
-
-	<bean id="lastLevelAction" class="uk.org.squirm3.ui.toolbar.actions.LastLevelAction"
-		parent="abstractAction">
-		<constructor-arg value="/graphics/last.png" />
-	</bean>
 
 	<bean id="reactionConstructorPanel" class="uk.org.squirm3.ui.reaction.ReactionConstructorPanel">
 		<constructor-arg ref="applicationEngine" />
@@ -80,17 +124,11 @@
 	</bean>
 	<bean id="reactionListPanel" class="uk.org.squirm3.ui.reaction.ReactionListPanel"
 		autowire="constructor" />
-	<bean id="speedPanel" class="uk.org.squirm3.ui.toolbar.SpeedPanel"
-		autowire="constructor" />
+	
 
-	<bean id="parametersAction" class="uk.org.squirm3.ui.toolbar.actions.ParametersAction"
-		parent="abstractAction">
-		<constructor-arg type="javax.swing.ImageIcon" value="/graphics/parameters.png" />
-		<constructor-arg ref="speedPanel" />
-	</bean>
+	
 
-	<bean id="levelPicker" class="uk.org.squirm3.ui.toolbar.LevelPicker"
-		autowire="constructor" />
+	
 
 
 
