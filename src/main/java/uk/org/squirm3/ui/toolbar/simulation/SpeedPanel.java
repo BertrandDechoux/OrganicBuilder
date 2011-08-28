@@ -32,7 +32,7 @@ public class SpeedPanel extends JPanel implements Listener {
         this.speedSelector = createSpeedSelector();
         setupLayout(messageSource);
         applicationEngine.addListener(this, ApplicationEngineEvent.SPEED);
-
+        setMaximumSize(getPreferredSize());
     }
 
     private void setupLayout(final MessageSource messageSource) {

@@ -2,7 +2,6 @@ package uk.org.squirm3.ui.toolbar;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Insets;
 
 import javax.swing.Action;
@@ -33,62 +32,52 @@ public class ToolBarPanel extends JPanel {
             @Qualifier("aboutAction") final Action aboutAction) {
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        setBackground(ToolBarPanel.BACKGROUND);
+        setBackground(BACKGROUND);
 
-        add(createSimulationControlPanel(stopSimulationAction,
-                runSimulationAction, resetSimulationAction));
-        add(Box.createHorizontalGlue());
-        add(createSpeedPanel(speedPanel));
-        add(Box.createHorizontalGlue());
-        add(createLevelsControlPanel(firstLevelAction, previousLevelAction,
-                levelPicker, nextLevelAction, lastLevelAction));
-        add(Box.createHorizontalGlue());
-        add(createAboutPanel(aboutAction));
-    }
+        addActions(stopSimulationAction, runSimulationAction,
+                resetSimulationAction);
 
-    private JPanel createSimulationControlPanel(final Action stopAction,
-            final Action runAction, final Action resetAction) {
-        final JPanel simulationControlPanel = new JPanel();
-        simulationControlPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 2));
-        simulationControlPanel.setBackground(BACKGROUND);
-        simulationControlPanel.add(createIconButton(stopAction));
-        simulationControlPanel.add(createIconButton(runAction));
-        simulationControlPanel.add(createIconButton(resetAction));
-        return simulationControlPanel;
-    }
+        addGlueSeparartor(1);
 
-    private JPanel createSpeedPanel(final JPanel speedPanel) {
-        final JPanel speedLayoutPanel = new JPanel();
-        speedLayoutPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 2));
-        speedLayoutPanel.setBackground(BACKGROUND);
         speedPanel.setBackground(BACKGROUND);
-        speedLayoutPanel.add(speedPanel);
-        return speedLayoutPanel;
-    }
+        add(speedPanel);
 
-    private JPanel createLevelsControlPanel(final Action introAction,
-            final Action previousAction, final LevelPicker levelPicker,
-            final Action nextAction, final Action lastAction) {
-        final JPanel levelsControlPanel = new JPanel();
-        levelsControlPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 2));
-        levelsControlPanel.setBackground(BACKGROUND);
-        levelsControlPanel.add(createIconButton(introAction));
-        levelsControlPanel.add(createIconButton(previousAction));
+        addGlueSeparartor(2);
+
+        addActions(firstLevelAction, previousLevelAction);
         levelPicker.setMaximumSize(new Dimension(150, 80));
-        levelsControlPanel.add(levelPicker);
-        levelsControlPanel.add(createIconButton(nextAction));
-        levelsControlPanel.add(createIconButton(lastAction));
-        return levelsControlPanel;
+        add(levelPicker);
+        addActions(nextLevelAction, lastLevelAction);
+
+        addGlueSeparartor(6);
+
+        addActions(aboutAction);
     }
 
-    private JPanel createAboutPanel(final Action aboutAction) {
-        final JPanel aboutPanel = new JPanel();
-        aboutPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 2));
-        aboutPanel.setBackground(BACKGROUND);
-        aboutPanel.add(createIconButton(aboutAction));
-        return aboutPanel;
+    /**
+     * Add all provided actions as standard {@link JButton}s.
+     */
+    private void addActions(Action... actions) {
+        for (Action action : actions) {
+            add(createIconButton(action));
+        }
     }
 
+    /**
+     * Add a glue component having the provided strength. The higher the
+     * strength, the higher free space the glue will take with regards to other
+     * components.
+     */
+    private void addGlueSeparartor(final int strenght) {
+        for (int i = 0; i < strenght; i++) {
+            add(Box.createHorizontalGlue());
+        }
+    }
+
+    /**
+     * @return a standard {@link JButton}n for this toolbar created from the
+     *         provided {@link Action}
+     */
     public static JButton createIconButton(final Action action) {
         final JButton button = new JButton(action);
         button.setMargin(new Insets(-3, -3, -3, -3));
