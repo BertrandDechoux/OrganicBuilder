@@ -57,8 +57,8 @@ public class ToolBarPanel extends JPanel {
     /**
      * Add all provided actions as standard {@link JButton}s.
      */
-    private void addActions(Action... actions) {
-        for (Action action : actions) {
+    private void addActions(final Action... actions) {
+        for (final Action action : actions) {
             add(createIconButton(action));
         }
     }

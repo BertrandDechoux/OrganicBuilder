@@ -17,7 +17,7 @@ public abstract class SwingUtils {
      */
     public static GridBagConstraints createCustomGBC(final int x, final int y,
             final double weightx, final int fill) {
-        final GridBagConstraints gbc = SwingUtils.createCustomGBC(x, y);
+        final GridBagConstraints gbc = createCustomGBC(x, y);
         gbc.weightx = weightx;
         gbc.fill = fill;
         return gbc;

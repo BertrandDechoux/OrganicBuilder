@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -31,10 +32,12 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 public class ActionConfigurerIntegrationTest {
     private static final String IDENTIFIER = "myid";
 
+    private final Properties properties = new Properties();
     private final MessageSource messageSource = createMessageSource();
     private final ConversionService conversionService = createConversionService();
     private final ActionConfigurer actionConfigurer = ActionConfigurerFactory
-            .createDefaultConfigurer(messageSource, conversionService);
+            .createDefaultConfigurer(properties, messageSource,
+                    conversionService);
 
     @Test
     public void testActionSetting() {

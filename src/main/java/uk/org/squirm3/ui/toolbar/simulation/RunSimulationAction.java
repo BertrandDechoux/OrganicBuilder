@@ -14,7 +14,7 @@ import uk.org.squirm3.listener.Listener;
  */
 public class RunSimulationAction extends AbstractAction implements Listener {
     private static final long serialVersionUID = 1L;
-    
+
     private final ApplicationEngine applicationEngine;
 
     public RunSimulationAction(final ApplicationEngine applicationEngine) {

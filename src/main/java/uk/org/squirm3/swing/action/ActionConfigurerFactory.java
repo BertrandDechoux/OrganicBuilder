@@ -2,6 +2,7 @@ package uk.org.squirm3.swing.action;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Properties;
 
 import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
@@ -15,10 +16,10 @@ public class ActionConfigurerFactory {
      * By default, {@link ActionConfigurer} uses {@link ActionProperties}.
      */
     public static ActionConfigurer createDefaultConfigurer(
-            final MessageSource messageSource,
+            final Properties properties, final MessageSource messageSource,
             final ConversionService conversionService) {
-        return new ActionConfigurer(messageSource, conversionService,
-                Arrays.asList(ActionProperties.values()));
+        return new ActionConfigurer(properties, messageSource,
+                conversionService, Arrays.asList(ActionProperties.values()));
 
     }
 
@@ -26,11 +27,11 @@ public class ActionConfigurerFactory {
      * A custom list of {@link ActionProperty} can be provided.
      */
     public static ActionConfigurer createCustomConfigurer(
-            final MessageSource messageSource,
+            final Properties properties, final MessageSource messageSource,
             final ConversionService conversionService,
             final Collection<? extends ActionProperty> actionProperties) {
-        return new ActionConfigurer(messageSource, conversionService,
-                actionProperties);
+        return new ActionConfigurer(properties, messageSource,
+                conversionService, actionProperties);
 
     }
 

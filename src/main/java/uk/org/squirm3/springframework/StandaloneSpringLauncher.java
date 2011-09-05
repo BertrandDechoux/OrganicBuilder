@@ -6,8 +6,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Startup for standalone application using a spring xml application context for
  * configuration.
  * 
- * @enhancement user should be able to specify the name and location of the
- *              configuration regardless of the type (xml, annotation)
+ * TODO user should be able to specify the name and location of the
+ * configuration regardless of the type (xml, annotation)
  */
 public class StandaloneSpringLauncher {
     public static final String DEFAULT_APPLICATION_CONTEXT = "application-context.xml";

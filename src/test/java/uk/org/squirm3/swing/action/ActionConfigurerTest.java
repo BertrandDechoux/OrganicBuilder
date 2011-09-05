@@ -2,6 +2,7 @@ package uk.org.squirm3.swing.action;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Properties;
 
 import javax.swing.Action;
 
@@ -35,9 +36,11 @@ public class ActionConfigurerTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Mock
-    private ConversionService conversionService;
+    private Properties properties;
     @Mock
     private MessageSource messageSource;
+    @Mock
+    private ConversionService conversionService;
     @Mock
     private ActionProperty actionProperty;
     @Mock
@@ -48,9 +51,9 @@ public class ActionConfigurerTest {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Before
     public void setup() {
-        actionConfigurer = ActionConfigurerFactory
-                .createCustomConfigurer(messageSource, conversionService,
-                        Arrays.asList(actionProperty));
+        actionConfigurer = ActionConfigurerFactory.createCustomConfigurer(
+                properties, messageSource, conversionService,
+                Arrays.asList(actionProperty));
 
         when(actionProperty.getMessageCode(IDENTIFIER))
                 .thenReturn(MESSAGE_CODE);
@@ -60,15 +63,24 @@ public class ActionConfigurerTest {
 
     @Test
     public void shouldIgnoreMissingMessage() {
-        whenMessageSourceReturn(null);
+        whenMessageIs(null, null);
         whenConversionFail();
         actionConfigurer.configure(action, IDENTIFIER);
         verify(action, never()).putValue(any(String.class), any());
     }
 
     @Test
+    public void shouldSkipMessageIfPropertyIsNotNull() {
+        whenMessageIs(null, null);
+        whenConversionFail();
+        actionConfigurer.configure(action, IDENTIFIER);
+
+        verify(action, never()).putValue(any(String.class), any());
+    }
+
+    @Test
     public void shouldIgnoreEmptyMessage() {
-        whenMessageSourceReturn("    ");
+        whenMessageIs(null, "    ");
         whenConversionFail();
         actionConfigurer.configure(action, IDENTIFIER);
         verify(action, never()).putValue(any(String.class), any());
@@ -76,7 +88,7 @@ public class ActionConfigurerTest {
 
     @Test
     public void shoulFailOnConversionException() {
-        whenMessageSourceReturn(MESSAGE);
+        whenMessageIs(null, MESSAGE);
         whenConversionFail();
         try {
             actionConfigurer.configure(action, IDENTIFIER);
@@ -87,7 +99,7 @@ public class ActionConfigurerTest {
 
     @Test
     public void shoulFailOnConversionWithoutResult() {
-        whenMessageSourceReturn(MESSAGE);
+        whenMessageIs(null, MESSAGE);
         when(conversionService.convert(MESSAGE, TARGET_TYPE)).thenReturn(null);
         try {
             actionConfigurer.configure(action, IDENTIFIER);
@@ -98,8 +110,16 @@ public class ActionConfigurerTest {
     }
 
     @Test
-    public void shouldSetPropertyAfterSuccessfulConversion() {
-        whenMessageSourceReturn(MESSAGE);
+    public void shouldSetPropertyAfterSuccessfulPropertyConversion() {
+        whenMessageIs(MESSAGE, "property overide message");
+        when(conversionService.convert(MESSAGE, TARGET_TYPE)).thenReturn(VALUE);
+        actionConfigurer.configure(action, IDENTIFIER);
+        verify(action).putValue(SWING_KEY, VALUE);
+    }
+
+    @Test
+    public void shouldSetPropertyAfterSuccessfulMessageConversion() {
+        whenMessageIs(null, MESSAGE);
         when(conversionService.convert(MESSAGE, TARGET_TYPE)).thenReturn(VALUE);
         actionConfigurer.configure(action, IDENTIFIER);
         verify(action).putValue(SWING_KEY, VALUE);
@@ -110,7 +130,8 @@ public class ActionConfigurerTest {
         thrown.expectMessage("Error during the conversion of " + MESSAGE);
     }
 
-    private void whenMessageSourceReturn(final String message) {
+    private void whenMessageIs(final String property, final String message) {
+        when(properties.getProperty(MESSAGE_CODE)).thenReturn(property);
         when(
                 messageSource.getMessage(MESSAGE_CODE, null, null,
                         Locale.getDefault())).thenReturn(message);

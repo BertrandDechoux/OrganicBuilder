@@ -11,7 +11,7 @@ import uk.org.squirm3.engine.ApplicationEngine;
  */
 public class ResetSimulationAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
-    
+
     private final ApplicationEngine applicationEngine;
 
     public ResetSimulationAction(final ApplicationEngine applicationEngine) {

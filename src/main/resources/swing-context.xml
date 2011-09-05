@@ -8,6 +8,7 @@
 
 	<bean id="actionConfigurer" class="uk.org.squirm3.swing.action.ActionConfigurerFactory"
 		factory-method="createDefaultConfigurer">
+		<constructor-arg ref="properties" />
 		<constructor-arg ref="messageSource" />
 		<constructor-arg ref="conversionService" />
 	</bean>
@@ -24,10 +25,6 @@
 	<bean id="toolBarPanel" class="uk.org.squirm3.ui.toolbar.ToolBarPanel"
 		autowire="constructor" />
 
-	<bean id="abstractAction" abstract="true">
-		<constructor-arg ref="applicationEngine" />
-		<constructor-arg ref="messageSource" />
-	</bean>
 
 	<bean id="runSimulationAction" factory-bean="actionConfigurer"
 		factory-method="configure">
@@ -124,12 +121,5 @@
 	</bean>
 	<bean id="reactionListPanel" class="uk.org.squirm3.ui.reaction.ReactionListPanel"
 		autowire="constructor" />
-	
-
-	
-
-	
-
-
 
 </beans>

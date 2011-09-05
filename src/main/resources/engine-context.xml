@@ -6,7 +6,19 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<context:property-placeholder location="classpath:configuration.properties" />
+	<!-- definition of a property placeholder configure with explicit properties 
+		for programmatic access -->
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		id="propertyConfigurer">
+		<property name="properties" ref="properties" />
+	</bean>
+
+	<bean id="properties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:configuration.properties" />
+	</bean>
 
 	<bean id="messageSource"
 		class="org.springframework.context.support.ResourceBundleMessageSource">
@@ -31,8 +43,10 @@
 					class="uk.org.squirm3.springframework.converter.StringToReactionConverter">
 					<constructor-arg ref="characterToReactionTypeConverter" />
 				</bean>
-				<bean class="uk.org.squirm3.springframework.converter.StringToIconConverter"/>
-				<bean class="uk.org.squirm3.springframework.converter.StringToImageConverter" />
+				<bean
+					class="uk.org.squirm3.springframework.converter.StringToIconConverter" />
+				<bean
+					class="uk.org.squirm3.springframework.converter.StringToImageConverter" />
 			</list>
 		</property>
 	</bean>

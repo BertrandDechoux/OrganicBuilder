@@ -29,7 +29,7 @@ public class SpeedPanel extends JPanel implements Listener {
     public SpeedPanel(final ApplicationEngine applicationEngine,
             final MessageSource messageSource) {
         this.applicationEngine = applicationEngine;
-        this.speedSelector = createSpeedSelector();
+        speedSelector = createSpeedSelector();
         setupLayout(messageSource);
         applicationEngine.addListener(this, ApplicationEngineEvent.SPEED);
         setMaximumSize(getPreferredSize());
@@ -57,8 +57,8 @@ public class SpeedPanel extends JPanel implements Listener {
      * Convert non-linear mapping : selector to engine.
      */
     private void updateEngineSpeed() {
-        applicationEngine.setSimulationSpeed((short) (Math.pow(
-                speedSelector.getValue(), 2)));
+        applicationEngine.setSimulationSpeed((short) Math.pow(
+                speedSelector.getValue(), 2));
     }
 
     /**
@@ -76,7 +76,7 @@ public class SpeedPanel extends JPanel implements Listener {
     private final class SpeedSelectorListener implements ChangeListener {
         private final JSlider speedSelector;
 
-        private SpeedSelectorListener(JSlider speedSelector) {
+        private SpeedSelectorListener(final JSlider speedSelector) {
             this.speedSelector = speedSelector;
         }
 
