@@ -15,10 +15,13 @@ import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
 
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.EventDispatcher;
-import uk.org.squirm3.listener.IListener;
+import uk.org.squirm3.engine.ApplicationEngineEvent;
+import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.springframework.Messages;
+import uk.org.squirm3.ui.reaction.mode.JListMode;
+import uk.org.squirm3.ui.reaction.mode.JTextAreaMode;
+import uk.org.squirm3.ui.reaction.mode.ReactionsListMode;
 
 public class ReactionListPanel extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -45,10 +48,8 @@ public class ReactionListPanel extends JPanel {
         createListPanel();
         setCurrentModeTo(defaultMode);
 
-        final IListener reactionListener = new ReactionsChangedListener();
-        reactionListener.propertyHasChanged();
-        applicationEngine.getEventDispatcher().addListener(reactionListener,
-                EventDispatcher.Event.REACTIONS);
+        applicationEngine.addListener(new ReactionsChangedListener(),
+                ApplicationEngineEvent.REACTIONS);
     }
 
     public void setCurrentModeTo(final ReactionsListMode futureMode) {
@@ -60,21 +61,22 @@ public class ReactionListPanel extends JPanel {
         currentMode.reactionsHaveChanged(applicationEngine.getReactions());
     }
 
-    public JButton createJButton(String key, ActionListener actionListener) {
+    public JButton createJButton(final String key,
+            final ActionListener actionListener) {
         final JButton jButton = new JButton(Messages.localize(key,
                 messageSource));
         jButton.addActionListener(actionListener);
         return jButton;
     }
-    
+
     public void setReactions(final Collection<Reaction> reactions) {
         applicationEngine.setReactions(reactions);
     }
-    
+
     public void removeReactions(final Collection<Reaction> reactions) {
         applicationEngine.removeReactions(reactions);
     }
-    
+
     public void clearReactions() {
         applicationEngine.clearReactions();
     }
@@ -83,7 +85,7 @@ public class ReactionListPanel extends JPanel {
         return Messages.localize("reactions.current", messageSource);
     }
 
-    private final class ReactionsChangedListener implements IListener {
+    private final class ReactionsChangedListener implements Listener {
         @Override
         public void propertyHasChanged() {
             final Collection<Reaction> reactions = applicationEngine

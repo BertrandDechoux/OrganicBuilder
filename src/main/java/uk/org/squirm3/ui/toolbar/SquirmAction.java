@@ -1,4 +1,4 @@
-package uk.org.squirm3.ui.toolbar.actions;
+package uk.org.squirm3.ui.toolbar;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -7,10 +7,13 @@ import javax.swing.ImageIcon;
 import org.springframework.context.MessageSource;
 
 import uk.org.squirm3.engine.ApplicationEngine;
-import uk.org.squirm3.listener.EventDispatcher.Event;
-import uk.org.squirm3.listener.IListener;
 import uk.org.squirm3.springframework.Messages;
 
+/**
+ * Centralize repetitive misc code.
+ */
+// TODO use properties for configuration
+// see http://download.oracle.com/javase/6/docs/api/javax/swing/Action.html
 public abstract class SquirmAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
@@ -32,11 +35,6 @@ public abstract class SquirmAction extends AbstractAction {
         return applicationEngine;
     }
 
-    protected final void addListener(final IListener listener, final Event event) {
-        listener.propertyHasChanged();
-        applicationEngine.getEventDispatcher().addListener(listener, event);
-    }
-    
     protected final String localize(final String key) {
         return Messages.localize(key, messageSource);
     }

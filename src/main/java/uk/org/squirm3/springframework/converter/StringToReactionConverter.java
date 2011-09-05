@@ -33,7 +33,7 @@ public class StringToReactionConverter implements Converter<String, Reaction> {
     }
 
     @Override
-    public Reaction convert(String source) {
+    public Reaction convert(final String source) {
         final Matcher m = match(source);
         final ReactionType a_type = toReactionType(m.group(1));
         final int a_state = toState(m.group(2));
@@ -47,22 +47,22 @@ public class StringToReactionConverter implements Converter<String, Reaction> {
                 future_a_state, bonded_after, future_b_state);
     }
 
-    private Matcher match(String source) {
+    private Matcher match(final String source) {
         final Matcher m = pattern
                 .matcher(StringUtils.trimAllWhitespace(source));
         m.matches();
         return m;
     }
 
-    private int toState(String group) {
+    private int toState(final String group) {
         return Integer.parseInt(group);
     }
 
-    private boolean isBonded(String group) {
+    private boolean isBonded(final String group) {
         return !group.contains("+");
     }
 
-    private ReactionType toReactionType(String group) {
+    private ReactionType toReactionType(final String group) {
         return characterToReactionTypeConverter.convert(group.charAt(0));
     }
 

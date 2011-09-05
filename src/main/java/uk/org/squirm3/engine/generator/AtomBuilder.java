@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
@@ -39,14 +41,21 @@ public class AtomBuilder {
         this.conversionService = conversionService;
     }
 
-    public Collection<Atom> build(final String levelDescription,
-            final Configuration configuration) throws BuilderException {
+    private float getSize(final String string) {
+        return Atom.getAtomSize() * 2 * Integer.parseInt(string);
+    }
+
+    public Configuration build(final String levelDescription)
+            throws BuilderException {
         String randomizerConfiguration = "abcdef";
         final BufferedReader descriptionReader = new BufferedReader(
                 new StringReader(levelDescription));
 
         try {
             String descriptionLine = descriptionReader.readLine();
+            final Configuration partialConfiguration = parseSizeConfiguration(descriptionLine);
+            descriptionLine = descriptionReader.readLine();
+
             if (descriptionLine != null && descriptionLine.startsWith("#")) {
                 randomizerConfiguration = descriptionLine.substring(1);
                 descriptionLine = descriptionReader.readLine();
@@ -108,8 +117,9 @@ public class AtomBuilder {
                 }
             }
             atoms.removeAll(Collections.singleton(null));
-            checkConfiguration(configuration, maxX, y);
-            return atoms;
+            checkConfiguration(partialConfiguration, maxX, y);
+            return new Configuration(partialConfiguration.getHeight(),
+                    partialConfiguration.getWidth(), atoms);
 
         } catch (final IOException e) {
             throw new BuilderException(
@@ -123,8 +133,29 @@ public class AtomBuilder {
         }
 
     }
-    private void checkConfiguration(Configuration configuration, int x, int y)
+
+    private Configuration parseSizeConfiguration(final String descriptionLine)
             throws BuilderException {
+        if (descriptionLine == null) {
+            throwIncorrectSizeConfiguration(descriptionLine);
+        }
+        final Matcher matcher = Pattern.compile("#(\\d+)x(\\d+)").matcher(
+                descriptionLine);
+        if (!matcher.matches()) {
+            throwIncorrectSizeConfiguration(descriptionLine);
+        }
+        return new Configuration(getSize(matcher.group(1)),
+                getSize(matcher.group(2)));
+    }
+
+    private void throwIncorrectSizeConfiguration(final String descriptionLine)
+            throws BuilderException {
+        throw new BuilderException(
+                "First line should indicate the size of the level : "
+                        + descriptionLine);
+    }
+    private void checkConfiguration(final Configuration configuration,
+            final int x, final int y) throws BuilderException {
         final double horizontalSpace = Atom.getAtomSize() * (x * 2 + 1);
         if (horizontalSpace > configuration.getWidth()) {
             throw new BuilderException(

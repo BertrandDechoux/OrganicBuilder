@@ -1,4 +1,4 @@
-package uk.org.squirm3;
+package uk.org.squirm3.swing;
 
 import java.awt.Component;
 import java.awt.Image;

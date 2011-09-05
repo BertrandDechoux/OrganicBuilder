@@ -11,5 +11,5 @@ public enum BasicType implements AtomType, BuilderType, ReactionType {
     public char getCharacterIdentifier() {
         return name().toLowerCase().charAt(0);
     }
-    
+
 }

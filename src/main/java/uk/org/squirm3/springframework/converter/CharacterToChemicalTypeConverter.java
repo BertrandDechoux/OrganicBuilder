@@ -30,7 +30,7 @@ public class CharacterToChemicalTypeConverter<T extends ChemicalType>
     }
 
     @Override
-    public T convert(Character source) {
+    public T convert(final Character source) {
         return chemicalTypeMapping.get(source);
     }
 

@@ -22,7 +22,7 @@ public class MembraneDivisionValidator implements AtomValidator {
         loopSeed = AtomSelector.findUnique(BasicType.A, 3, atoms);
         loop = Lists.newArrayList();
         for (final Atom atom : atoms) {
-        if (atom.getType() == BasicType.A) {
+            if (atom.getType() == BasicType.A) {
                 loop.add(atom);
             }
         }

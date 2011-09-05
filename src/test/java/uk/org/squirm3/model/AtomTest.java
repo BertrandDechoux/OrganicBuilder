@@ -26,7 +26,8 @@ public class AtomTest {
      */
     @Test
     public void testStuck() {
-        assertFalse(Atoms.createMobileAtomWithRandomSpeed(BasicType.A, 0, 0, 0).isStuck());
+        assertFalse(Atoms.createMobileAtomWithRandomSpeed(BasicType.A, 0, 0, 0)
+                .isStuck());
         assertTrue(Atoms.createFixedAtom(BasicType.A, 0, 0, 0).isStuck());
     }
 
@@ -65,7 +66,8 @@ public class AtomTest {
     public void testGeneralMethods() {
         final Atom a1 = Atoms.createAtom(BasicType.A, 1);
         final Atom a2 = Atoms.createAtom(BasicType.A, 2);
-        final Atom a3 = Atoms.createAtom(BasicType.A, 3);;
+        final Atom a3 = Atoms.createAtom(BasicType.A, 3);
+        ;
         final Atom a4 = Atoms.createAtom(BasicType.A, 4);
         final Atom a5 = Atoms.createAtom(BasicType.A, 3);
         final Atom a6 = Atoms.createAtom(BasicType.A, 4);

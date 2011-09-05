@@ -15,7 +15,8 @@ public class Atom {
     private final AtomType type;
     private final LinkedList<Atom> bonds;
 
-    public Atom(final IPhysicalPoint iPhysicalPoint, final AtomType type, final int state) {
+    public Atom(final IPhysicalPoint iPhysicalPoint, final AtomType type,
+            final int state) {
         this.iPhysicalPoint = iPhysicalPoint.copy();
         this.type = type;
         this.state = state;
