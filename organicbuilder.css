@@ -1,0 +1,129 @@
+/* from http://css.alsacreations.com/Faire-une-mise-en-page-sans-tableaux/design-css */
+body
+{
+	margin: 10px 0 ;
+	padding: 0 ;
+	text-align: center ;
+	color:black;
+	font: 0.8em "Trebuchet MS", helvetica, sans-serif ;
+	background: #E6E6FA;
+}
+div#conteneur
+{
+	width: 770px ;
+	margin: 0 auto ;
+	text-align: left ;
+	border: 2px solid #6A5ACD;
+	background: #F5F5F5;
+}
+h1#header
+{
+	margin: 0 ;
+}
+h1#header a
+{
+	width: 400px ;
+	height: 85px ;
+	display: block ;
+	background: url(title.gif) no-repeat ;
+	position: relative ;
+	left: 350px ;
+	top: 15px ;
+	text-indent: -5000px ;
+}
+h2#abstract{
+	font-size: 1.2em ;
+	color: #4682B4 ;
+	margin : 2% 10% 2% 10%;
+	text-align: justify;
+}
+ul#menu
+{
+	height: 35px ;
+	margin: 0 ;
+	padding: 0 ;
+	background: url(bg_menu.gif) repeat-x 0 -25px ;
+	list-style-type: none ;
+}
+ul#menu li
+{
+	float: left ;
+	text-align: center ;
+}
+ul#menu li a
+{
+	width: 185px ;
+	line-height: 25px ;
+	font-size: 1.2em ;
+	font-weight: bold ;
+	letter-spacing: 2px ;
+	color: #F5F5F5;
+	display: block ;
+	text-decoration: none ;
+	border-right: 2px solid #6A5ACD ;
+}
+ul#menu li a:hover
+{
+	background: url(bg_menu.gif) repeat-x 0 0 ;
+}
+div#contenu
+{
+	padding: 0 25px 0 50px ;
+}
+div#contenu h2
+{
+	line-height: 25px ;
+	font-size: 1.4em ;
+	color: #356287 ;
+	border-bottom: 1px solid #6A5ACD ;
+}
+div#contenu h3
+{
+	margin-left: 15px ;
+	padding-left: 5px ;
+	border-bottom: 1px solid #6A5ACD;
+	border-left: 3px solid #6A5ACD;
+	color: #4477A1; /*  #4682B4; */
+}
+div#contenu p
+{
+	text-align: justify ;
+	text-indent: 2em ;
+	line-height: 1.7em ;
+}
+div#contenu a
+{
+	color: #6A5ACD ;
+}
+div#contenu a:hover
+{
+	color: blue ;
+}
+p#footer
+{
+	margin: 0 ;
+	padding-right: 10px ;
+	line-height: 30px ;
+	text-align: right ;
+	color: #5F9EA0  ;
+}
+.warning
+{
+	color:#FF0000;
+}
+.command
+{
+	font-family: courier;
+	color: #000066;
+	background-color: #DDDDFF;
+}
+span.reaction, span.atype, span.btype, span.ctype, span.dtype, span.etype, span.ftype, span.button
+{
+	font-weight:bold;
+}
+span.atype { color:#FFA500; }
+span.btype { color:#778899; }
+span.ctype { color:Blue; }
+span.dtype { color:#FF00FF; }
+span.etype { color:red; }
+span.ftype { color:green; }
