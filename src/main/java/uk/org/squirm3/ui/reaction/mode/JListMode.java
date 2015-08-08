@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JButton;
@@ -25,7 +25,7 @@ public class JListMode implements ReactionsListMode {
     private final ReactionsListMode textMode;
 
     private final JButton editButton, deleteButton, clearButton;
-    private final JList reactionsList;
+    private final JList<Reaction> reactionsList;
     private final JPanel listButtonsPanel;
 
     public JListMode(final ReactionListPanel reactionListPanel,
@@ -49,7 +49,7 @@ public class JListMode implements ReactionsListMode {
                 new ClearReactionsListener());
         listButtonsPanel.add(clearButton);
 
-        reactionsList = new JList();
+        reactionsList = new JList<>();
         reactionsList.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
                     @Override
@@ -79,13 +79,13 @@ public class JListMode implements ReactionsListMode {
 
     @Override
     public void reactionsHaveChanged(final Collection<Reaction> reactions) {
-        reactionsList.setListData(reactions.toArray());
+        reactionsList.setListData(reactions.toArray(new Reaction[0]));
         clearButton.setEnabled(!reactions.isEmpty());
         updateDeleteButton();
     }
-
     private void updateDeleteButton() {
-        deleteButton.setEnabled(reactionsList.getSelectedValues().length != 0);
+        deleteButton.setEnabled(!reactionsList.getSelectedValuesList()
+                .isEmpty());
     }
 
     private final class DeleteSelectedReactionsListener
@@ -93,8 +93,8 @@ public class JListMode implements ReactionsListMode {
                 ActionListener {
         @Override
         public void actionPerformed(final ActionEvent e) {
-            reactionListPanel.removeReactions(Arrays.asList((Reaction[]) //
-                    reactionsList.getSelectedValues()));
+            reactionListPanel.removeReactions( //
+                    new ArrayList<>(reactionsList.getSelectedValuesList()));
         }
     }
 

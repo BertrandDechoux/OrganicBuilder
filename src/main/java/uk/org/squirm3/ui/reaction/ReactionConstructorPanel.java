@@ -33,7 +33,8 @@ public class ReactionConstructorPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private JCheckBox bondedBefore, bondedAfter;
-    private JComboBox aType, aState, bType, bState, futureAState, futureBState;
+    private JComboBox<ReactionType> aType, bType;
+    private JComboBox<?> aState, bState, futureAState, futureBState;
     private JLabel futureAType, futureBType;
     private JButton addReaction;
 
@@ -97,9 +98,9 @@ public class ReactionConstructorPanel extends JPanel {
                 bondedAfter.isSelected(), futureBState.getSelectedIndex());
     }
 
-    private JComboBox createTypeComboBox(final ActionListener actionListener,
-            final JPanel parent) {
-        final JComboBox jComboBox = new JComboBox();
+    private JComboBox<ReactionType> createTypeComboBox(
+            final ActionListener actionListener, final JPanel parent) {
+        final JComboBox<ReactionType> jComboBox = new JComboBox<>();
         jComboBox.setRenderer(new ReactionTypeListCellRenderer());
         for (final ReactionType reactionType : Types.getReactionTypes()) {
             jComboBox.addItem(reactionType);
@@ -109,9 +110,9 @@ public class ReactionConstructorPanel extends JPanel {
         return jComboBox;
     }
 
-    private JComboBox createStateComboBox(final ActionListener actionListener,
-            final JPanel parent) {
-        final JComboBox jComboBox = new JComboBox();
+    private JComboBox<String> createStateComboBox(
+            final ActionListener actionListener, final JPanel parent) {
+        final JComboBox<String> jComboBox = new JComboBox<>();
         for (int i = 0; i < Configuration.MAX_NUMBER_OF_STATUS; i++) {
             jComboBox.addItem(String.valueOf(i));
         }
@@ -137,25 +138,26 @@ public class ReactionConstructorPanel extends JPanel {
     private final class UpdateReactionListener implements ActionListener {
         @Override
         public void actionPerformed(final ActionEvent e) {
-            futureAType.setText(toStringIdentifier(aType.getSelectedItem()));
-            futureBType.setText(toStringIdentifier(bType.getSelectedItem()));
+            futureAType.setText(toStringIdentifier((ReactionType)aType.getSelectedItem()));
+            futureBType.setText(toStringIdentifier((ReactionType)bType.getSelectedItem()));
             addReaction.setText(createReactionFromEditor().toString());
         }
     }
 
     private static final class ReactionTypeListCellRenderer
             implements
-                ListCellRenderer {
+                ListCellRenderer<ReactionType> {
         @Override
-        public Component getListCellRendererComponent(final JList list,
-                final Object value, final int index, final boolean isSelected,
-                final boolean cellHasFocus) {
+        public Component getListCellRendererComponent(
+                final JList<? extends ReactionType> list,
+                final ReactionType value, final int index,
+                final boolean isSelected, final boolean cellHasFocus) {
             return new JLabel(toStringIdentifier(value));
         }
     }
 
-    private static String toStringIdentifier(final Object reactionType) {
-        return "" + ((ReactionType) reactionType).getCharacterIdentifier();
+    private static String toStringIdentifier(final ReactionType reactionType) {
+        return "" + reactionType.getCharacterIdentifier();
     }
 
 }

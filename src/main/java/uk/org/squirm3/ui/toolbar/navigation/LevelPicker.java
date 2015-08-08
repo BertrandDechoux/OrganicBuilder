@@ -15,7 +15,7 @@ import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.level.Level;
 import uk.org.squirm3.springframework.Messages;
 
-public class LevelPicker extends JComboBox {
+public class LevelPicker extends JComboBox<String> {
     private static final long serialVersionUID = 1L;
 
     private boolean update = true;

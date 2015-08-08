@@ -3,7 +3,7 @@ package uk.org.squirm3.model;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 public final class Configuration {
     public static final int MAX_NUMBER_OF_STATUS = 50;
@@ -36,8 +36,11 @@ public final class Configuration {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("width", width)
-                .add("height", height).toString();
+        return MoreObjects//
+                .toStringHelper(this)//
+                .add("width", width)//
+                .add("height", height)//
+                .toString();
     }
 
 }
