@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+    <head>
+	<meta http-equiv="Content-type"		content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-language"	content="en" />
+	<meta http-equiv="Content-script-type"	content="text/javascript" />
+	<meta http-equiv="Content-style-type"	content="text/css" />
+	<meta http-equiv="Page-enter"		content="blendTrans(Duration=2)" />
+	<meta http-equiv="Page-exit"		content="blendTrans(Duration=2)" />
+	<meta http-equiv="imagetoolbar"		content="no" />
+
+	<meta name="abstract"		content="Java simulation of evolution -the process in which natural selection and mutation can lead to complex, sophisticated design- using artificial chemistry." />
+	<meta name="author"		content="Dechoux Bertrand"/>
+	<meta name="category"		content="engineering"/>
+	<meta name="date"		content="2011-11-11"/>
+	<meta name="description"	content="Java simulation of evolution -the process in which natural selection and mutation can lead to complex, sophisticated design- using artificial chemistry."/>
+	<meta name="distribution"	content="global"/>
+	<meta name="expires"		content="0" />
+	<meta name="identifier-URL"	content="http://organicbuilder.sourceforge.net/explanation"/>
+	<meta name="keywords"		content="organic,builder,organicbuilder,squirm3,artificial,chemistry,java,applet,JWS,Java Web Start,evolution,selection,mutation,complex system,sourceforge,GPL,Gnu Public License"/>
+	<meta name="reply-to"		content="dechouxbREMOVE@gmail.com (Dechoux Bertrand)" />
+	<meta name="revisit-after"	content="7 days"/>
+	<meta name="robots"		content="all"/>
+
+
+	<meta name="MSSmartTagsPreventParsing" content="TRUE" />
+
+	<!-- Dublin Core http://dublincore.org/ -->
+		<!-- skipped : Contributor, Coverage-->
+	<meta name="DC.Creator"		content="Dechoux Bertrand" />
+	<meta name="DC.Date"		content="2011-11-11" />
+	<meta name="DC.Description"	content="Java simulation of evolution -the process in which natural selection and mutation can lead to complex, sophisticated design- using artificial chemistry." />
+	<meta name="DC.Format"		content="txt/html" />
+	<meta name="DC.Identifier"	content="http://organicbuilder.sourceforge.net/explanation" />
+	<meta name="DC.Language"	scheme="RFC1766" content="en" />
+	<meta name="DC.Publisher"	content="Sourceforge http://sourceforge.net/" />
+	<meta name="DC.Relation"	content="http://www.sq3.org.uk/wiki.pl" />
+		<!-- skipped : Rights-->
+	<meta name="DC.Source"		content="http://sourceforge.net/projects/organicbuilder/" />
+	<meta name="DC.Subject"		content="Artificial chemistry" />
+	<meta name="DC.Title"		content="Organic Builder - Explanation!" />
+	<meta name="DC.Type"		content="Text" />
+
+	<link rel="stylesheet" type="text/css" href="organicbuilder.css" />
+
+	<title>Organic Builder - Explanation!</title>
+    </head>
+
+    <body>
+	<div id="conteneur">		
+		<h1 id="header"><a href="http://organicbuilder.sourceforge.net/" title="Organic Builder - Home"><span>Organic Builder</span></a></h1>
+		<h2 id="abstract">"Make up our own rules of construction to simulate open-ended, creative evolution. Forget all that chemistry they made you learn in school, we're going to make it all up as we go along. "</h2>
+		<ul id="menu">
+			<li><a href="http://organicbuilder.sourceforge.net/explanation">Presentation</a></li>
+			<li><a href="http://organicbuilder.sourceforge.net/getortest">Get it, test it</a></li>
+			<li><a href="http://organicbuilder.sourceforge.net/documentation">Documentation</a></li>
+			<li><a href="http://organicbuilder.sourceforge.net/resources">Resources</a></li>
+		</ul>
+		
+		<div id="contenu"><h2>Presentation</h2>
+	<h3>What is this?</h3>
+		<img src="atoms.gif" width="300" height="300" style="float:left;margin:0% 2% 0% 0%;border:0;" alt="atoms"/>
+		<p>This freeware demonstrates an artificial chemistry. Each circle is an atom, that floats around and can become bonded to others to form a molecule.</p>
+		<p>In real chemistry, the bonding rules are written like this <span class="reaction">6*(CO<sub>2</sub>) + 6*(H<sub>2</sub>O) + light =&gt; C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6*(O<sub>2</sub>)</span>, where carbon dioxide and water (six of each) react (in the presence of light) to form glucose and oxygen. This is the reaction that plants use to photosynthesise.</p>
+		<p>In an <i>artificial</i> chemistry we use simpler rules, like this one <span class="reaction">a0 + b0 =&gt; a1b2</span>, rather than use the atomic types seen in nature (hydrogen, oxygen, etc.), we use arbitrary letters: '<span class="atype">a</span>', '<span class="btype">b</span>', '<span class="ctype">c</span>', '<span class="dtype">d</span>', '<span class="etype">e</span>' and '<span class="ftype">f</span>'.</p>
+		<p>And rather than have complicated rules for determining which molecules will react, based on charge, valency and shape, we use the state number (0, 1, 2, ...) to decide if the reactants match. For example, in the reaction above, two atoms <span class="atype">a</span>0 and <span class="btype">b</span>0 will become bonded, and the '<span class="atype">a</span>' atom will take on state 1 and the '<span class="btype">b</span>' atom state 2. They could each be bonded to different atoms at the time, that doesn't matter. The types of the atoms can't change (like in real chemistry), just their states.</p>
+		<p>And rather than worry about energy considerations, we assume that if a reaction rule is present then it is energetically favourable. All of these changes leave you with a very simple system but one in which you can still do some very interesting things. If you have come across cellular automata (<a href="http://en.wikipedia.org/wiki/Cellular_automaton">wikipedia link</a>) then the system will be somewhat familiar.</p>
+	<h3>Why do all this?</h3>
+		<p>The reason for using a strange abstraction of chemistry like this is that you can do some really cool things in a simple system. This freeware takes you through some of the possibilities.</p>
+		<p>Perhaps the coolest thing you can do is template replication - the process DNA uses to make copies of itself. If you choose the right rules you can actually get this working - follow through the challenges to find out how.</p>
+		<p>The reason for using a spatial system, with atoms bouncing off each other, is that you can then do things like make a membrane out of atoms, and use it to make compartments in the space. Again, some of the challenges explore this idea.</p>
+</div>		
+		
+		<hr/>
+		<p id="footer">
+			<a href="http://validator.w3.org/check?uri=http://organicbuilder.sourceforge.net/explanation"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Strict" height="31" width="88" style="border:0;margin:0;padding:0;float:left;"/></a>
+                        <a href="http://jigsaw.w3.org/css-validator/check?uri=http://organicbuilder.sourceforge.net/organicbuilder.css"><img src="http://www.w3.org/Icons/valid-css2.gif" alt="Valid CSS 2" height="31" width="88" style="border:0;margin:0;padding:0;float:left;"/></a>
+			Original XHTML/CSS files from Olivier Patry, <a href="http://www.alsacreations.com/tuto/lire/555-design-css.html">Alsacreations</a>.<br/>
+			<span >Organic Builder is hosted by </span><a href="http://sourceforge.net/projects/organicbuilder"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=167168&amp;type=8" width="80" height="15" style="border:0;" alt="Get Organic Builder at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+		</p>
+	</div>
+    </body>
+</html>
+
