@@ -16,11 +16,20 @@ mvn clean test
 **Create the executable jar**
 ```
 mvn clean package
-ls target/*-jar-with-dependencies.jar
+```
+
+**Run the executable jar**
+```
+java -jar target/*-jar-with-dependencies.jar
+```
+
+**Run the executable jar with alternative locale (language)**
+```
+java -Duser.language=fr -Duser.country=FR -jar target/*-jar-with-dependencies.jar
 ```
 
 **Create the artefact site**
 ```
 mvn clean site
 ```
-With depedencies, javadocs, test coverage and code/style checks (checkstyle,pmd,findbugs)
+With dependencies, javadocs, test coverage and code/style checks (checkstyle,pmd,findbugs)
