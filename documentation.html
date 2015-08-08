@@ -1,35 +1,26 @@
 ---
 layout: default
-url: https://bertranddechoux.github.io/OrganicBuilder/documentation
-title: Documentation
+fullurl: https://bertranddechoux.github.io/OrganicBuilder/documentation
+subtitle: Documentation
 description: Useful information on how to play with the Organic Builder.
 ---
-
-{% include head.html url=url title=title description=description %}
-
-    <body>
-	<div id="conteneur">		
-{% include header.html %}
+<h3>How does it look?</h3>
+	<img src="img/screenshot.png"
+		alt="Organic Build graphical user interface"
+		style="width: 600px;margin: auto;display: block;" />
 		
-		<div id="contenu"><h2>Documentation</h2>
-	<h3>How does it look?</h3>
-		<img src="img/screenshot.png"
-			alt="Organic Build graphical user interface"
-			style="width: 600px;margin: auto;display: block;" />
-			
-	<h3>How do I use this software?</h3>
-		<p>The interface has two parts: the collision arena on the right, full of bouncing atoms, and the controls part on the left. At the bottom of the controls area is a list box, showing the reactions that are currently active in the arena. There aren't any to start with (so no reactions happen) but you can add some by using the reaction editor controls just above.</p>
-		<p>To specify a reaction, use the drop-down lists to choose the type (<span class="atype">a</span>-<span class="ftype">f</span>) and state (0,1...) of the two atoms that are to react. Use the tick box between them to specify whether they should be unbonded before the reaction (no tick) or bonded (tick). Then, on the right of the 'produces' symbol (=&gt;) specify the final states of each atom, and whether the two atoms should be bonded afterwards (tick) or unbonded (no tick). Thus you can bond two atoms together, or break them apart, or simply change their states and leave them as they were.</p>
-		<p>The list of reactions can be manipulated as a simple list. In this case, the reaction editor will be used to add reaction one by one. To delete any numbers of reactions, you will need to select them and use the <span class="button">delete</span> button. Use the <span class="button">clean</span> button to delete all reactions. But this list can also be used like a text editor by using the <span class="button">edit</span> button. In this case, you can type reactions in by hand if you prefer, or copy-and-paste from an external editor. Use the <span class="button">update</span> button to let the system know that you have finished editing - it will tell you if it couldn't parse your text.</p>
-		<p>You can <span class="button">pause</span> and <span class="button">run</span> the collision arena using the buttons at the top. The <span class="button">reset</span> button allows you to get rid of all the bonds that have been made, and reset the atom states to their starting values (usually all zeroes). Finally, the levels selector in the control bar lets you choose which level to explore (but work through them sequentially to start with).</p>
-	<h3>How to develop in a hurry?</h3>
-		<p>Go to <a href="https://github.com/BertrandDechoux/OrganicBuilder">github</a>, fork the project and submit pull requests.</p>
-		<p>You will need a 1.8+ jdk, maven 3 and git.</p>
-</div>		
-		
-		<hr/>
-{% include footer.html url=url %}
-	</div>
-    </body>
+<h3>How do I use this software?</h3>
+	<p>The interface has two parts: the collision arena on the right, full of bouncing atoms, and the controls part on the left. At the bottom of the controls area is a list box, showing the reactions that are currently active in the arena. There aren't any to start with (so no reactions happen) but you can add some by using the reaction editor controls just above.</p>
+	
+	<p>To specify a reaction, use the drop-down lists to choose the type (<span class="atype">a</span>-<span class="ftype">f</span>) and state (0,1...) of the two atoms that are to react. Use the tick box between them to specify whether they should be unbonded before the reaction (no tick) or bonded (tick). Then, on the right of the 'produces' symbol (=&gt;) specify the final states of each atom, and whether the two atoms should be bonded afterwards (tick) or unbonded (no tick). Thus you can bond two atoms together, or break them apart, or simply change their states and leave them as they were.</p>
+	
+	<p>The list of reactions can be manipulated as a simple list. In this case, the reaction editor will be used to add reaction one by one. To delete any numbers of reactions, you will need to select them and use the <span class="button">delete</span> button. Use the <span class="button">clean</span> button to delete all reactions. But this list can also be used like a text editor by using the <span class="button">edit</span> button. In this case, you can type reactions in by hand if you prefer, or copy-and-paste from an external editor. Use the <span class="button">update</span> button to let the system know that you have finished editing - it will tell you if it couldn't parse your text.</p>
+	
+	<p>You can <span class="button">pause</span> and <span class="button">run</span> the collision arena using the buttons at the top. The <span class="button">reset</span> button allows you to get rid of all the bonds that have been made, and reset the atom states to their starting values (usually all zeroes). Finally, the levels selector in the control bar lets you choose which level to explore (but work through them sequentially to start with).</p>
+	
+<h3>How to develop in a hurry?</h3>
+	<p>Go to <a href="https://github.com/BertrandDechoux/OrganicBuilder">github</a>, fork the project and submit pull requests.</p>
+	<p>You will need a 1.8+ jdk, maven 3 and git.</p>
+
 
 
