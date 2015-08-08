@@ -1,4 +1,4 @@
-package uk.org.squirm3.swing.action;
+package uk.org.squirm3.config.gui;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -30,34 +30,34 @@ enum ActionProperties implements ActionProperty {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see uk.org.squirm3.swing.action.ActionProperty#getSwingKey()
      */
     @Override
     public String getSwingKey() {
-        return swingKey;
+        return this.swingKey;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see uk.org.squirm3.swing.action.ActionProperty#getTargetType()
      */
     @Override
     public Class<?> getTargetType() {
-        return targetType;
+        return this.targetType;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * uk.org.squirm3.swing.action.ActionProperty#getMessageCode(java.lang.String
      * )
      */
     @Override
     public String getMessageCode(final String actionIdentifier) {
-        return actionIdentifier + ".action." + name().toLowerCase();
+        return actionIdentifier + ".action." + this.name().toLowerCase();
     }
 
 }

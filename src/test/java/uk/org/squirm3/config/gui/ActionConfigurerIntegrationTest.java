@@ -1,10 +1,15 @@
-package uk.org.squirm3.swing.action;
+package uk.org.squirm3.config.gui;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -25,34 +30,27 @@ import uk.org.squirm3.springframework.converter.StringToKeyStrokeConverter;
 
 import com.google.common.collect.Sets;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-
 public class ActionConfigurerIntegrationTest {
     private static final String IDENTIFIER = "myid";
 
-    private final Environment properties = new StandardEnvironment();
-    private final MessageSource messageSource = createMessageSource();
-    private final ConversionService conversionService = createConversionService();
-    private final ActionConfigurer actionConfigurer = ActionConfigurerFactory
-            .createDefaultConfigurer(properties, messageSource,
-                    conversionService);
+    private final Environment environment = new StandardEnvironment();
+    private final MessageSource messageSource = this.createMessageSource();
+    private final ConversionService conversionService = this.createConversionService();
+    private final ActionConfigurer actionConfigurer = ActionConfigurerFactory.createDefaultConfigurer(this.environment, this.messageSource, this.conversionService);
 
     @Test
     public void testActionSetting() {
         final Action action = new TestAction();
-        actionConfigurer.configure(action, IDENTIFIER);
+        this.actionConfigurer.configure(action, IDENTIFIER);
         new JButton(action);
 
     }
+
     @Test
     public void shouldBeSupportedByAction() {
         final Action action = mock(Action.class);
-        actionConfigurer.configure(action, IDENTIFIER);
-        verifyActionSetting(action);
+        this.actionConfigurer.configure(action, IDENTIFIER);
+        this.verifyActionSetting(action);
     }
 
     private StaticMessageSource createMessageSource() {
@@ -64,18 +62,15 @@ public class ActionConfigurerIntegrationTest {
     @SuppressWarnings("unchecked")
     private ConversionService createConversionService() {
         final ConversionServiceFactoryBean conversionServiceFactoryBean = new ConversionServiceFactoryBean();
-        conversionServiceFactoryBean.setConverters(Sets.newHashSet(
-                new StringToIconConverter(), new StringToKeyStrokeConverter()));
+        conversionServiceFactoryBean.setConverters(Sets.newHashSet(new StringToIconConverter(), new StringToKeyStrokeConverter()));
         conversionServiceFactoryBean.afterPropertiesSet();
 
-        final ConversionService conversionService = conversionServiceFactoryBean
-                .getObject();
+        final ConversionService conversionService = conversionServiceFactoryBean.getObject();
         return conversionService;
     }
 
     private void verifyActionSetting(final Action action) {
-        verify(action).putValue(eq(Action.ACCELERATOR_KEY),
-                any(KeyStroke.class));
+        verify(action).putValue(eq(Action.ACCELERATOR_KEY), any(KeyStroke.class));
         verify(action).putValue(Action.ACTION_COMMAND_KEY, "wecan");
         verify(action).putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, 42);
         verify(action).putValue(eq(Action.LARGE_ICON_KEY), any(Icon.class));

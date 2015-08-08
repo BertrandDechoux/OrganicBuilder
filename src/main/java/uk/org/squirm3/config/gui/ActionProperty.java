@@ -1,4 +1,4 @@
-package uk.org.squirm3.swing.action;
+package uk.org.squirm3.config.gui;
 
 /**
  * Property that can be used for {@link javax.swing.Action}.

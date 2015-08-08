@@ -4,10 +4,8 @@ import java.util.List;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.convert.ConversionService;
 
 import uk.org.squirm3.engine.ApplicationEngine;
@@ -40,8 +38,6 @@ import com.google.common.collect.Lists;
 
 @Configuration
 @Import(SpringConfig.class)
-@ComponentScan("uk.org.squirm3.springframework.converter")
-@PropertySource("classpath:configuration.properties")
 public class EngineConfig {
     @Bean(name = "applicationEngine")
     public ApplicationEngine getApplicationEngine(LevelManager levelManager) throws Exception {
@@ -50,7 +46,7 @@ public class EngineConfig {
 
     @Bean
     public LevelManager getLevelManager(ComposedLevelFactory levelFactory) {
-        return new LevelManager(getLevels(levelFactory));
+        return new LevelManager(this.getLevels(levelFactory));
     }
 
     @Bean
@@ -80,7 +76,7 @@ public class EngineConfig {
         levels.add(levelFactory.create("membranetransport", new MembraneTransportValidator()));
         levels.add(levelFactory.create("membranedivision", new MembraneTransportValidator()));
         levels.add(levelFactory.create("celldivision", new CellDivisionValidator()));
-        levels.add(levelFactory.createWithConstructor("playground", randomConstructor(), new IntroValidator()));
+        levels.add(levelFactory.createWithConstructor("playground", this.randomConstructor(), new IntroValidator()));
         return levels;
     }
 

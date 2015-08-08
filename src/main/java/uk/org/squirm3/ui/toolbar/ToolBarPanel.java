@@ -10,8 +10,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import uk.org.squirm3.ui.toolbar.navigation.LevelPicker;
 import uk.org.squirm3.ui.toolbar.simulation.SpeedPanel;
 
@@ -20,16 +18,16 @@ public class ToolBarPanel extends JPanel {
     private static final Color BACKGROUND = new Color(255, 255, 225);
 
     public ToolBarPanel(
-            @Qualifier("runSimulationAction") final Action runSimulationAction,
-            @Qualifier("stopSimulationAction") final Action stopSimulationAction,
-            @Qualifier("resetSimulationAction") final Action resetSimulationAction,
+            final Action runSimulationAction,
+            final Action stopSimulationAction,
+            final Action resetSimulationAction,
             final SpeedPanel speedPanel,
-            @Qualifier("firstLevelAction") final Action firstLevelAction,
-            @Qualifier("previousLevelAction") final Action previousLevelAction,
+            final Action firstLevelAction,
+            final Action previousLevelAction,
             final LevelPicker levelPicker,
-            @Qualifier("nextLevelAction") final Action nextLevelAction,
-            @Qualifier("lastLevelAction") final Action lastLevelAction,
-            @Qualifier("aboutAction") final Action aboutAction) {
+            final Action nextLevelAction,
+            final Action lastLevelAction,
+            final Action aboutAction) {
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setBackground(BACKGROUND);
