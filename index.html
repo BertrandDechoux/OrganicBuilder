@@ -1,12 +1,11 @@
 ---
+layout: default
+url: https://bertranddechoux.github.io/OrganicBuilder
+title: Explanation
+description: Java simulation of evolution -the process in which natural selection and mutation can lead to complex, sophisticated design- using artificial chemistry.
 ---
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-{% include head.html
-	url="https://bertranddechoux.github.io/OrganicBuilder"
-	title="Explanation"
-	description="Java simulation of evolution -the process in which natural selection and mutation can lead to complex, sophisticated design- using artificial chemistry."
-%}
+
+{% include head.html url=url title=title description=description %}
 
     <body>
 	<div id="conteneur">
@@ -14,7 +13,7 @@
 		
 		<div id="contenu"><h2>Presentation</h2>
 	<h3>What is this?</h3>
-		<img src="atoms.gif" width="300" height="300" style="float:left;margin:0% 2% 0% 0%;border:0;" alt="atoms"/>
+		<img src="img/atoms.gif" width="300" height="300" style="float:left;margin:0% 2% 0% 0%;border:0;" alt="atoms"/>
 		<p>This freeware demonstrates an artificial chemistry. Each circle is an atom, that floats around and can become bonded to others to form a molecule.</p>
 		<p>In real chemistry, the bonding rules are written like this <span class="reaction">6*(CO<sub>2</sub>) + 6*(H<sub>2</sub>O) + light =&gt; C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6*(O<sub>2</sub>)</span>, where carbon dioxide and water (six of each) react (in the presence of light) to form glucose and oxygen. This is the reaction that plants use to photosynthesise.</p>
 		<p>In an <i>artificial</i> chemistry we use simpler rules, like this one <span class="reaction">a0 + b0 =&gt; a1b2</span>, rather than use the atomic types seen in nature (hydrogen, oxygen, etc.), we use arbitrary letters: '<span class="atype">a</span>', '<span class="btype">b</span>', '<span class="ctype">c</span>', '<span class="dtype">d</span>', '<span class="etype">e</span>' and '<span class="ftype">f</span>'.</p>
@@ -28,8 +27,8 @@
 
 
 		<hr/>
-{% include footer.html url="https://bertranddechoux.github.io/OrganicBuilder/" %}
+{% include footer.html url=url %}
 	</div>
     </body>
-</html>
+
 

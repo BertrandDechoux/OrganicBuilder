@@ -25,7 +25,7 @@ h1#header a
 	width: 400px ;
 	height: 85px ;
 	display: block ;
-	background: url(title.gif) no-repeat ;
+	background: url(img/title.gif) no-repeat ;
 	position: relative ;
 	left: 350px ;
 	top: 15px ;
@@ -42,7 +42,7 @@ ul#menu
 	height: 35px ;
 	margin: 0 ;
 	padding: 0 ;
-	background: url(bg_menu.gif) repeat-x 0 -25px ;
+	background: url(img/bg_menu.gif) repeat-x 0 -25px ;
 	list-style-type: none ;
 }
 ul#menu li
@@ -64,7 +64,7 @@ ul#menu li a
 }
 ul#menu li a:hover
 {
-	background: url(bg_menu.gif) repeat-x 0 0 ;
+	background: url(img/bg_menu.gif) repeat-x 0 0 ;
 }
 div#contenu
 {
