@@ -1,5 +1,10 @@
 package uk.org.squirm3.swing.action;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
@@ -15,11 +20,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ActionConfigurerTest {
@@ -142,9 +142,8 @@ public class ActionConfigurerTest {
         thrown.expectMessage(CONVERSION_MESSAGE);
     }
 
-    @SuppressWarnings("unchecked")
     private void whenConversionFail() {
-        when(conversionService.convert(any(), any(Class.class))).thenThrow(
+        when(conversionService.convert(any(), any())).thenThrow(
                 new RuntimeException(CONVERSION_MESSAGE));
     }
 
