@@ -7,13 +7,14 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomSelector;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.def.BasicType;
 
 public class LineCsValidator implements AtomValidator {
     private Atom seed;
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
-        seed = AtomSelector.findUnique("c1", atoms);
+        seed = AtomSelector.findUnique(BasicType.C, 1, atoms);
     }
 
     @Override
@@ -26,7 +27,7 @@ public class LineCsValidator implements AtomValidator {
         // fail on bonds<1 or >2, or not in 'joined' list
         for (final Atom atom2 : atoms) {
             final Atom atom = atom2;
-            if (atom.getType() != 2) {
+            if (atom.getType() != BasicType.C) {
                 if (atom.getBonds().size() != 0) {
                     return messages.getError(1);
                 }

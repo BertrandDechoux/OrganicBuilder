@@ -7,16 +7,19 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomSelector;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.AtomType;
+import uk.org.squirm3.model.type.def.BasicType;
 
 public class SelfrepValidator implements AtomValidator {
 
     private Atom chainStart;
-    private final int[] chainTypes = {0, 0, 0, 0};
+    private final AtomType[] chainTypes = {BasicType.A, BasicType.A,
+            BasicType.A, BasicType.A};
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
         final Collection<? extends Atom> potentialStarts = AtomSelector
-                .findAll("e1", atoms);
+                .findAll(BasicType.E, 1, atoms);
         for (final Atom atom : potentialStarts) {
             if (atom.getBonds().size() == 1) {
                 chainStart = atom;
@@ -45,7 +48,7 @@ public class SelfrepValidator implements AtomValidator {
             if (first.getBonds().size() > 0) {
                 bound_atoms++;
 
-                if (first.getType() == 4) {
+                if (first.getType() == BasicType.E) {
                     joined.clear();
                     first.getAllConnectedAtoms(joined);
 
@@ -56,7 +59,7 @@ public class SelfrepValidator implements AtomValidator {
                     final Atom last = joined.getLast();
                     if (first.getBonds().size() != 1
                             || last.getBonds().size() != 1
-                            || last.getType() != 5) {
+                            || last.getType() != BasicType.F) {
                         return messages.getError(2);
                     }
 

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="actionConfigurer" class="uk.org.squirm3.swing.action.ActionConfigurerFactory"
+		factory-method="createDefaultConfigurer">
+		<constructor-arg ref="properties" />
+		<constructor-arg ref="messageSource" />
+		<constructor-arg ref="conversionService" />
+	</bean>
+
+	<bean id="gui" class="uk.org.squirm3.ui.GUI">
+		<constructor-arg ref="messageSource" />
+		<constructor-arg ref="currentLevelPanel" />
+		<constructor-arg ref="reactionListPanel" />
+		<constructor-arg ref="reactionConstructorPanel" />
+		<constructor-arg ref="atomsPanel" />
+		<constructor-arg ref="toolBarPanel" />
+	</bean>
+
+	<bean id="toolBarPanel" class="uk.org.squirm3.ui.toolbar.ToolBarPanel"
+		autowire="constructor" />
+
+
+	<bean id="runSimulationAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.simulation.RunSimulationAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="simulation.run" />
+	</bean>
+
+	<bean id="stopSimulationAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.simulation.StopSimulationAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="simulation.stop" />
+	</bean>
+
+	<bean id="resetSimulationAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.simulation.ResetSimulationAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="simulation.reset" />
+	</bean>
+
+	<bean id="firstLevelAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.navigation.FirstLevelAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="level.first" />
+	</bean>
+
+	<bean id="previousLevelAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.navigation.PreviousLevelAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="level.previous" />
+	</bean>
+
+	<bean id="speedPanel" class="uk.org.squirm3.ui.toolbar.simulation.SpeedPanel"
+		autowire="constructor" />
+
+	<bean id="levelPicker" class="uk.org.squirm3.ui.toolbar.navigation.LevelPicker"
+		autowire="constructor" />
+
+	<bean id="nextLevelAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.navigation.NextLevelAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="level.next" />
+	</bean>
+
+	<bean id="lastLevelAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.navigation.LastLevelAction"
+				autowire="constructor" />
+		</constructor-arg>
+		<constructor-arg value="level.last" />
+	</bean>
+
+	<bean id="aboutAction" factory-bean="actionConfigurer"
+		factory-method="configure">
+		<constructor-arg>
+			<bean class="uk.org.squirm3.ui.toolbar.AboutAction">
+				<constructor-arg value="${about.url}" />
+				<constructor-arg ref="messageSource" />
+			</bean>
+		</constructor-arg>
+		<constructor-arg value="about" />
+	</bean>
+
+	<bean id="atomsPanel" class="uk.org.squirm3.ui.collider.AtomsPanel">
+		<constructor-arg ref="applicationEngine" />
+		<constructor-arg value="/graphics/spiky.png" />
+	</bean>
+
+	<bean id="currentLevelPanel" class="uk.org.squirm3.ui.level.CurrentLevelPanel"
+		autowire="constructor" />
+
+	<bean id="reactionConstructorPanel" class="uk.org.squirm3.ui.reaction.ReactionConstructorPanel">
+		<constructor-arg ref="applicationEngine" />
+		<constructor-arg ref="messageSource" />
+		<constructor-arg value="/graphics/add.png" />
+	</bean>
+	<bean id="reactionListPanel" class="uk.org.squirm3.ui.reaction.ReactionListPanel"
+		autowire="constructor" />
+
+</beans>

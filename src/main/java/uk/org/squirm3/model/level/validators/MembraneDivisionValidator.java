@@ -8,6 +8,7 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomSelector;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.def.BasicType;
 
 import com.google.common.collect.Lists;
 
@@ -18,10 +19,10 @@ public class MembraneDivisionValidator implements AtomValidator {
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
-        loopSeed = AtomSelector.findUnique("a3", atoms);
+        loopSeed = AtomSelector.findUnique(BasicType.A, 3, atoms);
         loop = Lists.newArrayList();
         for (final Atom atom : atoms) {
-            if (atom.getType() == 0) {
+            if (atom.getType() == BasicType.A) {
                 loop.add(atom);
             }
         }
@@ -52,14 +53,14 @@ public class MembraneDivisionValidator implements AtomValidator {
         // (hence a neat loop)
         for (int i = 0; i < loop0.size(); i++) {
             final Atom a = loop0.get(i);
-            if (a.getType() != 0 || a.getBonds().size() != 2) {
+            if (a.getType() != BasicType.A || a.getBonds().size() != 2) {
                 return messages.getError(3);
             }
         }
 
         for (int i = 0; i < loop1.size(); i++) {
             final Atom a = loop1.get(i);
-            if (a.getType() != 0 || a.getBonds().size() != 2) {
+            if (a.getType() != BasicType.A || a.getBonds().size() != 2) {
                 return messages.getError(3);
             }
         }

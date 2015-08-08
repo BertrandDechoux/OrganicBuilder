@@ -7,6 +7,7 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomSelector;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.def.BasicType;
 
 public class ConnectCornersValidator implements AtomValidator {
 
@@ -15,8 +16,8 @@ public class ConnectCornersValidator implements AtomValidator {
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
-        upperLeftCorner = AtomSelector.findUnique("a1", atoms);
-        bottomRightCorner = AtomSelector.findUnique("f1", atoms);
+        upperLeftCorner = AtomSelector.findUnique(BasicType.A, 1, atoms);
+        bottomRightCorner = AtomSelector.findUnique(BasicType.F, 1, atoms);
     }
 
     @Override

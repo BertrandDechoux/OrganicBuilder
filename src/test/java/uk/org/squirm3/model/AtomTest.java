@@ -4,6 +4,8 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
+import uk.org.squirm3.model.type.def.BasicType;
+import uk.org.squirm3.model.type.def.SpecialType;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -14,11 +16,9 @@ public class AtomTest {
      */
     @Test
     public void testAtom() {
-        final int t = 4;
-        final int s = 5;
-        final Atom a = new Atom(new MobilePoint(), t, s);
-        assertTrue(a.getType() == t);
-        assertTrue(a.getState() == s);
+        final Atom a = Atoms.createAtom(BasicType.D, 5);
+        assertTrue(a.getType() == BasicType.D);
+        assertTrue(a.getState() == 5);
     }
 
     /**
@@ -26,11 +26,9 @@ public class AtomTest {
      */
     @Test
     public void testStuck() {
-        Atom a = new Atom(new MobilePoint(), 0, 0);
-        assertFalse(a.isStuck());
-
-        a = new Atom(new FixedPoint(0, 0), 0, 0);
-        assertTrue(a.isStuck());
+        assertFalse(Atoms.createMobileAtomWithRandomSpeed(BasicType.A, 0, 0, 0)
+                .isStuck());
+        assertTrue(Atoms.createFixedAtom(BasicType.A, 0, 0, 0).isStuck());
     }
 
     /**
@@ -38,11 +36,8 @@ public class AtomTest {
      */
     @Test
     public void testKiller() {
-        Atom a = new Atom(new MobilePoint(), 0, 0);
-        assertFalse(a.isKiller());
-
-        a = new Atom(new MobilePoint(), Atom.KILLER_TYPE, 0);
-        assertTrue(a.isKiller());
+        assertFalse(Atoms.createAtom(BasicType.A, 0).isKiller());
+        assertTrue(Atoms.createAtom(SpecialType.KILLER, 0).isKiller());
     }
 
     /**
@@ -50,8 +45,8 @@ public class AtomTest {
      */
     @Test
     public void testBondingAndBreaking() {
-        final Atom a1 = new Atom(new MobilePoint(), 0, 1);
-        final Atom a2 = new Atom(new MobilePoint(), 0, 2);
+        final Atom a1 = Atoms.createAtom(BasicType.A, 1);
+        final Atom a2 = Atoms.createAtom(BasicType.A, 2);
         assertFalse(a1.hasBondWith(a2));
         assertFalse(a2.hasBondWith(a1));
 
@@ -69,13 +64,13 @@ public class AtomTest {
      */
     @Test
     public void testGeneralMethods() {
-        final MobilePoint physicalPoint = new MobilePoint();
-        final Atom a1 = new Atom(physicalPoint, 0, 1);
-        final Atom a2 = new Atom(physicalPoint, 0, 2);
-        final Atom a3 = new Atom(physicalPoint, 0, 3);
-        final Atom a4 = new Atom(physicalPoint, 0, 4);
-        final Atom a5 = new Atom(physicalPoint, 0, 3);
-        final Atom a6 = new Atom(physicalPoint, 0, 4);
+        final Atom a1 = Atoms.createAtom(BasicType.A, 1);
+        final Atom a2 = Atoms.createAtom(BasicType.A, 2);
+        final Atom a3 = Atoms.createAtom(BasicType.A, 3);
+        ;
+        final Atom a4 = Atoms.createAtom(BasicType.A, 4);
+        final Atom a5 = Atoms.createAtom(BasicType.A, 3);
+        final Atom a6 = Atoms.createAtom(BasicType.A, 4);
 
         a1.bondWith(a2);
         a1.bondWith(a3);
@@ -107,7 +102,7 @@ public class AtomTest {
      */
     @Test
     public void testToString() {
-        final Atom a = new Atom(new MobilePoint(), 1, 1);
+        final Atom a = Atoms.createAtom(BasicType.B, 1);
         assertTrue("b1".equals(a.toString()));
     }
 }

@@ -9,11 +9,7 @@ public enum BasicType implements AtomType, BuilderType, ReactionType {
 
     @Override
     public char getCharacterIdentifier() {
-        return (char) ('a' + ordinal());
+        return name().toLowerCase().charAt(0);
     }
-    
-    @Override
-    public int getIntegerIndentifier() {
-        return ordinal();
-    }
+
 }

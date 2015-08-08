@@ -8,18 +8,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 
 import uk.org.squirm3.model.Atom;
+import uk.org.squirm3.model.Atoms;
 import uk.org.squirm3.model.Configuration;
-import uk.org.squirm3.model.FixedPoint;
-import uk.org.squirm3.model.IPhysicalPoint;
-import uk.org.squirm3.model.MobilePoint;
 import uk.org.squirm3.model.type.AtomType;
 import uk.org.squirm3.model.type.BuilderType;
 import uk.org.squirm3.springframework.converter.BuilderTypeToAtomTypeConverter;
-import uk.org.squirm3.springframework.converter.CharacterToBuilderTypeConverter;
 
 import com.google.common.collect.Lists;
 
@@ -35,20 +35,27 @@ public class AtomBuilder {
     private static final char HORIZONTAL_BOND = '⇠';
     private static final char VERTICAL_BOND = '⇡';
 
-    private final Converter<Character, BuilderType> builderTypeConverter;
+    private final ConversionService conversionService;
 
-    public AtomBuilder() {
-        builderTypeConverter = new CharacterToBuilderTypeConverter();
+    public AtomBuilder(final ConversionService conversionService) {
+        this.conversionService = conversionService;
     }
 
-    public Collection<Atom> build(final String levelDescription,
-            final Configuration configuration) throws BuilderException {
+    private float getSize(final String string) {
+        return Atom.getAtomSize() * 2 * Integer.parseInt(string);
+    }
+
+    public Configuration build(final String levelDescription)
+            throws BuilderException {
         String randomizerConfiguration = "abcdef";
         final BufferedReader descriptionReader = new BufferedReader(
                 new StringReader(levelDescription));
 
         try {
             String descriptionLine = descriptionReader.readLine();
+            final Configuration partialConfiguration = parseSizeConfiguration(descriptionLine);
+            descriptionLine = descriptionReader.readLine();
+
             if (descriptionLine != null && descriptionLine.startsWith("#")) {
                 randomizerConfiguration = descriptionLine.substring(1);
                 descriptionLine = descriptionReader.readLine();
@@ -77,9 +84,13 @@ public class AtomBuilder {
                         final char atomType = atomDescription[2];
                         final char atomState = atomDescription[3];
 
-                        final Atom atom = new Atom(getPhysicalPoint(x, y,
-                                atomStart), getAtomType(atomType,
-                                atomTypeConverter), getAtomState(atomState));
+                        final float xCoordinate = 2 * x * Atom.getAtomSize();
+                        final float yCoordinate = 2 * y * Atom.getAtomSize();
+
+                        final Atom atom = Atoms.createAtom(
+                                getAtomType(atomType, atomTypeConverter),
+                                getAtomState(atomState), xCoordinate,
+                                yCoordinate, atomStart == FIXED_ATOM_START);
 
                         currentAtomLine.add(atom);
 
@@ -106,8 +117,9 @@ public class AtomBuilder {
                 }
             }
             atoms.removeAll(Collections.singleton(null));
-            checkConfiguration(configuration, maxX, y);
-            return atoms;
+            checkConfiguration(partialConfiguration, maxX, y);
+            return new Configuration(partialConfiguration.getHeight(),
+                    partialConfiguration.getWidth(), atoms);
 
         } catch (final IOException e) {
             throw new BuilderException(
@@ -122,8 +134,28 @@ public class AtomBuilder {
 
     }
 
-    private void checkConfiguration(Configuration configuration, int x, int y)
+    private Configuration parseSizeConfiguration(final String descriptionLine)
             throws BuilderException {
+        if (descriptionLine == null) {
+            throwIncorrectSizeConfiguration(descriptionLine);
+        }
+        final Matcher matcher = Pattern.compile("#(\\d+)x(\\d+)").matcher(
+                descriptionLine);
+        if (!matcher.matches()) {
+            throwIncorrectSizeConfiguration(descriptionLine);
+        }
+        return new Configuration(getSize(matcher.group(1)),
+                getSize(matcher.group(2)));
+    }
+
+    private void throwIncorrectSizeConfiguration(final String descriptionLine)
+            throws BuilderException {
+        throw new BuilderException(
+                "First line should indicate the size of the level : "
+                        + descriptionLine);
+    }
+    private void checkConfiguration(final Configuration configuration,
+            final int x, final int y) throws BuilderException {
         final double horizontalSpace = Atom.getAtomSize() * (x * 2 + 1);
         if (horizontalSpace > configuration.getWidth()) {
             throw new BuilderException(
@@ -196,28 +228,12 @@ public class AtomBuilder {
                     e);
         }
     }
-    private IPhysicalPoint getPhysicalPoint(final int x, final int y,
-            final char atomStart) {
-        final float xCoordinate = 2 * x * Atom.getAtomSize();
-        final float yCoordinate = 2 * y * Atom.getAtomSize();
 
-        if (atomStart == MOBILE_ATOM_START) {
-            final IPhysicalPoint mobilePoint = new MobilePoint(xCoordinate,
-                    yCoordinate, 0, 0, 0, 0);
-            final float ms = Atom.getAtomSize() / 3;
-            mobilePoint.setSpeedX((float) (Math.random() * ms - ms / 2.0));
-            mobilePoint.setSpeedY((float) (Math.random() * ms - ms / 2.0));
-            return mobilePoint;
-        } else if (atomStart == FIXED_ATOM_START) {
-            return new FixedPoint(xCoordinate, yCoordinate);
-        }
-        return null;
-    }
-
-    private int getAtomType(final char atomType,
+    private AtomType getAtomType(final char atomType,
             final Converter<BuilderType, AtomType> atomTypeConverter)
             throws BuilderException {
-        final BuilderType builderType = builderTypeConverter.convert(atomType);
+        final BuilderType builderType = conversionService.convert(atomType,
+                BuilderType.class);
         if (builderType == null) {
             throw new BuilderException("Incorrect BuilderType : " + atomType);
         }
@@ -225,7 +241,7 @@ public class AtomBuilder {
         if (type == null) {
             throw new BuilderException("No AtomType for : " + builderType);
         }
-        return type.getIntegerIndentifier();
+        return type;
     }
 
     private int getAtomState(final char atomState) throws BuilderException {

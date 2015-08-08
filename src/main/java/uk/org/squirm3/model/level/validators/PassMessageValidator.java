@@ -5,6 +5,7 @@ import java.util.Collection;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.def.BasicType;
 
 import com.google.common.collect.Lists;
 
@@ -17,11 +18,11 @@ public class PassMessageValidator implements AtomValidator {
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
         for (final Atom atom : atoms) {
-            if (atom.getType() == 2) {
+            if (atom.getType() == BasicType.C) {
                 seed = atom;
                 continue;
             }
-            if (atom.getType() == 1) {
+            if (atom.getType() == BasicType.B) {
                 if (atom.getBonds().size() == 2) {
                     innerAtoms.add(atom);
                 } else {
@@ -45,12 +46,12 @@ public class PassMessageValidator implements AtomValidator {
             }
         }
 
-        if (seed.getType() != 2 || extremity.getType() != 2) {
+        if (seed.getType() != BasicType.C || extremity.getType() != BasicType.C) {
             return messages.getError(2);
         }
 
         for (final Atom atom : innerAtoms) {
-            if (atom.getType() != 2) {
+            if (atom.getType() != BasicType.C) {
                 return messages.getError(2);
             }
         }

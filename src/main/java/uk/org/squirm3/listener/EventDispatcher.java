@@ -2,39 +2,40 @@ package uk.org.squirm3.listener;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-public final class EventDispatcher {
+/**
+ * Binds and fires {@link Listener} for a defined event.
+ */
+public final class EventDispatcher<E> {
 
-    public enum Event {
-        ATOMS, DRAGGING_POINT, LEVEL, REACTIONS, SPEED, SIMULATION_STATE
-    }
-
-    private final Map<Event, Collection<IListener>> listeners;
+    private final Map<E, Collection<Listener>> listeners;
 
     public EventDispatcher() {
-        listeners = new HashMap<Event, Collection<IListener>>(
-                Event.values().length);
-        final Event[] events = Event.values();
-        for (final Event event : events) {
-            listeners.put(event, new LinkedList<IListener>());
-        }
+        listeners = new HashMap<E, Collection<Listener>>();
     }
 
-    public void addListener(final IListener listener, final Event event) {
+    /**
+     * Binds a listener to an event. It will then be called by
+     * {@link #dispatchEvent(Object)}.
+     */
+    public void addListener(final Listener listener, final E event) {
+        if (!listeners.containsKey(event)) {
+            listeners.put(event, new LinkedList<Listener>());
+        }
         listeners.get(event).add(listener);
     }
 
-    public void removeListener(final IListener listener, final Event event) {
-        listeners.get(event).remove(listener);
-    }
-
-    public void dispatchEvent(final Event event) {
-        final Iterator<IListener> iterator = listeners.get(event).iterator();
-        while (iterator.hasNext()) {
-            iterator.next().propertyHasChanged();
+    /**
+     * Calls all listeners associated with an event.
+     */
+    public void dispatchEvent(final E event) {
+        if (!listeners.containsKey(event)) {
+            listeners.put(event, new LinkedList<Listener>());
+        }
+        for (final Listener listener : listeners.get(event)) {
+            listener.propertyHasChanged();
         }
     }
 }

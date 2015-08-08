@@ -6,6 +6,20 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+	<!-- definition of a property placeholder configure with explicit properties 
+		for programmatic access -->
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		id="propertyConfigurer">
+		<property name="properties" ref="properties" />
+	</bean>
+
+	<bean id="properties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:configuration.properties" />
+	</bean>
+
 	<bean id="messageSource"
 		class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basenames">
@@ -16,29 +30,29 @@
 		</property>
 	</bean>
 
-	<bean id="propertyPlaceholderConfigurer"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<list>
-				<value>configuration.properties</value>
-			</list>
-		</property>
-	</bean>
-
 	<bean id="conversionService"
 		class="org.springframework.context.support.ConversionServiceFactoryBean">
 		<property name="converters">
 			<list>
 				<bean
 					class="uk.org.squirm3.springframework.converter.ResourceToStringConverter" />
+				<bean
+					class="uk.org.squirm3.springframework.converter.CharacterToBuilderTypeConverter" />
+				<ref bean="characterToReactionTypeConverter" />
+				<bean
+					class="uk.org.squirm3.springframework.converter.StringToReactionConverter">
+					<constructor-arg ref="characterToReactionTypeConverter" />
+				</bean>
+				<bean
+					class="uk.org.squirm3.springframework.converter.StringToIconConverter" />
+				<bean
+					class="uk.org.squirm3.springframework.converter.StringToImageConverter" />
 			</list>
 		</property>
 	</bean>
 
-	<bean id="configuration" class="uk.org.squirm3.model.Configuration">
-		<constructor-arg name="width" value="650" />
-		<constructor-arg name="height" value="550" />
-	</bean>
+	<bean id="characterToReactionTypeConverter"
+		class="uk.org.squirm3.springframework.converter.CharacterToReactionTypeConverter" />
 
 	<bean id="applicationEngine" class="uk.org.squirm3.engine.ApplicationEngine">
 		<constructor-arg>
@@ -46,14 +60,15 @@
 				<constructor-arg ref="levels" />
 			</bean>
 		</constructor-arg>
-		<constructor-arg ref="configuration" />
 	</bean>
 
 	<bean id="levelFactory" class="uk.org.squirm3.model.level.ComposedLevelFactory">
 		<constructor-arg ref="conversionService" />
 		<constructor-arg ref="messageSource" />
 		<constructor-arg>
-			<bean class="uk.org.squirm3.engine.generator.AtomBuilder" />
+			<bean class="uk.org.squirm3.engine.generator.AtomBuilder">
+				<constructor-arg ref="conversionService" />
+			</bean>
 		</constructor-arg>
 	</bean>
 
@@ -179,6 +194,22 @@
 			<constructor-arg value="celldivision" />
 			<constructor-arg>
 				<bean class="uk.org.squirm3.model.level.validators.CellDivisionValidator" />
+			</constructor-arg>
+		</bean>
+		<bean factory-bean="levelFactory" factory-method="createWithConstructor">
+			<constructor-arg value="playground" />
+			<constructor-arg>
+				<bean class="uk.org.squirm3.engine.generator.RandomConstructor">
+					<constructor-arg>
+						<bean class="uk.org.squirm3.model.Configuration">
+							<constructor-arg value="4000" />
+							<constructor-arg value="4000" />
+						</bean>
+					</constructor-arg>
+				</bean>
+			</constructor-arg>
+			<constructor-arg>
+				<bean class="uk.org.squirm3.model.level.validators.IntroValidator" />
 			</constructor-arg>
 		</bean>
 	</util:list>

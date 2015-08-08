@@ -7,6 +7,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<import resource="engine-context.xml" />
-	<import resource="gui-context.xml" />
+	
+	<bean class="uk.org.squirm3.springframework.SwingUserInterfaceBean" />
 	
 </beans>

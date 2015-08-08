@@ -7,12 +7,7 @@ public enum RandomBasicType implements BuilderType {
 
     @Override
     public char getCharacterIdentifier() {
-        return (char) ('A' + ordinal());
-    }
-
-    @Override
-    public int getIntegerIndentifier() {
-        return 10 + ordinal();
+        return name().charAt(0);
     }
 
 }
