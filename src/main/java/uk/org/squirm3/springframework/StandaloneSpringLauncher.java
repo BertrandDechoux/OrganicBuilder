@@ -15,8 +15,10 @@ public class StandaloneSpringLauncher {
     /**
      * Load the default xml application context provided in the classpath.
      * 
-     * @warn If any bean need to be created, this is the responsibility of the
-     *       application context itself and not of this method.
+     * XXX If any bean need to be created, this is the responsibility of the
+     * application context itself and not of this method.
+     * 
+     * @param args unused arguments from cli
      */
     public static void main(final String... args) {
         new ClassPathXmlApplicationContext(DEFAULT_APPLICATION_CONTEXT);

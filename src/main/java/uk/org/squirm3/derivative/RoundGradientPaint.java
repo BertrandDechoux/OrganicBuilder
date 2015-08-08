@@ -15,8 +15,9 @@ import java.awt.image.ColorModel;
  * oreilly's example.
  * 
  * @author from oreilly, Bertrand Dechoux
- * @see http://www.oreilly.com/pub/a/oreilly/ask_tim/2001/codepolicy.html
- * @see http://examples.oreilly.com/java2d/examples/RoundGradientPaint.java
+ * 
+ * see "http://www.oreilly.com/pub/a/oreilly/ask_tim/2001/codepolicy.html"
+ * see "http://examples.oreilly.com/java2d/examples/RoundGradientPaint.java"
  */
 
 public class RoundGradientPaint implements Paint {
@@ -25,9 +26,7 @@ public class RoundGradientPaint implements Paint {
     protected Point2D mRadius;
     protected Color mPointColor, mBackgroundColor;
 
-    public RoundGradientPaint(final double x, final double y,
-            final Color pointColor, final Point2D radius,
-            final Color backgroundColor) {
+    public RoundGradientPaint(final double x, final double y, final Color pointColor, final Point2D radius, final Color backgroundColor) {
         if (radius.distance(0, 0) <= 0) {
             throw new IllegalArgumentException("Radius must be greater than 0.");
         }
@@ -38,13 +37,10 @@ public class RoundGradientPaint implements Paint {
     }
 
     @Override
-    public PaintContext createContext(final ColorModel cm,
-            final Rectangle deviceBounds, final Rectangle2D userBounds,
-            final AffineTransform xform, final RenderingHints hints) {
+    public PaintContext createContext(final ColorModel cm, final Rectangle deviceBounds, final Rectangle2D userBounds, final AffineTransform xform, final RenderingHints hints) {
         final Point2D transformedPoint = xform.transform(mPoint, null);
         final Point2D transformedRadius = xform.deltaTransform(mRadius, null);
-        return new RoundGradientContext(transformedPoint, mPointColor,
-                transformedRadius, mBackgroundColor);
+        return new RoundGradientContext(transformedPoint, mPointColor, transformedRadius, mBackgroundColor);
     }
 
     @Override
