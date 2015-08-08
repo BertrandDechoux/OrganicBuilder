@@ -18,8 +18,7 @@ public class ComposedLevelFactory implements ResourceLoaderAware {
 
     private final AtomBuilder atomBuilder;
 
-    private ComposedLevelFactory(final ConversionService conversionService,
-            final MessageSource messageSource, final AtomBuilder atomBuilder) {
+    public ComposedLevelFactory(final ConversionService conversionService, final MessageSource messageSource, final AtomBuilder atomBuilder) {
         this.conversionService = conversionService;
         this.messageSource = messageSource;
         this.atomBuilder = atomBuilder;
@@ -29,25 +28,18 @@ public class ComposedLevelFactory implements ResourceLoaderAware {
         return create(key, key + ".map", atomValidator);
     }
 
-    public Level createRandom(final String key,
-            final AtomValidator atomValidator) {
+    public Level createRandom(final String key, final AtomValidator atomValidator) {
         return create(key, "random.map", atomValidator);
     }
 
-    private Level create(final String key, final String map,
-            final AtomValidator atomValidator) {
-        final String levelDescription = conversionService.convert(
-                resourceLoader.getResource("classpath:levels/" + map),
-                String.class);
-        final LevelConstructor levelConstructo = new AtomBuilderGonstructor(
-                levelDescription, atomBuilder);
+    private Level create(final String key, final String map, final AtomValidator atomValidator) {
+        final String levelDescription = conversionService.convert(resourceLoader.getResource("classpath:levels/" + map), String.class);
+        final LevelConstructor levelConstructo = new AtomBuilderGonstructor(levelDescription, atomBuilder);
         final LevelMessages messages = new LevelMessages(key, messageSource);
         return new ComposedLevel(levelConstructo, messages, atomValidator);
     }
 
-    public Level createWithConstructor(final String key,
-            final LevelConstructor levelConstructor,
-            final AtomValidator atomValidator) {
+    public Level createWithConstructor(final String key, final LevelConstructor levelConstructor, final AtomValidator atomValidator) {
         final LevelMessages messages = new LevelMessages(key, messageSource);
         return new ComposedLevel(levelConstructor, messages, atomValidator);
     }

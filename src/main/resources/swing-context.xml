@@ -8,7 +8,7 @@
 
 	<bean id="actionConfigurer" class="uk.org.squirm3.swing.action.ActionConfigurerFactory"
 		factory-method="createDefaultConfigurer">
-		<constructor-arg ref="properties" />
+		<constructor-arg ref="environment" />
 		<constructor-arg ref="messageSource" />
 		<constructor-arg ref="conversionService" />
 	</bean>

@@ -3,12 +3,16 @@ package uk.org.squirm3.model.level;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import uk.org.squirm3.config.EngineConfig;
+import uk.org.squirm3.engine.LevelManager;
 
 import com.google.common.collect.Lists;
 
@@ -22,16 +26,14 @@ public class LevelsIntegrationTest {
 
     @Parameters
     public static Collection<Object[]> parameters() {
-        final ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
-                "engine-context.xml");
+        final ApplicationContext applicationContext = new AnnotationConfigApplicationContext(EngineConfig.class);
 
-        @SuppressWarnings("unchecked")
-        final List<Level> levels = applicationContext.getBean("levels",
-                List.class);
+        final List<? extends Level> levels = applicationContext.getBean(LevelManager.class).getLevels();
         final Collection<Object[]> parameters = Lists.newArrayList();
         for (final Level level : levels) {
-            parameters.add(new Object[]{level});
+            parameters.add(new Object[] { level });
         }
+        Assert.assertEquals(levels.size(), 21);
         return parameters;
     }
 
@@ -41,7 +43,6 @@ public class LevelsIntegrationTest {
         level.getTitle();
         level.getChallenge();
         level.getHint();
-
     }
 
 }

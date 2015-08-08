@@ -4,10 +4,12 @@ import java.io.IOException;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
+@Component
 public class ResourceToStringConverter implements Converter<Resource, String> {
 
     @Override

@@ -3,12 +3,15 @@ package uk.org.squirm3.springframework.converter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.model.type.ReactionType;
 
+@Component
 public class StringToReactionConverter implements Converter<String, Reaction> {
     // the basic parts of a reaction pattern
     private static final String ATOM = "(\\p{Lower})(\\d{1,})";
@@ -25,10 +28,10 @@ public class StringToReactionConverter implements Converter<String, Reaction> {
 
     private static final Pattern pattern = Pattern.compile(REACTION);
 
-    private final Converter<Character, ReactionType> characterToReactionTypeConverter;
+    private final CharacterToReactionTypeConverter characterToReactionTypeConverter;
 
-    public StringToReactionConverter(
-            final Converter<Character, ReactionType> characterToReactionTypeConverter) {
+    @Autowired
+    public StringToReactionConverter(final CharacterToReactionTypeConverter characterToReactionTypeConverter) {
         this.characterToReactionTypeConverter = characterToReactionTypeConverter;
     }
 
@@ -43,13 +46,11 @@ public class StringToReactionConverter implements Converter<String, Reaction> {
         final int future_a_state = toState(m.group(6));
         final boolean bonded_after = isBonded(m.group(7));
         final int future_b_state = toState(m.group(8));
-        return new Reaction(a_type, a_state, bonded_before, b_type, b_state,
-                future_a_state, bonded_after, future_b_state);
+        return new Reaction(a_type, a_state, bonded_before, b_type, b_state, future_a_state, bonded_after, future_b_state);
     }
 
     private Matcher match(final String source) {
-        final Matcher m = pattern
-                .matcher(StringUtils.trimAllWhitespace(source));
+        final Matcher m = pattern.matcher(StringUtils.trimAllWhitespace(source));
         m.matches();
         return m;
     }

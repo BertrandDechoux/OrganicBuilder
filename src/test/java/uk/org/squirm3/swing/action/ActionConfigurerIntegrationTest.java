@@ -17,6 +17,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.support.ConversionServiceFactoryBean;
 import org.springframework.context.support.StaticMessageSource;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.StandardEnvironment;
 
 import uk.org.squirm3.springframework.converter.StringToIconConverter;
 import uk.org.squirm3.springframework.converter.StringToKeyStrokeConverter;
@@ -32,7 +34,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 public class ActionConfigurerIntegrationTest {
     private static final String IDENTIFIER = "myid";
 
-    private final Properties properties = new Properties();
+    private final Environment properties = new StandardEnvironment();
     private final MessageSource messageSource = createMessageSource();
     private final ConversionService conversionService = createConversionService();
     private final ActionConfigurer actionConfigurer = ActionConfigurerFactory

@@ -8,6 +8,7 @@ import javax.swing.Action;
 
 import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -23,12 +24,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ActionConfigurer {
 
-    private final Properties properties;
+    private final Environment properties;
     private final MessageSource messageSource;
     private final ConversionService conversionService;
     private final Collection<? extends ActionProperty> actionProperties;
 
-    /* package */ActionConfigurer(final Properties properties,
+    /* package */ActionConfigurer(final Environment properties,
             final MessageSource messageSource,
             final ConversionService conversionService,
             final Collection<? extends ActionProperty> actionProperties) {

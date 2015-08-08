@@ -3,9 +3,11 @@ package uk.org.squirm3.springframework.converter;
 import java.awt.Image;
 
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
 import uk.org.squirm3.swing.GraphicsFactory;
 
+@Component
 public class StringToImageConverter implements Converter<String, Image> {
     private final GraphicsFactory graphicsFactory = new GraphicsFactory();
 

@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.Properties;
 
 import javax.swing.Action;
 
@@ -20,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.env.Environment;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ActionConfigurerTest {
@@ -36,7 +36,7 @@ public class ActionConfigurerTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Mock
-    private Properties properties;
+    private Environment properties;
     @Mock
     private MessageSource messageSource;
     @Mock

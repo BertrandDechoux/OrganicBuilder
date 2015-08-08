@@ -14,7 +14,7 @@ public class RandomConstructor implements LevelConstructor {
     final Configuration partialConfiguration;
     final AtomType[] types = BasicType.values();
 
-    private RandomConstructor(final Configuration partialConfiguration) {
+    public RandomConstructor(final Configuration partialConfiguration) {
         super();
         this.partialConfiguration = partialConfiguration;
     }
@@ -24,23 +24,18 @@ public class RandomConstructor implements LevelConstructor {
         final Collection<Atom> atoms = new ArrayList<Atom>();
         float currentWidth = 5 * Atom.getAtomSize();
         float currentHeight = 5 * Atom.getAtomSize();
-        final float maximumWidth = partialConfiguration.getWidth()
-                - currentWidth;
-        final float maximumHeigth = partialConfiguration.getHeight()
-                - currentHeight;
+        final float maximumWidth = partialConfiguration.getWidth() - currentWidth;
+        final float maximumHeigth = partialConfiguration.getHeight() - currentHeight;
         while (currentHeight < maximumHeigth) {
             if (currentWidth >= maximumWidth) {
                 currentWidth = Atom.getAtomSize();
                 currentHeight += 6 * Atom.getAtomSize();
             } else {
-                atoms.add(Atoms.createMobileAtomWithRandomSpeed(
-                        getRandomAtomType(), getRandomState(), currentWidth,
-                        currentHeight));
+                atoms.add(Atoms.createMobileAtomWithRandomSpeed(getRandomAtomType(), getRandomState(), currentWidth, currentHeight));
                 currentWidth += 6 * Atom.getAtomSize();
             }
         }
-        return new Configuration(partialConfiguration.getHeight(),
-                partialConfiguration.getWidth(), atoms);
+        return new Configuration(partialConfiguration.getHeight(), partialConfiguration.getWidth(), atoms);
     }
 
     private AtomType getRandomAtomType() {
