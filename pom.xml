@@ -3,6 +3,10 @@
 
 	<!-- http://www.wakaleo.com/blog/292-site-generation-in-maven-3 -->
 	<!-- http://blog.springsource.com/2009/12/02/obtaining-spring-3-artifacts-with-maven/ -->
+	
+	<prerequisites> 
+		<maven>3.0</maven> 
+	</prerequisites> 
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.org.squirm3</groupId>
@@ -51,17 +55,25 @@
 		<url>http://groups.google.fr/group/OrganicBuilder</url>
 	</issueManagement>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<cobertura.version>2.4</cobertura.version>
+		<org.springframework.version>4.2.0.RELEASE</org.springframework.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>r09</version>
+			<version>18.0</version>
 		</dependency>
+		<!-- test -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -103,31 +115,46 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>2.6.1</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.3</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.8.2</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>2.5.2</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.6</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.7</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.18.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.0-beta-2</version>
+				<version>3.4</version>
 				<configuration>
 					<reportPlugins>
 						<plugin>
@@ -178,7 +205,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
+				<version>2.5.5</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -213,18 +240,11 @@
 				</file>
 			</activation>
 			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-site-plugin</artifactId>
-							<version>3.0-beta-3</version>
-						</plugin>
-					</plugins>
-				</pluginManagement>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-site-plugin</artifactId>
+						<version>3.4</version>
 						<executions>
 							<execution>
 								<id>attach-descriptor</id>
@@ -238,13 +258,5 @@
 			</build>
 		</profile>
 	</profiles>
-
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cobertura.version>2.4</cobertura.version>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-	</properties>
-
 
 </project>
