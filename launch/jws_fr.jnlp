@@ -1,14 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?><jnlp spec="1.0+" codebase="http://organicbuilder.sourceforge.net/jws/" href="fr">
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="https://bertranddechoux.github.io/OrganicBuilder/launch/jws_fr.jnlp" href="fr">
 	<information>
 		<title>Organic Builder</title>
 		<vendor>Tim J. Hutton, Bertrand Dechoux</vendor>
-		<homepage href="http://organicbuilder.sourceforge.net/" />
+		<homepage href="https://bertranddechoux.github.io/OrganicBuilder/" />
 		<description>Artificial chemistry</description>	
 	</information>
 
 	<resources>
-		<j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-		<jar href="http://organicbuilder.sourceforge.net/OrganicBuilder.jar"/>
+		<j2se version="1.8+" href="http://java.sun.com/products/autodl/j2se"/>
+		<jar href="https://bertranddechoux.github.io/OrganicBuilder/launch/OrganicBuilder.jar"/>
 	</resources>
 
 	<application-desc main-class="uk.org.squirm3.Application">
