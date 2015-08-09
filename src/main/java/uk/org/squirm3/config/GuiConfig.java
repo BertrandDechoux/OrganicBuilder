@@ -114,8 +114,8 @@ public class GuiConfig {
     }
 
     @Bean
-    public AboutButton getAboutButton(@Value("${about.url}") String aboutUrl) {
-    	return configure(new AboutButton(aboutUrl, this.messageSource), "about");
+    public AboutButton getAboutButton() {
+    	return configure(new AboutButton(this.messageSource), "about");
     }
 
     @Bean

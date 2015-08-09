@@ -1,7 +1,6 @@
 package uk.org.squirm3.ui.level;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import java.util.Optional;
 
 import org.springframework.context.MessageSource;
 import org.springframework.util.StringUtils;
@@ -10,7 +9,9 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -90,50 +91,37 @@ public class CurrentLevelPanel extends BorderPane {
 		}
 
 		private void showErrorMessage(final String result) {
-			SwingUtilities.invokeLater(() -> {
-				JOptionPane.showMessageDialog(//
-						null, localize("level.error") + result, //
-						localize("level.error.title"), //
-						JOptionPane.ERROR_MESSAGE);
-			});
+			Utils.modalAlert(AlertType.ERROR, //
+					localize("level.error.title"), //
+					localize("level.error") + result, //
+					CurrentLevelPanel.this.getScene().getWindow());
 		}
 
 		private void showLevelClearedMessage() {
-			SwingUtilities.invokeLater(() -> {
-				final int n = JOptionPane.showOptionDialog(//
-						null, //
-						localize("level.success"), //
-						localize("level.success.title"), //
-						JOptionPane.YES_NO_OPTION, //
-						JOptionPane.INFORMATION_MESSAGE, //
-						null, options, options[0]);
-				if (n == JOptionPane.YES_OPTION) {
-					applicationEngine.goToNextLevel();
-				}
-			});
+			Optional<ButtonType> result = Utils.modalAlert(AlertType.CONFIRMATION, //
+					localize("level.success.title"), //
+					localize("level.success"), //
+					CurrentLevelPanel.this.getScene().getWindow());
+			if (result != null && result.get() == ButtonType.OK){
+				applicationEngine.goToNextLevel();
+			}
 		}
 
 		private void showLastLevelClearedMessage() {
-			SwingUtilities.invokeLater(() -> {
-				JOptionPane.showMessageDialog(//
-						null, //
-						localize("level.fullsuccess"), //
-						localize("level.success.title"), //
-						JOptionPane.INFORMATION_MESSAGE);
-			});
+			Utils.modalAlert(AlertType.INFORMATION, //
+					localize("level.success.title"), //
+					localize("level.fullsuccess"), //
+					CurrentLevelPanel.this.getScene().getWindow());
 		}
 	}
 
 	private final class HintHandler implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
-			SwingUtilities.invokeLater(() -> {
-				JOptionPane.showMessageDialog(//
-						null, //
-						currentLevel.getHint(), //
-						Messages.localize("level.hint", messageSource), //
-						JOptionPane.INFORMATION_MESSAGE);
-			});
+			Utils.modalAlert(AlertType.INFORMATION, //
+					Messages.localize("level.hint", messageSource), //
+					currentLevel.getHint(), //
+					CurrentLevelPanel.this.getScene().getWindow());
 		}
 	}
 

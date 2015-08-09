@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.swing.JOptionPane;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.util.StringUtils;
 
@@ -15,10 +13,12 @@ import com.google.common.base.Joiner;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
 import uk.org.squirm3.model.Reaction;
+import uk.org.squirm3.ui.Utils;
 import uk.org.squirm3.ui.reaction.ReactionListPanel;
 
 public class TextAreaMode implements ReactionsListMode {
@@ -61,8 +61,15 @@ public class TextAreaMode implements ReactionsListMode {
 			try {
 				reactionListPanel.setReactions(parseReactions(textArea.getText()));
 			} catch (final UnparsableReactionException exception) {
-				JOptionPane.showMessageDialog(null, exception.getUnparsableReaction(),
-						reactionListPanel.localize("reactions.parsing.error"), JOptionPane.ERROR_MESSAGE);
+				Utils.modalAlert(AlertType.ERROR, //
+						reactionListPanel.localize("reactions.parsing.error"), //
+						exception.getUnparsableReaction(), //
+						TextAreaMode.this.getReactionsList().getScene().getWindow());
+			} catch (final Exception exception) {
+				Utils.modalAlert(AlertType.ERROR, //
+						reactionListPanel.localize("reactions.parsing.error"), //
+						exception.getLocalizedMessage(), //
+						TextAreaMode.this.getReactionsList().getScene().getWindow());
 			}
 		}
 
