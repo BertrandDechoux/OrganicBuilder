@@ -7,8 +7,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
@@ -19,8 +17,10 @@ import java.util.Map.Entry;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
+import javafx.embed.swing.SwingNode;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
 import uk.org.squirm3.derivative.RoundGradientPaint;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.engine.ApplicationEngineEvent;
@@ -31,16 +31,14 @@ import uk.org.squirm3.model.DraggingPoint;
 import uk.org.squirm3.model.type.AtomType;
 import uk.org.squirm3.model.type.def.BasicType;
 
-public class AtomsPanel extends JScrollPane {
-    private static final long serialVersionUID = 1L;
-
+public class AtomsPanel extends BorderPane {
     DraggingPoint draggingPoint;
     Atom[] latestAtomsCopy;
 
     private int simulationWidth;
     private int simulationHeight;
 
-    BufferedImage bimg;
+    private BufferedImage bimg;
     private boolean needRepaint = true;
     byte scale;
 
@@ -64,21 +62,29 @@ public class AtomsPanel extends JScrollPane {
 
     public AtomsPanel(final ApplicationEngine applicationEngine,
             final Image spikyImage) {
-    	setMinimumSize(new Dimension(300, 300));
+    	setMinSize(300, 300);
 
         imagePanel = new ImagePanel(this);
-        setViewportView(imagePanel);
+        imagePanel.setMinimumSize(new Dimension(300, 300));
+		final SwingNode swingNode = new SwingNode();
+		swingNode.setContent(imagePanel);
+        setCenter(swingNode);
 
         this.applicationEngine = applicationEngine;
         createAtomsImages();
         this.spikyImage = spikyImage;
         needRepaint = true;
         scale = 100;
-        addComponentListener(new ResizeListener());
         imageSizeHasChanged();
 
         bindToApplicationEngine(applicationEngine);
 
+    }
+    
+    @Override
+    public void resize(double width, double height) {
+    	super.resize(width, height);
+    	imageSizeHasChanged();
     }
 
     private void bindToApplicationEngine(
@@ -132,17 +138,17 @@ public class AtomsPanel extends JScrollPane {
             simulationWidth = (int) configuration.getWidth();
         }
         if (imagePanel != null) {
-            final Dimension d = getSize();
+        	double height = getHeight();
+        	double width = getWidth();
             final int pseudoScale = (int) (Math.min(
-                    (d.height * 0.99 / simulationHeight),
-                    (d.width * 0.99 / simulationWidth)) * 100);
+                    (height * 0.99 / simulationHeight),
+                    (width * 0.99 / simulationWidth)) * 100);
             scale = pseudoScale >= 100 ? 100 : (byte) pseudoScale;
         }
         final float zoom = (float) scale / 100;
         imagePanel
                 .setPreferredSize(new Dimension((int) (simulationWidth * zoom),
                         (int) (simulationHeight * zoom)));
-        SwingUtilities.updateComponentTreeUI(this);
         imageHasChanged();
     }
 
@@ -152,6 +158,15 @@ public class AtomsPanel extends JScrollPane {
             return;
         }
         imagePanel.repaint();
+    }
+    
+    public BufferedImage getBimg() {
+        final int w = simulationWidth;
+        final int h = simulationHeight;
+        if (bimg == null || bimg.getWidth() != w || bimg.getHeight() != h) {
+            bimg = (BufferedImage) imagePanel.createImage(w, h);
+        }
+        return bimg;
     }
 
     void updateImage() {
@@ -167,10 +182,7 @@ public class AtomsPanel extends JScrollPane {
         final int w = simulationWidth;
         final int h = simulationHeight;
 
-        // do we have a correct bimg ?
-        if (bimg == null || bimg.getWidth() != w || bimg.getHeight() != h) {
-            bimg = (BufferedImage) createImage(w, h);
-        }
+        getBimg();
         if (bimg == null) {
             return;// collisionsPanel is not displayable
         }
@@ -199,7 +211,7 @@ public class AtomsPanel extends JScrollPane {
                             (int) atoms[i].getPhysicalPoint().getPositionX()
                                     - offset_x, (int) atoms[i]
                                     .getPhysicalPoint().getPositionY()
-                                    - offset_y, R * 2, R * 2, this);
+                                    - offset_y, R * 2, R * 2, imagePanel);
                     final String label = atoms[i].toString();
                     final int width = g2.getFontMetrics().stringWidth(label);
                     g2.drawString(label, (int) atoms[i].getPhysicalPoint()
@@ -210,7 +222,7 @@ public class AtomsPanel extends JScrollPane {
                     g2.drawImage(spikyImage, (int) atoms[i].getPhysicalPoint()
                             .getPositionX() - offset_x, (int) atoms[i]
                             .getPhysicalPoint().getPositionY() - offset_y,
-                            R * 2, R * 2, this);
+                            R * 2, R * 2, imagePanel);
                 }
             }
         }
@@ -309,22 +321,6 @@ public class AtomsPanel extends JScrollPane {
                 i++;
             }
             imageHasChanged();
-        }
-    }
-
-    private final class ResizeListener implements ComponentListener {
-        @Override
-        public void componentResized(final ComponentEvent arg0) {
-            imageSizeHasChanged();
-        }
-        @Override
-        public void componentHidden(final ComponentEvent arg0) {
-        }
-        @Override
-        public void componentMoved(final ComponentEvent arg0) {
-        }
-        @Override
-        public void componentShown(final ComponentEvent arg0) {
         }
     }
 

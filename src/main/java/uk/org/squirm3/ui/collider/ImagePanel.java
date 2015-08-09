@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 import javax.swing.Scrollable;
@@ -36,9 +37,10 @@ class ImagePanel extends JPanel implements Scrollable {
         super.paint(g);
         atomsPanel.updateImage();
         final float zoom = (float) atomsPanel.scale / 100;
-        g.drawImage(atomsPanel.bimg, 0, 0,
-                (int) (atomsPanel.bimg.getWidth() * zoom),
-                (int) (atomsPanel.bimg.getHeight() * zoom), this);
+        BufferedImage bimg = atomsPanel.getBimg();
+        g.drawImage(bimg, 0, 0,
+                (int) (bimg.getWidth() * zoom),
+                (int) (bimg.getHeight() * zoom), this);
     }
 
     @Override

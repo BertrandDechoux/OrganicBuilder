@@ -3,7 +3,6 @@ package uk.org.squirm3.ui;
 import org.springframework.context.MessageSource;
 
 import javafx.application.Platform;
-import javafx.embed.swing.SwingNode;
 import javafx.geometry.Orientation;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -49,9 +48,7 @@ public class GUI {
 
 		final SplitPane toollessApp = new SplitPane();
 		toollessApp.setOrientation(Orientation.HORIZONTAL);
-		final SwingNode swingNode = new SwingNode();
-		swingNode.setContent(collisionsPanel);
-		toollessApp.getItems().addAll(leftComponent, swingNode);
+		toollessApp.getItems().addAll(leftComponent, collisionsPanel);
 		return toollessApp;
 	}
 
