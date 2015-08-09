@@ -1,9 +1,7 @@
 package uk.org.squirm3.ui.collider;
 
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -12,7 +10,6 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
-import javax.swing.Scrollable;
 
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.DraggingPoint;
@@ -21,7 +18,7 @@ import uk.org.squirm3.model.DraggingPoint;
  * TODO read
  * http://download.oracle.com/javase/tutorial/uiswing/components/scrollpane.html
  */
-class ImagePanel extends JPanel implements Scrollable {
+class ImagePanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private final AtomsPanel atomsPanel;
@@ -41,33 +38,6 @@ class ImagePanel extends JPanel implements Scrollable {
         g.drawImage(bimg, 0, 0,
                 (int) (bimg.getWidth() * zoom),
                 (int) (bimg.getHeight() * zoom), this);
-    }
-
-    @Override
-    public Dimension getPreferredScrollableViewportSize() {
-        return getPreferredSize();
-    }
-
-    @Override
-    public int getScrollableBlockIncrement(final Rectangle arg0,
-            final int arg1, final int arg2) {
-        return 1; // TODO
-    }
-
-    @Override
-    public boolean getScrollableTracksViewportHeight() {
-        return false;
-    }
-
-    @Override
-    public boolean getScrollableTracksViewportWidth() {
-        return false;
-    }
-
-    @Override
-    public int getScrollableUnitIncrement(final Rectangle arg0, final int arg1,
-            final int arg2) {
-        return 1;
     }
 
     private final class ImageMouseMotionListener implements MouseMotionListener {
