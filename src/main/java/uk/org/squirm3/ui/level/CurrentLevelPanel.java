@@ -19,6 +19,7 @@ import uk.org.squirm3.engine.ApplicationEngineEvent;
 import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.level.Level;
 import uk.org.squirm3.springframework.Messages;
+import uk.org.squirm3.ui.Utils;
 
 public class CurrentLevelPanel extends BorderPane {
 	private final MessageSource messageSource;
@@ -36,6 +37,7 @@ public class CurrentLevelPanel extends BorderPane {
 		setCenter(browser);
 
 		BorderPane buttonsPane = new BorderPane();
+		buttonsPane.setPadding(new Insets(8));
 		hintButton = createButton("level.hint", new HintHandler());
 		buttonsPane.setLeft(hintButton);
 		evaluateButton = createButton("level.evaluate", new EvaluateHandler(applicationEngine));
@@ -44,6 +46,7 @@ public class CurrentLevelPanel extends BorderPane {
 
 		bindWithApplicationEngine(applicationEngine, messageSource);
 		setMinSize(150, 150);
+		Utils.defaultBorder(this);
 	}
 
 	private void bindWithApplicationEngine(final ApplicationEngine applicationEngine,
@@ -54,7 +57,7 @@ public class CurrentLevelPanel extends BorderPane {
 
 	private Button createButton(final String key, final EventHandler<ActionEvent> handler) {
 		final Button button = new Button(localize(key));
-		button.setPadding(new Insets(5, 10, 5, 10));
+		Utils.defaultSize(button);
 		button.setOnAction(handler);
 		return button;
 	}

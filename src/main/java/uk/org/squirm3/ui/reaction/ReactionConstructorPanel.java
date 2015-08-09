@@ -22,21 +22,16 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.model.type.ReactionType;
 import uk.org.squirm3.model.type.Types;
 import uk.org.squirm3.springframework.Messages;
+import uk.org.squirm3.ui.Utils;
 
 public class ReactionConstructorPanel extends VBox {
     private CheckBox bondedBefore, bondedAfter;
@@ -53,8 +48,8 @@ public class ReactionConstructorPanel extends VBox {
     	label.setPadding(new Insets(5));
 		getChildren().add(label);
 
-		setBorder(new Border(
-				new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+		Utils.defaultBackground(this);
+		Utils.defaultBorder(this);
 
 		final EventHandler<ActionEvent> updateReactionListener = (ActionEvent event) -> {
 			Platform.runLater(() -> {

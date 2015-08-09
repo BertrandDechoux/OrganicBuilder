@@ -12,20 +12,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
-import javafx.scene.paint.Color;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.engine.ApplicationEngineEvent;
 import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.springframework.Messages;
+import uk.org.squirm3.ui.Utils;
 import uk.org.squirm3.ui.reaction.mode.ListViewMode;
 import uk.org.squirm3.ui.reaction.mode.ReactionsListMode;
 import uk.org.squirm3.ui.reaction.mode.TextAreaMode;
@@ -55,10 +50,8 @@ public class ReactionListPanel extends BorderPane {
     }
 
     public void setCurrentModeTo(final ReactionsListMode futureMode) {
-        //buttonParentPanel.setTop(futureMode.getMenu());
         setRight(futureMode.getMenu());
         setCenter(futureMode.getReactionsList());
-        //scrollPanel.setContent(futureMode.getReactionsList());
         currentMode = futureMode;
         currentMode.reactionsHaveChanged(applicationEngine.getReactions());
     }
@@ -76,10 +69,7 @@ public class ReactionListPanel extends BorderPane {
             final EventHandler<ActionEvent> handler) {
         final Button button = new Button(Messages.localize(key,
                 messageSource));
-        button.setMinWidth(80);
-        button.setMaxWidth(80);
-        button.setMinHeight(25);
-        button.setMaxHeight(25);
+        Utils.defaultSize(button);
         button.setOnAction(handler);
         return button;
     }
@@ -112,7 +102,7 @@ public class ReactionListPanel extends BorderPane {
     }
 
     private void createListPanel() {
-    	setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+		Utils.defaultBorder(this);
         
     	nReactions = new Label(localize("reactions.current"));
     	nReactions.setPadding(new Insets(5));

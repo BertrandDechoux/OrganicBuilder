@@ -9,26 +9,24 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
+import uk.org.squirm3.ui.Utils;
 import uk.org.squirm3.ui.toolbar.navigation.LevelPicker;
 import uk.org.squirm3.ui.toolbar.simulation.SpeedPane;
 
 public class ToolBarPanel extends HBox {
-	private static final Color BACKGROUND = Color.rgb(255, 255, 225);
-
 	public ToolBarPanel(final Button runSimulationButton, final Button stopSimulationButton,
 			final Button resetSimulationButton, final SpeedPane speedPanel, final Button firstLevelButton,
 			final Button previousLevelButton, final LevelPicker levelPicker, final Button nextLevelButton,
 			final Button lastLevelButton, final Button aboutButton) {
 		super(5);
 		
-		setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
+		Utils.defaultBackground(this);
 		setPadding(new Insets(5));
 		
 		addButtons(stopSimulationButton, runSimulationButton, resetSimulationButton);
 		addHighPrioritySpacer();
 		
-		speedPanel.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
+		Utils.defaultBackground(speedPanel);
 		speedPanel.setPadding(new Insets(8, 0, 8, 0));
 		getChildren().add(speedPanel);
 		addHighPrioritySpacer();
@@ -67,7 +65,7 @@ public class ToolBarPanel extends HBox {
 	 */
 	public static Button createIconButton(final Button button) {
 		button.setPadding(new Insets(-1, -1, -1, -1));
-		button.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
+		Utils.defaultBackground(button);
 		return button;
 	}
 
