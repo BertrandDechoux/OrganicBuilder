@@ -1,7 +1,5 @@
 package uk.org.squirm3.ui.toolbar;
 
-import javax.swing.JPanel;
-
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Insets;
@@ -18,7 +16,7 @@ import javafx.scene.paint.Color;
 import uk.org.squirm3.ui.toolbar.navigation.LevelPicker;
 import uk.org.squirm3.ui.toolbar.simulation.SpeedPane;
 
-public class ToolBarPanel extends JPanel {
+public class ToolBarPanel extends JFXPanel {
 	private static final long serialVersionUID = 1L;
 	private static final Color BACKGROUND = Color.rgb(255, 255, 225);
 
@@ -27,26 +25,24 @@ public class ToolBarPanel extends JPanel {
 			final Button previousLevelButton, final LevelPicker levelPicker, final Button nextLevelButton,
 			final Button lastLevelButton, final Button aboutButton) {
 
-		JFXPanel futurContainer = new JFXPanel();
-		add(futurContainer);
 		Platform.runLater(() -> {
 			HBox mainBox = new HBox(5);
 			mainBox.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
 			
 			Scene scene = new Scene(mainBox, 1000, 45);
 			scene.setFill(BACKGROUND);
-			futurContainer.setScene(scene);
+			ToolBarPanel.this.setScene(scene);
 
 			mainBox.setPadding(new Insets(5));
 			addButtons(mainBox, stopSimulationButton, runSimulationButton, resetSimulationButton);
 
-			addGlueSeparartor(mainBox);
+			addHighPrioritySpacer(mainBox);
 
 			speedPanel.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
 			speedPanel.setPadding(new Insets(8, 0, 8, 0));
 			mainBox.getChildren().add(speedPanel);
 
-			addGlueSeparartor(mainBox);
+			addHighPrioritySpacer(mainBox);
 
 			addButtons(mainBox, firstLevelButton, previousLevelButton);
 			levelPicker.setMaxSize(150, 18);
@@ -56,7 +52,7 @@ public class ToolBarPanel extends JPanel {
 			mainBox.getChildren().add(levelPickerPane);
 			addButtons(mainBox, nextLevelButton, lastLevelButton);
 
-			addGlueSeparartor(mainBox);
+			addHighPrioritySpacer(mainBox);
 
 			addButtons(mainBox, aboutButton);
 		});
@@ -72,9 +68,9 @@ public class ToolBarPanel extends JPanel {
 	}
 
 	/**
-	 * Add a glue component that will grow if there is extra space.
+	 * Add a region component that will grow if there is extra space.
 	 */
-	private void addGlueSeparartor(HBox mainBox) {
+	private void addHighPrioritySpacer(HBox mainBox) {
 		Region spacer = new Region();
 		HBox.setHgrow(spacer, Priority.ALWAYS);
 		mainBox.getChildren().add(spacer);
