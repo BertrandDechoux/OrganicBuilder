@@ -48,14 +48,4 @@ public abstract class SwingUtils {
         return TF;
     }
 
-    /**
-     * Custom creation method for {@link JEditorPane}.
-     */
-    public static JEditorPane createReadOnlyHtmlEditorPane() {
-        final JEditorPane jEditorPane = new JEditorPane();
-        jEditorPane.setContentType("text/html");
-        jEditorPane.setEditable(false);
-        return jEditorPane;
-    }
-
 }

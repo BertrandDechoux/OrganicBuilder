@@ -1,169 +1,197 @@
 package uk.org.squirm3.ui.level;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import org.springframework.context.MessageSource;
 import org.springframework.util.StringUtils;
 
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.engine.ApplicationEngineEvent;
 import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.level.Level;
 import uk.org.squirm3.springframework.Messages;
-import uk.org.squirm3.swing.SwingUtils;
 
 public class CurrentLevelPanel extends JPanel {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private final JEditorPane description;
-    private JButton hintButton, evaluateButton;
-    private Level currentLevel;
+	private final MessageSource messageSource;
 
-    private final MessageSource messageSource;
+	private JFXPanel futurContainer;
+	private Scene scene;
 
-    public CurrentLevelPanel(final ApplicationEngine applicationEngine,
-            final MessageSource messageSource) {
-        this.messageSource = messageSource;
-        description = SwingUtils.createReadOnlyHtmlEditorPane();
+	private WebView browser;
+	private WebEngine webEngine;
+	private Button hintButton, evaluateButton;
 
-        setLayout(new BorderLayout());
-        add(decorateWithScroll(description), BorderLayout.CENTER);
-        add(createButtonsPanel(applicationEngine), BorderLayout.SOUTH);
+	private Level currentLevel;
 
-        bindWithApplicationEngine(applicationEngine, messageSource);
-    }
+	public CurrentLevelPanel(final ApplicationEngine applicationEngine, final MessageSource messageSource) {
+		this.messageSource = messageSource;
 
-    private void bindWithApplicationEngine(
-            final ApplicationEngine applicationEngine,
-            final MessageSource messageSource) {
-        applicationEngine.addListener(new LevelListener(applicationEngine,
-                messageSource), ApplicationEngineEvent.LEVEL);
-    }
+		futurContainer = new JFXPanel();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				BorderPane mainPane = new BorderPane();
+				scene = new Scene(mainPane, 400, 300);
+				browser = new WebView();
+				webEngine = browser.getEngine();
 
-    private JScrollPane decorateWithScroll(final Component component) {
-        final JScrollPane pane = new JScrollPane(component);
-        pane.setMinimumSize(new Dimension(50, 200));
-        return pane;
-    }
+				scene.setFill(Color.BLACK);
 
-    private JPanel createButtonsPanel(final ApplicationEngine applicationEngine) {
-        final JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.LINE_AXIS));
-        hintButton = createJButton("level.hint", new HintListener(), jPanel);
-        jPanel.add(Box.createHorizontalGlue());
-        evaluateButton = createJButton("level.evaluate", new EvaluateListener(
-                applicationEngine), jPanel);
-        return jPanel;
-    }
+				futurContainer.setScene(scene);
+				mainPane.setCenter(browser);
 
-    private JButton createJButton(final String key,
-            final ActionListener listener, final JPanel parent) {
-        final JButton jButton = new JButton(localize(key));
-        jButton.addActionListener(listener);
-        parent.add(jButton);
-        return jButton;
-    }
+				BorderPane buttonsPane = new BorderPane();
+				hintButton = createButton("level.hint", new HintHandler());
+				buttonsPane.setLeft(hintButton);
+				evaluateButton = createButton("level.evaluate", new EvaluateHandler(applicationEngine));
+				buttonsPane.setRight(evaluateButton);
+				mainPane.setBottom(buttonsPane);
 
-    private String localize(final String key) {
-        return Messages.localize(key, messageSource);
-    }
+				bindWithApplicationEngine(applicationEngine, messageSource);
+			}
+		});
+		add(futurContainer);
+		setMinimumSize(new Dimension(400, 300));
+	}
 
-    private final class EvaluateListener implements ActionListener {
-        private final Object[] options;
-        private final ApplicationEngine applicationEngine;
+	private void bindWithApplicationEngine(final ApplicationEngine applicationEngine,
+			final MessageSource messageSource) {
+		applicationEngine.addListener(new LevelListener(applicationEngine, messageSource),
+				ApplicationEngineEvent.LEVEL);
+	}
 
-        private EvaluateListener(final ApplicationEngine applicationEngine) {
-            options = new Object[]{localize("level.yes"), localize("level.no")};
-            this.applicationEngine = applicationEngine;
-        }
-        @Override
-        public void actionPerformed(final ActionEvent arg0) {
-            final String result = currentLevel.evaluate(applicationEngine
-                    .getAtoms());
-            if (result == null) {
-                if (applicationEngine.getLevelManager()
-                        .isCurrentLevelLastLevel()) {
-                    showLastLevelClearedMessage();
-                } else {
-                    showLevelClearedMessage();
-                }
-            } else {
-                showErrorMessage(result);
-            }
-        }
+	private Button createButton(final String key, final EventHandler<ActionEvent> handler) {
+		final Button button = new Button(localize(key));
+		button.setPadding(new Insets(10));
+		button.setOnAction(handler);
+		return button;
+	}
 
-        private void showErrorMessage(final String result) {
-            JOptionPane.showMessageDialog(CurrentLevelPanel.this,
-                    localize("level.error") + result,
-                    localize("level.error.title"), JOptionPane.ERROR_MESSAGE);
-        }
+	private String localize(final String key) {
+		return Messages.localize(key, messageSource);
+	}
 
-        private void showLevelClearedMessage() {
-            final int n = JOptionPane.showOptionDialog(CurrentLevelPanel.this,
-                    localize("level.success"), localize("level.success.title"),
-                    JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
-                    null, options, options[0]);
-            if (n == JOptionPane.YES_OPTION) {
-                applicationEngine.goToNextLevel();
-            }
-        }
+	private final class EvaluateHandler implements EventHandler<ActionEvent> {
+		private final Object[] options;
+		private final ApplicationEngine applicationEngine;
 
-        private void showLastLevelClearedMessage() {
-            JOptionPane.showMessageDialog(CurrentLevelPanel.this,
-                    localize("level.fullsuccess"),
-                    localize("level.success.title"),
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
+		private EvaluateHandler(final ApplicationEngine applicationEngine) {
+			options = new Object[] { localize("level.yes"), localize("level.no") };
+			this.applicationEngine = applicationEngine;
+		}
 
-    private final class HintListener implements ActionListener {
-        @Override
-        public void actionPerformed(final ActionEvent arg0) {
-            JOptionPane.showMessageDialog(CurrentLevelPanel.this,
-                    currentLevel.getHint(),
-                    Messages.localize("level.hint", messageSource),
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
+		@Override
+		public void handle(ActionEvent event) {
+			final String result = currentLevel.evaluate(applicationEngine.getAtoms());
+			if (result == null) {
+				if (applicationEngine.getLevelManager().isCurrentLevelLastLevel()) {
+					showLastLevelClearedMessage();
+				} else {
+					showLevelClearedMessage();
+				}
+			} else {
+				showErrorMessage(result);
+			}
+		}
 
-    private final class LevelListener implements Listener {
-        private final ApplicationEngine applicationEngine;
-        private final MessageSource messageSource;
+		private void showErrorMessage(final String result) {
+			SwingUtilities.invokeLater(() -> {
+				JOptionPane.showMessageDialog(//
+						CurrentLevelPanel.this, localize("level.error") + result, //
+						localize("level.error.title"), //
+						JOptionPane.ERROR_MESSAGE);
+			});
+		}
 
-        private LevelListener(final ApplicationEngine applicationEngine,
-                final MessageSource messageSource) {
-            this.applicationEngine = applicationEngine;
-            this.messageSource = messageSource;
-        }
+		private void showLevelClearedMessage() {
+			SwingUtilities.invokeLater(() -> {
+				final int n = JOptionPane.showOptionDialog(//
+						CurrentLevelPanel.this, //
+						localize("level.success"), //
+						localize("level.success.title"), //
+						JOptionPane.YES_NO_OPTION, //
+						JOptionPane.INFORMATION_MESSAGE, //
+						null, options, options[0]);
+				if (n == JOptionPane.YES_OPTION) {
+					applicationEngine.goToNextLevel();
+				}
+			});
+		}
 
-        @Override
-        public void propertyHasChanged() {
-            currentLevel = applicationEngine.getLevelManager()
-                    .getCurrentLevel();
-            if (currentLevel == null) {
-                description.setText(Messages.localize("level.description.none",
-                        messageSource));
-                hintButton.setEnabled(false);
-                evaluateButton.setEnabled(false);
-            } else {
-                description.setText("<b>" + currentLevel.getTitle() + "</b>"
-                        + currentLevel.getChallenge());
-                hintButton.setEnabled(StringUtils.hasText(currentLevel
-                        .getHint()));
-                evaluateButton.setEnabled(true);
-            }
-        }
-    }
+		private void showLastLevelClearedMessage() {
+			SwingUtilities.invokeLater(() -> {
+				JOptionPane.showMessageDialog(//
+						CurrentLevelPanel.this, //
+						localize("level.fullsuccess"), //
+						localize("level.success.title"), //
+						JOptionPane.INFORMATION_MESSAGE);
+			});
+		}
+	}
+
+	private final class HintHandler implements EventHandler<ActionEvent> {
+		@Override
+		public void handle(ActionEvent event) {
+			SwingUtilities.invokeLater(() -> {
+				JOptionPane.showMessageDialog(//
+						CurrentLevelPanel.this, //
+						currentLevel.getHint(), //
+						Messages.localize("level.hint", messageSource), //
+						JOptionPane.INFORMATION_MESSAGE);
+			});
+		}
+	}
+
+	private final class LevelListener implements Listener {
+		private final ApplicationEngine applicationEngine;
+		private final MessageSource messageSource;
+
+		private LevelListener(final ApplicationEngine applicationEngine, final MessageSource messageSource) {
+			this.applicationEngine = applicationEngine;
+			this.messageSource = messageSource;
+		}
+
+		@Override
+		public void propertyHasChanged() {
+			currentLevel = applicationEngine.getLevelManager().getCurrentLevel();
+			if (currentLevel == null) {
+				String levelDescription = Messages.localize("level.description.none", messageSource);
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						webEngine.loadContent(levelDescription);
+						hintButton.setDisable(true);
+						evaluateButton.setDisable(true);
+					}
+				});
+			} else {
+				String levelDescription = "<b>" + currentLevel.getTitle() + "</b>" + currentLevel.getChallenge();
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						webEngine.loadContent(levelDescription);
+						hintButton.setDisable(!StringUtils.hasText(currentLevel.getHint()));
+						evaluateButton.setDisable(false);
+					}
+				});
+			}
+		}
+	}
 }

@@ -9,7 +9,8 @@ import uk.org.squirm3.config.ApplicationConfig;
  */
 public class StandaloneSpringLauncher {
     /**
-     * @param args unused arguments from cli
+     * @param args
+     *            unused arguments from cli
      */
     public static void main(final String... args) {
         new AnnotationConfigApplicationContext(ApplicationConfig.class);
