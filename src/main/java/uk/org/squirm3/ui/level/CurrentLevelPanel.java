@@ -43,7 +43,7 @@ public class CurrentLevelPanel extends BorderPane {
 		setBottom(buttonsPane);
 
 		bindWithApplicationEngine(applicationEngine, messageSource);
-		setMinSize(300, 300);
+		setMinSize(150, 150);
 	}
 
 	private void bindWithApplicationEngine(final ApplicationEngine applicationEngine,

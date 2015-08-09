@@ -65,9 +65,7 @@ public class ReactionConstructorPanel extends VBox {
 		getChildren().add(createAddReactionButton(applicationEngine, messageSource, addIcon));
 		updateReactionListener.handle(null);
 		
-		// XXX fix that
-		setMinSize(100, 100);
-		setPrefSize(100, 100);
+		setMinSize(500, 100);
     }
 
     private Pane createReactionForm(final EventHandler<ActionEvent> updateReactionHandler) {

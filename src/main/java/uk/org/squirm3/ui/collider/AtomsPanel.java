@@ -64,6 +64,8 @@ public class AtomsPanel extends JScrollPane {
 
     public AtomsPanel(final ApplicationEngine applicationEngine,
             final Image spikyImage) {
+    	setMinimumSize(new Dimension(300, 300));
+
         imagePanel = new ImagePanel(this);
         setViewportView(imagePanel);
 

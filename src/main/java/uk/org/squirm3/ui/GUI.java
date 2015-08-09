@@ -1,12 +1,11 @@
 package uk.org.squirm3.ui;
 
-import javax.swing.JComponent;
-
 import org.springframework.context.MessageSource;
 
 import javafx.application.Platform;
 import javafx.embed.swing.SwingNode;
 import javafx.geometry.Orientation;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
@@ -25,57 +24,48 @@ import uk.org.squirm3.ui.toolbar.ToolBarPanel;
 public class GUI {
 	public GUI(Stage primaryStage, final MessageSource messageSource, final CurrentLevelPanel currentLevelPanel,
 			final ReactionListPanel reactionListPanel, final ReactionConstructorPanel reactionConstructorPanel,
-			final AtomsPanel collisionsPanel, final ToolBarPanel toolBarPanel) {
+			final AtomsPanel atomsPanel, final ToolBarPanel toolBarPanel) {
 
-		Platform.runLater(() -> {
-			SplitPane reactionsPane = createReactionsPane(reactionListPanel, reactionConstructorPanel);
-			SplitPane rootComponent = buildRootComponent(collisionsPanel, currentLevelPanel, reactionsPane);
-			final BorderPane contentPane = buildContentPane(toolBarPanel, rootComponent);
+		SplitPane toollessApp = buildToollessApp(currentLevelPanel, reactionConstructorPanel, reactionListPanel,
+				atomsPanel);
+		Parent app = addTools(toolBarPanel, toollessApp);
+		showApplication(primaryStage, app, Messages.localize("application.title", messageSource));
 
-			showApplication(primaryStage, contentPane, Messages.localize("application.title", messageSource));
-		});
-
-	}
-
-	/**
-	 * Bottom-left component.
-	 */
-	private SplitPane createReactionsPane(final ReactionListPanel reactionListPanel,
-			final ReactionConstructorPanel reactionConstructorPanel) {
-		final SplitPane reactionsPane = new SplitPane();
-		reactionsPane.setOrientation(Orientation.VERTICAL);
-		reactionsPane.getItems().addAll(reactionConstructorPanel, reactionListPanel);
-		return reactionsPane;
 	}
 
 	/**
 	 * The main component (without the toolbar)
 	 */
-	private SplitPane buildRootComponent(final JComponent collisionsPanel, final CurrentLevelPanel currentLevelPanel,
-			final SplitPane reactionsPane) {
+	private SplitPane buildToollessApp(final CurrentLevelPanel currentLevelPanel,
+			final ReactionConstructorPanel reactionConstructorPanel, final ReactionListPanel reactionListPanel,
+			final AtomsPanel collisionsPanel) {
+		BorderPane reactionsPane = new BorderPane();
+		reactionsPane.setTop(reactionConstructorPanel);
+		reactionsPane.setCenter(reactionListPanel);
+
 		final SplitPane leftComponent = new SplitPane();
 		leftComponent.setOrientation(Orientation.VERTICAL);
 		leftComponent.getItems().addAll(currentLevelPanel, reactionsPane);
 
-		final SplitPane rootComponent = new SplitPane();
-		rootComponent.setOrientation(Orientation.HORIZONTAL);
+		final SplitPane toollessApp = new SplitPane();
+		toollessApp.setOrientation(Orientation.HORIZONTAL);
 		final SwingNode swingNode = new SwingNode();
 		swingNode.setContent(collisionsPanel);
-		rootComponent.getItems().addAll(leftComponent, swingNode);
-		return rootComponent;
+		toollessApp.getItems().addAll(leftComponent, swingNode);
+		return toollessApp;
 	}
 
 	/**
 	 * The whole graphical user interface.
 	 */
-	private BorderPane buildContentPane(final ToolBarPanel toolBarPanel, final SplitPane rootComponent) {
-		final BorderPane contentPane = new BorderPane();
-		contentPane.setTop(toolBarPanel);
-		contentPane.setCenter(rootComponent);
-		return contentPane;
+	private Parent addTools(final ToolBarPanel toolBarPanel, final SplitPane rootComponent) {
+		final BorderPane app = new BorderPane();
+		app.setTop(toolBarPanel);
+		app.setCenter(rootComponent);
+		return app;
 	}
 
-	private void showApplication(Stage primaryStage, BorderPane pane, String title) {
+	private void showApplication(Stage primaryStage, Parent app, String title) {
 		primaryStage.setMaximized(true);
 		primaryStage.setFullScreen(true);
 
@@ -84,7 +74,7 @@ public class GUI {
 			System.exit(0);
 		});
 
-		Scene scene = new Scene(pane);
+		Scene scene = new Scene(app);
 		primaryStage.setTitle(title);
 		primaryStage.setScene(scene);
 		primaryStage.show();

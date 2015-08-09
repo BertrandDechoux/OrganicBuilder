@@ -8,6 +8,8 @@ import org.springframework.core.convert.ConversionService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -17,6 +19,8 @@ import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.engine.ApplicationEngineEvent;
@@ -60,11 +64,24 @@ public class ReactionListPanel extends BorderPane {
         currentMode = futureMode;
         currentMode.reactionsHaveChanged(applicationEngine.getReactions());
     }
+    
+    public Pane createButtonsPane() {
+    	TilePane pane = new TilePane(Orientation.VERTICAL);
+    	pane.setVgap(5);
+    	pane.setPadding(new Insets(5));
+    	pane.setPrefRows(3);
+    	return pane;
+    }
+
 
     public Button createButton(final String key,
             final EventHandler<ActionEvent> handler) {
         final Button button = new Button(Messages.localize(key,
                 messageSource));
+        button.setMinWidth(80);
+        button.setMaxWidth(80);
+        button.setMinHeight(25);
+        button.setMaxHeight(25);
         button.setOnAction(handler);
         return button;
     }

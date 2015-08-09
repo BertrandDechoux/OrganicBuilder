@@ -12,12 +12,12 @@ import org.springframework.util.StringUtils;
 
 import com.google.common.base.Joiner;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Pane;
 import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.ui.reaction.ReactionListPanel;
 
@@ -26,6 +26,7 @@ public class TextAreaMode implements ReactionsListMode {
 	private final ReactionListPanel reactionListPanel;
 	private final ConversionService conversionService;
 
+	private Pane buttonsPane;
 	private Button updateButton;
 	private TextArea textArea;
 
@@ -33,16 +34,15 @@ public class TextAreaMode implements ReactionsListMode {
 		this.reactionListPanel = reactionListPanel;
 		this.conversionService = conversionService;
 
-		Platform.runLater(() -> {
-			updateButton = reactionListPanel.createButton("reactions.update", new UpdateReactionsHandler());
-			textArea = new TextArea();
-		});
-
+		buttonsPane = reactionListPanel.createButtonsPane();
+		updateButton = reactionListPanel.createButton("reactions.update", new UpdateReactionsHandler());
+		buttonsPane.getChildren().add(updateButton);
+		textArea = new TextArea();
 	}
 
 	@Override
 	public Node getMenu() {
-		return updateButton;
+		return buttonsPane;
 	}
 
 	@Override
