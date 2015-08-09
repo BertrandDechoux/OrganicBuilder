@@ -215,7 +215,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>uk.org.squirm3.springframework.StandaloneSpringLauncher</mainClass>
+							<mainClass>OrganicBuilder</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

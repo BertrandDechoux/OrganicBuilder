@@ -1,6 +1,5 @@
 package uk.org.squirm3.ui.reaction;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,13 +8,11 @@ import org.springframework.context.MessageSource;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -41,9 +38,7 @@ import uk.org.squirm3.model.type.ReactionType;
 import uk.org.squirm3.model.type.Types;
 import uk.org.squirm3.springframework.Messages;
 
-public class ReactionConstructorPanel extends JFXPanel {
-    private static final long serialVersionUID = 1L;
-
+public class ReactionConstructorPanel extends VBox {
     private CheckBox bondedBefore, bondedAfter;
     private ComboBox<ReactionType> aType, bType;
     private ComboBox<?> aState, bState, futureAState, futureBState;
@@ -52,31 +47,27 @@ public class ReactionConstructorPanel extends JFXPanel {
 
     public ReactionConstructorPanel(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final Image addIcon) {
-		Platform.runLater(() -> {
-			VBox vBox = new VBox(5);
+    	super(5);
 			
-			Scene scene = new Scene(vBox, 100, 100);
-			ReactionConstructorPanel.this.setScene(scene);
-			vBox.getChildren().add(new Label(Messages.localize("reactions.editor", messageSource)));
-			
-			vBox.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-			
-	        final EventHandler<ActionEvent> updateReactionListener = (ActionEvent event) -> {
-	        	Platform.runLater(() -> {
-					futureAType.setText(toStringIdentifier(aType.getSelectionModel().getSelectedItem()));
-					futureBType.setText(toStringIdentifier(bType.getSelectionModel().getSelectedItem()));
-					addReaction.setText(createReactionFromEditor().toString());
-	        	});
-	        };
-	        vBox.getChildren().add(createReactionForm(updateReactionListener));
-	        vBox.getChildren().add(createAddReactionButton(applicationEngine, messageSource, addIcon));
-	        updateReactionListener.handle(null);
-			
-		});
-		setMinimumSize(new Dimension(100, 100));
-		setSize(100, 100);
+		getChildren().add(new Label(Messages.localize("reactions.editor", messageSource)));
 
-        setMaximumSize(getMinimumSize());
+		setBorder(new Border(
+				new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+		final EventHandler<ActionEvent> updateReactionListener = (ActionEvent event) -> {
+			Platform.runLater(() -> {
+				futureAType.setText(toStringIdentifier(aType.getSelectionModel().getSelectedItem()));
+				futureBType.setText(toStringIdentifier(bType.getSelectionModel().getSelectedItem()));
+				addReaction.setText(createReactionFromEditor().toString());
+			});
+		};
+		getChildren().add(createReactionForm(updateReactionListener));
+		getChildren().add(createAddReactionButton(applicationEngine, messageSource, addIcon));
+		updateReactionListener.handle(null);
+		
+		// XXX fix that
+		setMinSize(100, 100);
+		setPrefSize(100, 100);
     }
 
     private Pane createReactionForm(final EventHandler<ActionEvent> updateReactionHandler) {

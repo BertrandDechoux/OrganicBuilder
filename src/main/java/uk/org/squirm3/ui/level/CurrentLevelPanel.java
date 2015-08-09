@@ -1,7 +1,5 @@
 package uk.org.squirm3.ui.level;
 
-import java.awt.Dimension;
-
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -9,14 +7,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.util.StringUtils;
 
 import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import uk.org.squirm3.engine.ApplicationEngine;
@@ -25,9 +20,7 @@ import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.level.Level;
 import uk.org.squirm3.springframework.Messages;
 
-public class CurrentLevelPanel extends JFXPanel {
-	private static final long serialVersionUID = 1L;
-
+public class CurrentLevelPanel extends BorderPane {
 	private final MessageSource messageSource;
 
 	private WebEngine webEngine;
@@ -38,27 +31,19 @@ public class CurrentLevelPanel extends JFXPanel {
 	public CurrentLevelPanel(final ApplicationEngine applicationEngine, final MessageSource messageSource) {
 		this.messageSource = messageSource;
 
-		Platform.runLater(() -> {
-			BorderPane mainPane = new BorderPane();
-			Scene scene = new Scene(mainPane);
-			WebView browser = new WebView();
-			webEngine = browser.getEngine();
+		WebView browser = new WebView();
+		webEngine = browser.getEngine();
+		setCenter(browser);
 
-			scene.setFill(Color.BLACK);
+		BorderPane buttonsPane = new BorderPane();
+		hintButton = createButton("level.hint", new HintHandler());
+		buttonsPane.setLeft(hintButton);
+		evaluateButton = createButton("level.evaluate", new EvaluateHandler(applicationEngine));
+		buttonsPane.setRight(evaluateButton);
+		setBottom(buttonsPane);
 
-			CurrentLevelPanel.this.setScene(scene);
-			mainPane.setCenter(browser);
-
-			BorderPane buttonsPane = new BorderPane();
-			hintButton = createButton("level.hint", new HintHandler());
-			buttonsPane.setLeft(hintButton);
-			evaluateButton = createButton("level.evaluate", new EvaluateHandler(applicationEngine));
-			buttonsPane.setRight(evaluateButton);
-			mainPane.setBottom(buttonsPane);
-
-			bindWithApplicationEngine(applicationEngine, messageSource);
-		});
-		setMinimumSize(new Dimension(300, 300));
+		bindWithApplicationEngine(applicationEngine, messageSource);
+		setMinSize(300, 300);
 	}
 
 	private void bindWithApplicationEngine(final ApplicationEngine applicationEngine,
@@ -104,7 +89,7 @@ public class CurrentLevelPanel extends JFXPanel {
 		private void showErrorMessage(final String result) {
 			SwingUtilities.invokeLater(() -> {
 				JOptionPane.showMessageDialog(//
-						CurrentLevelPanel.this, localize("level.error") + result, //
+						null, localize("level.error") + result, //
 						localize("level.error.title"), //
 						JOptionPane.ERROR_MESSAGE);
 			});
@@ -113,7 +98,7 @@ public class CurrentLevelPanel extends JFXPanel {
 		private void showLevelClearedMessage() {
 			SwingUtilities.invokeLater(() -> {
 				final int n = JOptionPane.showOptionDialog(//
-						CurrentLevelPanel.this, //
+						null, //
 						localize("level.success"), //
 						localize("level.success.title"), //
 						JOptionPane.YES_NO_OPTION, //
@@ -128,7 +113,7 @@ public class CurrentLevelPanel extends JFXPanel {
 		private void showLastLevelClearedMessage() {
 			SwingUtilities.invokeLater(() -> {
 				JOptionPane.showMessageDialog(//
-						CurrentLevelPanel.this, //
+						null, //
 						localize("level.fullsuccess"), //
 						localize("level.success.title"), //
 						JOptionPane.INFORMATION_MESSAGE);
@@ -141,7 +126,7 @@ public class CurrentLevelPanel extends JFXPanel {
 		public void handle(ActionEvent event) {
 			SwingUtilities.invokeLater(() -> {
 				JOptionPane.showMessageDialog(//
-						CurrentLevelPanel.this, //
+						null, //
 						currentLevel.getHint(), //
 						Messages.localize("level.hint", messageSource), //
 						JOptionPane.INFORMATION_MESSAGE);

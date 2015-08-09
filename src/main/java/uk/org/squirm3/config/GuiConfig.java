@@ -3,8 +3,6 @@ package uk.org.squirm3.config;
 import java.awt.Image;
 import java.util.Locale;
 
-import javax.swing.ImageIcon;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -16,6 +14,7 @@ import org.springframework.core.env.Environment;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.ui.GUI;
 import uk.org.squirm3.ui.collider.AtomsPanel;
@@ -46,9 +45,9 @@ public class GuiConfig {
     private Environment environment;
 
     @Bean
-    public GUI getGUI(MessageSource messageSource, CurrentLevelPanel currentLevelPanel, ReactionListPanel reactionListPanel, ReactionConstructorPanel reactionConstructorPanel,
+    public GUI getGUI(Stage primaryStage, MessageSource messageSource, CurrentLevelPanel currentLevelPanel, ReactionListPanel reactionListPanel, ReactionConstructorPanel reactionConstructorPanel,
             AtomsPanel collisionsPanel, ToolBarPanel toolBarPanel) {
-        return new GUI(messageSource, currentLevelPanel, reactionListPanel, reactionConstructorPanel, collisionsPanel, toolBarPanel);
+        return new GUI(primaryStage, messageSource, currentLevelPanel, reactionListPanel, reactionConstructorPanel, collisionsPanel, toolBarPanel);
     }
 
     @Bean

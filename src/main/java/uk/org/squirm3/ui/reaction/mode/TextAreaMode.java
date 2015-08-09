@@ -61,7 +61,7 @@ public class TextAreaMode implements ReactionsListMode {
 			try {
 				reactionListPanel.setReactions(parseReactions(textArea.getText()));
 			} catch (final UnparsableReactionException exception) {
-				JOptionPane.showMessageDialog(reactionListPanel, exception.getUnparsableReaction(),
+				JOptionPane.showMessageDialog(null, exception.getUnparsableReaction(),
 						reactionListPanel.localize("reactions.parsing.error"), JOptionPane.ERROR_MESSAGE);
 			}
 		}

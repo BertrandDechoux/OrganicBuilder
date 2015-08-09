@@ -1,9 +1,6 @@
 package uk.org.squirm3.ui.toolbar;
 
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -16,64 +13,53 @@ import javafx.scene.paint.Color;
 import uk.org.squirm3.ui.toolbar.navigation.LevelPicker;
 import uk.org.squirm3.ui.toolbar.simulation.SpeedPane;
 
-public class ToolBarPanel extends JFXPanel {
-	private static final long serialVersionUID = 1L;
+public class ToolBarPanel extends HBox {
 	private static final Color BACKGROUND = Color.rgb(255, 255, 225);
 
 	public ToolBarPanel(final Button runSimulationButton, final Button stopSimulationButton,
 			final Button resetSimulationButton, final SpeedPane speedPanel, final Button firstLevelButton,
 			final Button previousLevelButton, final LevelPicker levelPicker, final Button nextLevelButton,
 			final Button lastLevelButton, final Button aboutButton) {
+		super(5);
+		
+		setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
+		setPadding(new Insets(5));
+		
+		addButtons(stopSimulationButton, runSimulationButton, resetSimulationButton);
+		addHighPrioritySpacer();
+		
+		speedPanel.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
+		speedPanel.setPadding(new Insets(8, 0, 8, 0));
+		getChildren().add(speedPanel);
+		addHighPrioritySpacer();
 
-		Platform.runLater(() -> {
-			HBox mainBox = new HBox(5);
-			mainBox.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
-			
-			Scene scene = new Scene(mainBox, 1000, 45);
-			scene.setFill(BACKGROUND);
-			ToolBarPanel.this.setScene(scene);
+		addButtons(firstLevelButton, previousLevelButton);
+		levelPicker.setMaxSize(150, 18);
+		BorderPane levelPickerPane = new BorderPane();
+		levelPickerPane.setCenter(levelPicker);
+		getChildren().add(levelPickerPane);
+		addButtons(nextLevelButton, lastLevelButton);
+		addHighPrioritySpacer();
 
-			mainBox.setPadding(new Insets(5));
-			addButtons(mainBox, stopSimulationButton, runSimulationButton, resetSimulationButton);
-
-			addHighPrioritySpacer(mainBox);
-
-			speedPanel.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
-			speedPanel.setPadding(new Insets(8, 0, 8, 0));
-			mainBox.getChildren().add(speedPanel);
-
-			addHighPrioritySpacer(mainBox);
-
-			addButtons(mainBox, firstLevelButton, previousLevelButton);
-			levelPicker.setMaxSize(150, 18);
-			BorderPane levelPickerPane = new BorderPane();
-			levelPickerPane.setCenter(levelPicker);
-			
-			mainBox.getChildren().add(levelPickerPane);
-			addButtons(mainBox, nextLevelButton, lastLevelButton);
-
-			addHighPrioritySpacer(mainBox);
-
-			addButtons(mainBox, aboutButton);
-		});
+		addButtons(aboutButton);
 	}
 
 	/**
 	 * Add all provided buttons with additional configuration.
 	 */
-	private void addButtons(HBox mainBox, final Button... buttons) {
+	private void addButtons(final Button... buttons) {
 		for (final Button button : buttons) {
-			mainBox.getChildren().add(createIconButton(button));
+			getChildren().add(createIconButton(button));
 		}
 	}
 
 	/**
 	 * Add a region component that will grow if there is extra space.
 	 */
-	private void addHighPrioritySpacer(HBox mainBox) {
+	private void addHighPrioritySpacer() {
 		Region spacer = new Region();
 		HBox.setHgrow(spacer, Priority.ALWAYS);
-		mainBox.getChildren().add(spacer);
+		getChildren().add(spacer);
 	}
 
 	/**
