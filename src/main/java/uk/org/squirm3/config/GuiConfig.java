@@ -1,6 +1,7 @@
 package uk.org.squirm3.config;
 
 import java.awt.Image;
+import java.util.Locale;
 
 import javax.swing.ImageIcon;
 
@@ -12,25 +13,26 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.Environment;
 
-import uk.org.squirm3.config.gui.ActionConfigurer;
-import uk.org.squirm3.config.gui.ActionConfigurerFactory;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.ui.GUI;
 import uk.org.squirm3.ui.collider.AtomsPanel;
 import uk.org.squirm3.ui.level.CurrentLevelPanel;
 import uk.org.squirm3.ui.reaction.ReactionConstructorPanel;
 import uk.org.squirm3.ui.reaction.ReactionListPanel;
-import uk.org.squirm3.ui.toolbar.AboutAction;
+import uk.org.squirm3.ui.toolbar.AboutButton;
 import uk.org.squirm3.ui.toolbar.ToolBarPanel;
-import uk.org.squirm3.ui.toolbar.navigation.FirstLevelAction;
-import uk.org.squirm3.ui.toolbar.navigation.LastLevelAction;
+import uk.org.squirm3.ui.toolbar.navigation.FirstLevelButton;
+import uk.org.squirm3.ui.toolbar.navigation.LastLevelButton;
 import uk.org.squirm3.ui.toolbar.navigation.LevelPicker;
-import uk.org.squirm3.ui.toolbar.navigation.NextLevelAction;
+import uk.org.squirm3.ui.toolbar.navigation.NextLevelButton;
 import uk.org.squirm3.ui.toolbar.navigation.PreviousLevelAction;
-import uk.org.squirm3.ui.toolbar.simulation.ResetSimulationAction;
-import uk.org.squirm3.ui.toolbar.simulation.RunSimulationAction;
-import uk.org.squirm3.ui.toolbar.simulation.SpeedPanel;
-import uk.org.squirm3.ui.toolbar.simulation.StopSimulationAction;
+import uk.org.squirm3.ui.toolbar.simulation.ResetSimulationButton;
+import uk.org.squirm3.ui.toolbar.simulation.RunSimulationButton;
+import uk.org.squirm3.ui.toolbar.simulation.SpeedPane;
+import uk.org.squirm3.ui.toolbar.simulation.StopSimulationButton;
 
 @Configuration
 public class GuiConfig {
@@ -50,16 +52,16 @@ public class GuiConfig {
     }
 
     @Bean
-    public ToolBarPanel getToolBarPanel(RunSimulationAction runSimulationAction, StopSimulationAction stopSimulationAction, ResetSimulationAction resetSimulationAction, SpeedPanel speedPanel,
-            FirstLevelAction firstLevelAction, PreviousLevelAction previousLevelAction, LevelPicker levelPicker, NextLevelAction nextLevelAction, LastLevelAction lastLevelAction,
-            AboutAction aboutAction) {
+    public ToolBarPanel getToolBarPanel(RunSimulationButton runSimulationAction, StopSimulationButton stopSimulationAction, ResetSimulationButton resetSimulationAction, SpeedPane speedPanel,
+            FirstLevelButton firstLevelAction, PreviousLevelAction previousLevelAction, LevelPicker levelPicker, NextLevelButton nextLevelAction, LastLevelButton lastLevelAction,
+            AboutButton aboutAction) {
         return new ToolBarPanel(runSimulationAction, stopSimulationAction, resetSimulationAction, speedPanel, firstLevelAction, previousLevelAction, levelPicker, nextLevelAction, lastLevelAction,
                 aboutAction);
     }
 
     @Bean
-    public SpeedPanel getSpeedPanel() {
-        return new SpeedPanel(this.applicationEngine, this.messageSource);
+    public SpeedPane getSpeedPanel() {
+        return new SpeedPane(this.applicationEngine, this.messageSource);
     }
 
     @Bean
@@ -78,48 +80,43 @@ public class GuiConfig {
     }
 
     @Bean
-    public ActionConfigurer getActionConfigurer() {
-        return ActionConfigurerFactory.createDefaultConfigurer(this.environment, this.messageSource, this.conversionService);
+    public RunSimulationButton getRunSimulationActionConfiguration() {
+        return configure(new RunSimulationButton(this.applicationEngine), "simulation.run");
     }
 
     @Bean
-    public RunSimulationAction getRunSimulationActionConfiguration(ActionConfigurer configurer) {
-        return configurer.configure(new RunSimulationAction(this.applicationEngine), "simulation.run");
+    public StopSimulationButton getStopSimulationButton() {
+    	return configure(new StopSimulationButton(this.applicationEngine), "simulation.stop");
     }
 
     @Bean
-    public StopSimulationAction getStopSimulationAction(ActionConfigurer configurer) {
-        return configurer.configure(new StopSimulationAction(this.applicationEngine), "simulation.stop");
+    public ResetSimulationButton getResetSimulationButton() {
+    	return configure(new ResetSimulationButton(this.applicationEngine), "simulation.reset");
     }
 
     @Bean
-    public ResetSimulationAction getResetSimulationAction(ActionConfigurer configurer) {
-        return configurer.configure(new ResetSimulationAction(this.applicationEngine), "simulation.reset");
+    public FirstLevelButton getFirstLevelButton() {
+    	return configure(new FirstLevelButton(this.applicationEngine), "level.first");
     }
 
     @Bean
-    public FirstLevelAction getFirstLevelAction(ActionConfigurer configurer) {
-        return configurer.configure(new FirstLevelAction(this.applicationEngine), "level.first");
+    public PreviousLevelAction getPreviousLevelButton() {
+    	return configure(new PreviousLevelAction(this.applicationEngine), "level.previous");
     }
 
     @Bean
-    public PreviousLevelAction getPreviousLevelAction(ActionConfigurer configurer) {
-        return configurer.configure(new PreviousLevelAction(this.applicationEngine), "level.previous");
+    public NextLevelButton getNextLevelButton() {
+    	return configure(new NextLevelButton(this.applicationEngine), "level.next");
     }
 
     @Bean
-    public NextLevelAction getNextLevelAction(ActionConfigurer configurer) {
-        return configurer.configure(new NextLevelAction(this.applicationEngine), "level.next");
+    public LastLevelButton getLastLevelButton() {
+    	return configure(new LastLevelButton(this.applicationEngine), "level.last");
     }
 
     @Bean
-    public LastLevelAction getLastLevelAction(ActionConfigurer configurer) {
-        return configurer.configure(new LastLevelAction(this.applicationEngine), "level.last");
-    }
-
-    @Bean
-    public AboutAction getAboutAction(@Value("${about.url}") String aboutUrl, ActionConfigurer configurer) {
-        return configurer.configure(new AboutAction(aboutUrl, this.messageSource), "about");
+    public AboutButton getAboutButton(@Value("${about.url}") String aboutUrl) {
+    	return configure(new AboutButton(aboutUrl, this.messageSource), "about");
     }
 
     @Bean
@@ -130,5 +127,28 @@ public class GuiConfig {
     @Bean
     public ReactionConstructorPanel getReactionConstructorPanel(@Value("/graphics/add.png") ImageIcon addIcon) {
         return new ReactionConstructorPanel(this.applicationEngine, this.messageSource, addIcon);
+    }
+    
+    private <T extends Button> T configure(final T button, final String identifier) {
+		String text = getMessage(identifier + ".button.tooltip");
+		button.setTooltip(new Tooltip(text));
+
+		String path = getMessage(identifier + ".button.icon");
+		javafx.scene.image.Image image = new javafx.scene.image.Image(getClass().getResourceAsStream(path));
+		button.setGraphic(new ImageView(image));
+
+		return button;
+    }
+
+    /**
+     * Search properties and if not found messages.
+     */
+    private String getMessage(final String messageCode) {
+        final String messageFromProperty = this.environment.getProperty(messageCode);
+        if (messageFromProperty != null) {
+            return messageFromProperty;
+        }
+
+        return this.messageSource.getMessage(messageCode, null, null, Locale.getDefault());
     }
 }

@@ -1,17 +1,14 @@
 package uk.org.squirm3.ui.toolbar.simulation;
 
-import java.awt.Dimension;
-
-import javax.swing.JPanel;
 import org.springframework.context.MessageSource;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import uk.org.squirm3.engine.ApplicationEngine;
@@ -22,22 +19,16 @@ import uk.org.squirm3.springframework.Messages;
 /**
  * Allows user to change the speed of the simulation.
  */
-public class SpeedPanel extends JPanel implements Listener {
-	private static final long serialVersionUID = 1L;
-
-	private JFXPanel futurContainer;
+public class SpeedPane extends HBox implements Listener {
 	private Slider speedSelector;
-
 	private final ApplicationEngine applicationEngine;
 
-	public SpeedPanel(final ApplicationEngine applicationEngine, final MessageSource messageSource) {
+	public SpeedPane(final ApplicationEngine applicationEngine, final MessageSource messageSource) {
+		super(5);
 		this.applicationEngine = applicationEngine;
 
-		futurContainer = new JFXPanel();
 		Platform.runLater(() -> {
-			HBox mainBox = new HBox();
 			Text label = new Text(Messages.localize("parameters.speed", messageSource));
-			mainBox.getChildren().add(label);
 
 			speedSelector = new Slider(1, 8, 1);
 			speedSelector.setMajorTickUnit(1);
@@ -47,15 +38,13 @@ public class SpeedPanel extends JPanel implements Listener {
 			speedSelector.setShowTickMarks(true);
 			speedSelector.setShowTickLabels(false);
 			speedSelector.valueProperty().addListener(new SpeedSelectorListener());
-			mainBox.getChildren().add(speedSelector);
 
-			Scene scene = new Scene(mainBox, 250, 20);
-			scene.setFill(Color.BLACK);
-			futurContainer.setScene(scene);
+			SpeedPane.this.getChildren().add(label);
+			SpeedPane.this.getChildren().add(speedSelector);
 			applicationEngine.addListener(this, ApplicationEngineEvent.SPEED);
 		});
-		add(futurContainer);
-		setMinimumSize(new Dimension(250, 20));
+		setMinSize(250, 20);
+		// TODO
 		// setMaximumSize(getPreferredSize());
 	}
 

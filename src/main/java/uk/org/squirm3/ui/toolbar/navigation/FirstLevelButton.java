@@ -7,20 +7,21 @@ import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.engine.ApplicationEngineEvent;
 
 /**
- * Go to previous level.The button will be active if and only if the current
- * level is has a previous level.
+ * Go to the first level. The button will be active if and only if the current
+ * level is not the first level.
  */
-public class PreviousLevelAction extends Button {
-	public PreviousLevelAction(final ApplicationEngine applicationEngine) {
+public class FirstLevelButton extends Button {
+	public FirstLevelButton(final ApplicationEngine applicationEngine) {
 		this.setOnAction((ActionEvent e) -> {
-			applicationEngine.goToPreviousLevel();
+			applicationEngine.goToFirstLevel();
 		});
 
 		applicationEngine.addListener(() -> {
 			final boolean firstLevel = applicationEngine.getLevelManager().isCurrentLevelFirstLevel();
 			Platform.runLater(() -> {
-				PreviousLevelAction.this.setDisable(firstLevel);
+				FirstLevelButton.this.setDisable(firstLevel);
 			});
 		} , ApplicationEngineEvent.LEVEL);
 	}
+
 }

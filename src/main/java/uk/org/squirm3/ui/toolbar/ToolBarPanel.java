@@ -1,87 +1,92 @@
 package uk.org.squirm3.ui.toolbar;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Insets;
-
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import uk.org.squirm3.ui.toolbar.navigation.LevelPicker;
-import uk.org.squirm3.ui.toolbar.simulation.SpeedPanel;
+import uk.org.squirm3.ui.toolbar.simulation.SpeedPane;
 
 public class ToolBarPanel extends JPanel {
-    private static final long serialVersionUID = 1L;
-    private static final Color BACKGROUND = new Color(255, 255, 225);
+	private static final long serialVersionUID = 1L;
+	private static final Color BACKGROUND = Color.rgb(255, 255, 225);
 
-    public ToolBarPanel(
-            final Action runSimulationAction,
-            final Action stopSimulationAction,
-            final Action resetSimulationAction,
-            final SpeedPanel speedPanel,
-            final Action firstLevelAction,
-            final Action previousLevelAction,
-            final LevelPicker levelPicker,
-            final Action nextLevelAction,
-            final Action lastLevelAction,
-            final Action aboutAction) {
+	public ToolBarPanel(final Button runSimulationButton, final Button stopSimulationButton,
+			final Button resetSimulationButton, final SpeedPane speedPanel, final Button firstLevelButton,
+			final Button previousLevelButton, final LevelPicker levelPicker, final Button nextLevelButton,
+			final Button lastLevelButton, final Button aboutButton) {
 
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        setBackground(BACKGROUND);
+		JFXPanel futurContainer = new JFXPanel();
+		add(futurContainer);
+		Platform.runLater(() -> {
+			HBox mainBox = new HBox(5);
+			mainBox.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
+			
+			Scene scene = new Scene(mainBox, 1000, 45);
+			scene.setFill(BACKGROUND);
+			futurContainer.setScene(scene);
 
-        addActions(stopSimulationAction, runSimulationAction,
-                resetSimulationAction);
+			mainBox.setPadding(new Insets(5));
+			addButtons(mainBox, stopSimulationButton, runSimulationButton, resetSimulationButton);
 
-        addGlueSeparartor(1);
+			addGlueSeparartor(mainBox);
 
-        speedPanel.setBackground(BACKGROUND);
-        add(speedPanel);
+			speedPanel.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
+			speedPanel.setPadding(new Insets(8, 0, 8, 0));
+			mainBox.getChildren().add(speedPanel);
 
-        addGlueSeparartor(2);
+			addGlueSeparartor(mainBox);
 
-        addActions(firstLevelAction, previousLevelAction);
-        levelPicker.setMaximumSize(new Dimension(150, 80));
-        add(levelPicker);
-        addActions(nextLevelAction, lastLevelAction);
+			addButtons(mainBox, firstLevelButton, previousLevelButton);
+			levelPicker.setMaxSize(150, 18);
+			BorderPane levelPickerPane = new BorderPane();
+			levelPickerPane.setCenter(levelPicker);
+			
+			mainBox.getChildren().add(levelPickerPane);
+			addButtons(mainBox, nextLevelButton, lastLevelButton);
 
-        addGlueSeparartor(6);
+			addGlueSeparartor(mainBox);
 
-        addActions(aboutAction);
-    }
+			addButtons(mainBox, aboutButton);
+		});
+	}
 
-    /**
-     * Add all provided actions as standard {@link JButton}s.
-     */
-    private void addActions(final Action... actions) {
-        for (final Action action : actions) {
-            add(createIconButton(action));
-        }
-    }
+	/**
+	 * Add all provided buttons with additional configuration.
+	 */
+	private void addButtons(HBox mainBox, final Button... buttons) {
+		for (final Button button : buttons) {
+			mainBox.getChildren().add(createIconButton(button));
+		}
+	}
 
-    /**
-     * Add a glue component having the provided strength. The higher the
-     * strength, the higher free space the glue will take with regards to other
-     * components.
-     */
-    private void addGlueSeparartor(final int strenght) {
-        for (int i = 0; i < strenght; i++) {
-            add(Box.createHorizontalGlue());
-        }
-    }
+	/**
+	 * Add a glue component that will grow if there is extra space.
+	 */
+	private void addGlueSeparartor(HBox mainBox) {
+		Region spacer = new Region();
+		HBox.setHgrow(spacer, Priority.ALWAYS);
+		mainBox.getChildren().add(spacer);
+	}
 
-    /**
-     * @return a standard {@link JButton}n for this toolbar created from the
-     *         provided {@link Action}
-     */
-    public static JButton createIconButton(final Action action) {
-        final JButton button = new JButton(action);
-        button.setMargin(new Insets(-3, -3, -3, -3));
-        button.setBorderPainted(false);
-        button.setBackground(BACKGROUND);
-        return button;
-    }
+	/**
+	 * @return a button configured as a standard icon
+	 */
+	public static Button createIconButton(final Button button) {
+		button.setPadding(new Insets(-1, -1, -1, -1));
+		button.setBackground(new Background(new BackgroundFill(BACKGROUND, CornerRadii.EMPTY, Insets.EMPTY)));
+		return button;
+	}
 
 }
