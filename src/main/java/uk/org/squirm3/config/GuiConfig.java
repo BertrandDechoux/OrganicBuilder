@@ -125,7 +125,8 @@ public class GuiConfig {
     }
 
     @Bean
-    public ReactionConstructorPanel getReactionConstructorPanel(@Value("/graphics/add.png") ImageIcon addIcon) {
+    public ReactionConstructorPanel getReactionConstructorPanel() {
+    	javafx.scene.image.Image addIcon = new javafx.scene.image.Image(getClass().getResourceAsStream("/graphics/add.png"));
         return new ReactionConstructorPanel(this.applicationEngine, this.messageSource, addIcon);
     }
     
