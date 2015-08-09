@@ -66,7 +66,7 @@ public class GUI {
      * The main component (without the toolbar)
      */
     private JSplitPane buildRootComponent(final JComponent collisionsPanel,
-            final JPanel currentLevelPanel, final JSplitPane reactionsPane) {
+            final CurrentLevelPanel currentLevelPanel, final JSplitPane reactionsPane) {
         final JSplitPane leftComponent = new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT, true, currentLevelPanel,
                 reactionsPane);

@@ -3,7 +3,6 @@ package uk.org.squirm3.ui.level;
 import java.awt.Dimension;
 
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.springframework.context.MessageSource;
@@ -26,12 +25,11 @@ import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.level.Level;
 import uk.org.squirm3.springframework.Messages;
 
-public class CurrentLevelPanel extends JPanel {
+public class CurrentLevelPanel extends JFXPanel {
 	private static final long serialVersionUID = 1L;
 
 	private final MessageSource messageSource;
 
-	private JFXPanel futurContainer;
 	private WebEngine webEngine;
 	private Button hintButton, evaluateButton;
 
@@ -40,16 +38,15 @@ public class CurrentLevelPanel extends JPanel {
 	public CurrentLevelPanel(final ApplicationEngine applicationEngine, final MessageSource messageSource) {
 		this.messageSource = messageSource;
 
-		futurContainer = new JFXPanel();
 		Platform.runLater(() -> {
 			BorderPane mainPane = new BorderPane();
-			Scene scene = new Scene(mainPane, 400, 300);
+			Scene scene = new Scene(mainPane);
 			WebView browser = new WebView();
 			webEngine = browser.getEngine();
 
 			scene.setFill(Color.BLACK);
 
-			futurContainer.setScene(scene);
+			CurrentLevelPanel.this.setScene(scene);
 			mainPane.setCenter(browser);
 
 			BorderPane buttonsPane = new BorderPane();
@@ -61,8 +58,7 @@ public class CurrentLevelPanel extends JPanel {
 
 			bindWithApplicationEngine(applicationEngine, messageSource);
 		});
-		add(futurContainer);
-		setMinimumSize(new Dimension(400, 300));
+		setMinimumSize(new Dimension(300, 300));
 	}
 
 	private void bindWithApplicationEngine(final ApplicationEngine applicationEngine,
@@ -73,7 +69,7 @@ public class CurrentLevelPanel extends JPanel {
 
 	private Button createButton(final String key, final EventHandler<ActionEvent> handler) {
 		final Button button = new Button(localize(key));
-		button.setPadding(new Insets(10));
+		button.setPadding(new Insets(5, 10, 5, 10));
 		button.setOnAction(handler);
 		return button;
 	}
