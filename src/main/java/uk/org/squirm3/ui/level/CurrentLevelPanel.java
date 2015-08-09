@@ -32,9 +32,6 @@ public class CurrentLevelPanel extends JPanel {
 	private final MessageSource messageSource;
 
 	private JFXPanel futurContainer;
-	private Scene scene;
-
-	private WebView browser;
 	private WebEngine webEngine;
 	private Button hintButton, evaluateButton;
 
@@ -44,28 +41,25 @@ public class CurrentLevelPanel extends JPanel {
 		this.messageSource = messageSource;
 
 		futurContainer = new JFXPanel();
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				BorderPane mainPane = new BorderPane();
-				scene = new Scene(mainPane, 400, 300);
-				browser = new WebView();
-				webEngine = browser.getEngine();
+		Platform.runLater(() -> {
+			BorderPane mainPane = new BorderPane();
+			Scene scene = new Scene(mainPane, 400, 300);
+			WebView browser = new WebView();
+			webEngine = browser.getEngine();
 
-				scene.setFill(Color.BLACK);
+			scene.setFill(Color.BLACK);
 
-				futurContainer.setScene(scene);
-				mainPane.setCenter(browser);
+			futurContainer.setScene(scene);
+			mainPane.setCenter(browser);
 
-				BorderPane buttonsPane = new BorderPane();
-				hintButton = createButton("level.hint", new HintHandler());
-				buttonsPane.setLeft(hintButton);
-				evaluateButton = createButton("level.evaluate", new EvaluateHandler(applicationEngine));
-				buttonsPane.setRight(evaluateButton);
-				mainPane.setBottom(buttonsPane);
+			BorderPane buttonsPane = new BorderPane();
+			hintButton = createButton("level.hint", new HintHandler());
+			buttonsPane.setLeft(hintButton);
+			evaluateButton = createButton("level.evaluate", new EvaluateHandler(applicationEngine));
+			buttonsPane.setRight(evaluateButton);
+			mainPane.setBottom(buttonsPane);
 
-				bindWithApplicationEngine(applicationEngine, messageSource);
-			}
+			bindWithApplicationEngine(applicationEngine, messageSource);
 		});
 		add(futurContainer);
 		setMinimumSize(new Dimension(400, 300));
@@ -173,23 +167,17 @@ public class CurrentLevelPanel extends JPanel {
 			currentLevel = applicationEngine.getLevelManager().getCurrentLevel();
 			if (currentLevel == null) {
 				String levelDescription = Messages.localize("level.description.none", messageSource);
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						webEngine.loadContent(levelDescription);
-						hintButton.setDisable(true);
-						evaluateButton.setDisable(true);
-					}
+				Platform.runLater(() -> {
+					webEngine.loadContent(levelDescription);
+					hintButton.setDisable(true);
+					evaluateButton.setDisable(true);
 				});
 			} else {
 				String levelDescription = "<b>" + currentLevel.getTitle() + "</b>" + currentLevel.getChallenge();
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						webEngine.loadContent(levelDescription);
-						hintButton.setDisable(!StringUtils.hasText(currentLevel.getHint()));
-						evaluateButton.setDisable(false);
-					}
+				Platform.runLater(() -> {
+					webEngine.loadContent(levelDescription);
+					hintButton.setDisable(!StringUtils.hasText(currentLevel.getHint()));
+					evaluateButton.setDisable(false);
 				});
 			}
 		}

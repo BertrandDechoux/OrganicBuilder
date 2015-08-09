@@ -1,9 +1,7 @@
 package uk.org.squirm3.swing;
 
-import java.awt.GridBagConstraints;
 import java.text.NumberFormat;
 
-import javax.swing.JEditorPane;
 import javax.swing.JFormattedTextField;
 import javax.swing.text.NumberFormatter;
 
@@ -11,27 +9,6 @@ import javax.swing.text.NumberFormatter;
  * Shortcuts for swing.
  */
 public abstract class SwingUtils {
-
-    /**
-     * Custom creation method for {@link GridBagConstraints}.
-     */
-    public static GridBagConstraints createCustomGBC(final int x, final int y,
-            final double weightx, final int fill) {
-        final GridBagConstraints gbc = createCustomGBC(x, y);
-        gbc.weightx = weightx;
-        gbc.fill = fill;
-        return gbc;
-    }
-
-    /**
-     * Custom creation method for {@link GridBagConstraints}.
-     */
-    public static GridBagConstraints createCustomGBC(final int x, final int y) {
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = x;
-        gbc.gridy = y;
-        return gbc;
-    }
 
     /**
      * Custom creation method for {@link JFormattedTextField}.

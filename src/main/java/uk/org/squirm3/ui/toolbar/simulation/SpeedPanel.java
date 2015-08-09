@@ -1,101 +1,96 @@
 package uk.org.squirm3.ui.toolbar.simulation;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.Dimension;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.springframework.context.MessageSource;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.engine.ApplicationEngineEvent;
 import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.springframework.Messages;
-import uk.org.squirm3.swing.SwingUtils;
 
 /**
  * Allows user to change the speed of the simulation.
  */
 public class SpeedPanel extends JPanel implements Listener {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private final ApplicationEngine applicationEngine;
-    private final JSlider speedSelector;
+	private JFXPanel futurContainer;
+	private Slider speedSelector;
 
-    public SpeedPanel(final ApplicationEngine applicationEngine,
-            final MessageSource messageSource) {
-        this.applicationEngine = applicationEngine;
-        speedSelector = createSpeedSelector();
-        setupLayout(messageSource);
-        applicationEngine.addListener(this, ApplicationEngineEvent.SPEED);
-        setMaximumSize(getPreferredSize());
-    }
+	private final ApplicationEngine applicationEngine;
 
-    private void setupLayout(final MessageSource messageSource) {
-        setLayout(new GridBagLayout());
-        add(new JLabel(Messages.localize("parameters.speed", messageSource)),
-                SwingUtils.createCustomGBC(0, 0));
-        add(speedSelector, SwingUtils.createCustomGBC(1, 0, 80,
-                GridBagConstraints.HORIZONTAL));
-    }
+	public SpeedPanel(final ApplicationEngine applicationEngine, final MessageSource messageSource) {
+		this.applicationEngine = applicationEngine;
 
-    private JSlider createSpeedSelector() {
-        final JSlider speedSelector = new JSlider(1, 8);
-        speedSelector.setMajorTickSpacing(1);
-        speedSelector.setPaintTicks(true);
-        speedSelector.setInverted(true);
-        speedSelector
-                .addChangeListener(new SpeedSelectorListener(speedSelector));
-        return speedSelector;
-    }
+		futurContainer = new JFXPanel();
+		Platform.runLater(() -> {
+			HBox mainBox = new HBox();
+			Text label = new Text(Messages.localize("parameters.speed", messageSource));
+			mainBox.getChildren().add(label);
 
-    /**
-     * Convert non-linear mapping : selector to engine.
-     */
-    private void updateEngineSpeed() {
-        applicationEngine.setSimulationSpeed((short) Math.pow(
-                speedSelector.getValue(), 2));
-    }
+			speedSelector = new Slider(1, 8, 1);
+			speedSelector.setMajorTickUnit(1);
+			speedSelector.setMinorTickCount(0);
+			speedSelector.setSnapToTicks(true);
+			speedSelector.setBlockIncrement(1);
+			speedSelector.setShowTickMarks(true);
+			speedSelector.setShowTickLabels(false);
+			speedSelector.valueProperty().addListener(new SpeedSelectorListener());
+			mainBox.getChildren().add(speedSelector);
 
-    /**
-     * Convert non-linear mapping : engine to selector.
-     */
-    @Override
-    public void propertyHasChanged() {
-        speedSelector.setValue((int) Math.sqrt(applicationEngine
-                .getSimulationSpeed()));
-    }
+			Scene scene = new Scene(mainBox, 250, 20);
+			scene.setFill(Color.BLACK);
+			futurContainer.setScene(scene);
+			applicationEngine.addListener(this, ApplicationEngineEvent.SPEED);
+		});
+		add(futurContainer);
+		setMinimumSize(new Dimension(250, 20));
+		// setMaximumSize(getPreferredSize());
+	}
 
-    /**
-     * When the user has picked a new value for the selector, update the engine.
-     */
-    private final class SpeedSelectorListener implements ChangeListener {
-        private final JSlider speedSelector;
+	/**
+	 * Convert non-linear mapping : selector to engine.
+	 */
+	private void updateEngineSpeed() {
+		applicationEngine.setSimulationSpeed((short) Math.pow(speedSelector.getValue(), 2));
+	}
 
-        private SpeedSelectorListener(final JSlider speedSelector) {
-            this.speedSelector = speedSelector;
-        }
+	/**
+	 * Convert non-linear mapping : engine to selector.
+	 */
+	@Override
+	public void propertyHasChanged() {
+		Platform.runLater(() -> {
+			speedSelector.setValue((int) Math.sqrt(applicationEngine.getSimulationSpeed()));
+		});
+	}
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.
-         * ChangeEvent)
-         */
-        @Override
-        public void stateChanged(final ChangeEvent e) {
-            final Object object = e.getSource();
-            if (object != speedSelector) {
-                return;
-            }
-            if (!speedSelector.getValueIsAdjusting()) {
-                updateEngineSpeed();
-            }
-        }
+	/**
+	 * When the user has picked a new value for the selector, update the engine.
+	 */
+	private final class SpeedSelectorListener implements ChangeListener<Number> {
 
-    }
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see javafx.beans.value.ChangeListener#changed(javafx.beans.value.
+		 * ObservableValue, java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+			updateEngineSpeed();
+		}
+
+	}
 }
