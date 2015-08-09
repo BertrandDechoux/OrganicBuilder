@@ -12,7 +12,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -32,12 +31,9 @@ import uk.org.squirm3.ui.reaction.mode.ReactionsListMode;
 import uk.org.squirm3.ui.reaction.mode.TextAreaMode;
 
 public class ReactionListPanel extends BorderPane {
-
     private final ApplicationEngine applicationEngine;
     private final MessageSource messageSource;
 
-    private BorderPane buttonParentPanel;
-    private ScrollPane scrollPanel;
     private Label nReactions;
 
     private final ReactionsListMode defaultMode;
@@ -59,8 +55,10 @@ public class ReactionListPanel extends BorderPane {
     }
 
     public void setCurrentModeTo(final ReactionsListMode futureMode) {
-        buttonParentPanel.setTop(futureMode.getMenu());
-        scrollPanel.setContent(futureMode.getReactionsList());
+        //buttonParentPanel.setTop(futureMode.getMenu());
+        setRight(futureMode.getMenu());
+        setCenter(futureMode.getReactionsList());
+        //scrollPanel.setContent(futureMode.getReactionsList());
         currentMode = futureMode;
         currentMode.reactionsHaveChanged(applicationEngine.getReactions());
     }
@@ -115,14 +113,12 @@ public class ReactionListPanel extends BorderPane {
 
     private void createListPanel() {
     	setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-    	
-        nReactions = new Label(localize("reactions.current"));
+        
+    	nReactions = new Label(localize("reactions.current"));
+    	nReactions.setPadding(new Insets(5));
+        
         setTop(nReactions);
         
-        buttonParentPanel = new BorderPane();
-        setRight(buttonParentPanel);
-        
-        scrollPanel = new ScrollPane();
-        setCenter(scrollPanel);
+        setPadding(new Insets(12));
     }
 }

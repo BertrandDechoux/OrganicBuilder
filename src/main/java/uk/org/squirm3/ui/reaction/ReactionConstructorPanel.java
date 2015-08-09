@@ -48,8 +48,10 @@ public class ReactionConstructorPanel extends VBox {
     public ReactionConstructorPanel(final ApplicationEngine applicationEngine,
             final MessageSource messageSource, final Image addIcon) {
     	super(5);
-			
-		getChildren().add(new Label(Messages.localize("reactions.editor", messageSource)));
+		
+    	Label label = new Label(Messages.localize("reactions.editor", messageSource));
+    	label.setPadding(new Insets(5));
+		getChildren().add(label);
 
 		setBorder(new Border(
 				new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
@@ -66,6 +68,7 @@ public class ReactionConstructorPanel extends VBox {
 		updateReactionListener.handle(null);
 		
 		setMinSize(500, 100);
+        setPadding(new Insets(12));
     }
 
     private Pane createReactionForm(final EventHandler<ActionEvent> updateReactionHandler) {
