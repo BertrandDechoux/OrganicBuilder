@@ -37,7 +37,7 @@ public class AboutButton extends Button {
 	private void showUrlWithMessage(final java.awt.event.ActionEvent event) {
 		// TODO
 		SwingUtilities.invokeLater(() -> {
-			final Component component = (Component) (event.getSource() instanceof Component ? event.getSource() : null);
+			final Component component = (Component) (event != null && event.getSource() instanceof Component ? event.getSource() : null);
 			JOptionPane.showMessageDialog(component, localize("about.text"), localize("about.title"),
 					JOptionPane.QUESTION_MESSAGE);
 		});
