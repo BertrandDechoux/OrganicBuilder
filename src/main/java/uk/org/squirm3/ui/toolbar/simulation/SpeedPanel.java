@@ -63,7 +63,7 @@ public class SpeedPanel extends JPanel implements Listener {
 	 * Convert non-linear mapping : selector to engine.
 	 */
 	private void updateEngineSpeed() {
-		applicationEngine.setSimulationSpeed((short) Math.pow(speedSelector.getValue(), 2));
+		applicationEngine.setSimulationSpeed((short) Math.pow(9 - speedSelector.getValue(), 2));
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class SpeedPanel extends JPanel implements Listener {
 	@Override
 	public void propertyHasChanged() {
 		Platform.runLater(() -> {
-			speedSelector.setValue((int) Math.sqrt(applicationEngine.getSimulationSpeed()));
+			speedSelector.setValue(9 - (int) Math.sqrt(applicationEngine.getSimulationSpeed()));
 		});
 	}
 
