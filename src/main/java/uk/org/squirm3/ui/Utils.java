@@ -21,11 +21,16 @@ import javafx.stage.Modality;
 import javafx.stage.Window;
 
 public class Utils {
-	public static final Color BACKGROUND = Color.rgb(255, 255, 225);
+	private static final Color DEFAULT_BACKGROUND = Color.rgb(255, 255, 225);
 	
 	public static void defaultBackground(Region region) {
+		background(region, DEFAULT_BACKGROUND);
+
+	}
+	
+	public static void background(Region region, Color color) {
 		region.setBackground(new Background(new BackgroundFill(//
-				Utils.BACKGROUND, //
+				color, //
 				CornerRadii.EMPTY, //
 				Insets.EMPTY)));
 

@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
@@ -34,10 +33,13 @@ class ImagePanel extends JPanel {
         super.paint(g);
         atomsPanel.updateImage();
         final float zoom = (float) atomsPanel.scale / 100;
+        // XXX
+        /*
         BufferedImage bimg = atomsPanel.getBimg();
         g.drawImage(bimg, 0, 0,
                 (int) (bimg.getWidth() * zoom),
                 (int) (bimg.getHeight() * zoom), this);
+        */
     }
 
     private final class ImageMouseMotionListener implements MouseMotionListener {

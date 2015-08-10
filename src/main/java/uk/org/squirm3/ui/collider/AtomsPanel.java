@@ -1,35 +1,35 @@
 package uk.org.squirm3.ui.collider;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
+import javafx.application.Platform;
 import javafx.embed.swing.SwingNode;
-import javafx.scene.control.ScrollPane;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.BorderPane;
-import uk.org.squirm3.derivative.RoundGradientPaint;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import uk.org.squirm3.engine.ApplicationEngine;
 import uk.org.squirm3.engine.ApplicationEngineEvent;
 import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
-import uk.org.squirm3.model.type.AtomType;
 import uk.org.squirm3.model.type.def.BasicType;
+import uk.org.squirm3.ui.Utils;
 
 public class AtomsPanel extends BorderPane {
     DraggingPoint draggingPoint;
@@ -38,7 +38,7 @@ public class AtomsPanel extends BorderPane {
     private int simulationWidth;
     private int simulationHeight;
 
-    private BufferedImage bimg;
+    //private BufferedImage bimg;
     private boolean needRepaint = true;
     byte scale;
 
@@ -48,30 +48,43 @@ public class AtomsPanel extends BorderPane {
     private static final Map<BasicType, Color> atomColors;
     static {
         atomColors = new HashMap<BasicType, Color>();
-        atomColors.put(BasicType.A, new Color(0xbdcf00));
-        atomColors.put(BasicType.B, new Color(0x5f5f5f));
-        atomColors.put(BasicType.C, new Color(0x0773db));
-        atomColors.put(BasicType.D, new Color(0xee10ac));
-        atomColors.put(BasicType.E, new Color(0xef160f));
-        atomColors.put(BasicType.F, new Color(0x00df06));
+        atomColors.put(BasicType.A, Color.web("#bdcf00"));
+        atomColors.put(BasicType.B, Color.web("#5f5f5f"));
+        atomColors.put(BasicType.C, Color.web("#0773db"));
+        atomColors.put(BasicType.D, Color.web("#ee10ac"));
+        atomColors.put(BasicType.E, Color.web("#ef160f"));
+        atomColors.put(BasicType.F, Color.web("#00df06"));
     }
-    private static final Map<AtomType, BufferedImage> atomsImages = new HashMap<AtomType, BufferedImage>();
     private final Image spikyImage;
 
     final ApplicationEngine applicationEngine;
+    
+    private GraphicsContext gc;
+    private Canvas canvas;
+    private Group root;
 
     public AtomsPanel(final ApplicationEngine applicationEngine,
             final Image spikyImage) {
     	setMinSize(300, 300);
+    	Utils.background(this, Color.GREY);
+    	Utils.defaultBorder(this);
+    	setPadding(new Insets(12));
 
         imagePanel = new ImagePanel(this);
         imagePanel.setMinimumSize(new Dimension(300, 300));
 		final SwingNode swingNode = new SwingNode();
 		swingNode.setContent(imagePanel);
-        setCenter(swingNode);
+		
+		root = new Group();
+		canvas = new Canvas(200, 200);
+		canvas.setTranslateX(100);
+		canvas.setTranslateY(100);
+		gc = canvas.getGraphicsContext2D();
+		root.getChildren().add(canvas);
+
+		setCenter(root);
 
         this.applicationEngine = applicationEngine;
-        createAtomsImages();
         this.spikyImage = spikyImage;
         needRepaint = true;
         scale = 100;
@@ -96,60 +109,59 @@ public class AtomsPanel extends BorderPane {
         applicationEngine.addListener(new DraggingPointListener(
                 applicationEngine), ApplicationEngineEvent.DRAGGING_POINT);
     }
-    private static void createAtomsImages() {
+    
+    private static void drawAtomsImage(BasicType type, GraphicsContext g2, double x, double y) {
         // size
         final float R = Atom.getAtomSize() - 2;
         final int w = (int) (2 * R);
         final int h = (int) (2 * R);
-        for (final Entry<BasicType, Color> entry : atomColors.entrySet()) {
-            // creation of the image
-            final BufferedImage image = new BufferedImage(w, h,
-                    BufferedImage.TYPE_INT_ARGB);
-            atomsImages.put(entry.getKey(), image);
-            // creation of the graphic
-            final Graphics2D g2 = image.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
-            // creation of the colors
-            final Color baseColor = entry.getValue();
-            final int colorOffset = 220;
-            final int red = baseColor.getRed() < 255 - colorOffset ? baseColor
-                    .getRed() + colorOffset : 255;
-            final int green = baseColor.getGreen() < 255 - colorOffset
-                    ? baseColor.getGreen() + colorOffset
-                    : 255;
-            final int blue = baseColor.getBlue() < 255 - colorOffset
-                    ? baseColor.getBlue() + colorOffset
-                    : 255;
-            final Color lightColor = new Color(red, green, blue);
-            // drawing the image
-            final RoundGradientPaint gradient = new RoundGradientPaint(w / 3,
-                    h / 3, lightColor, new Point2D.Double(w / 2, h / 2),
-                    baseColor);
-            g2.setPaint(gradient);
-            g2.fillOval(0, 0, w, h);
-        }
+        Color baseColor = atomColors.get(type);
+        final int colorOffset = 220;
+        final double red = baseColor.getRed() * 255 < 255 - colorOffset ? baseColor
+                .getRed() * 255 + colorOffset : 255;
+        final double green = baseColor.getGreen() * 255 < 255 - colorOffset
+                ? baseColor.getGreen() * 255 + colorOffset
+                : 255;
+        final double blue = baseColor.getBlue() * 255 < 255 - colorOffset
+                ? baseColor.getBlue() * 255 + colorOffset
+                : 255;
+        final Color lightColor = Color.rgb((int)red, (int)green, (int)blue);
+        g2.setFill(new RadialGradient(
+        		0,//
+        		0,//
+        		x + w/2,//
+        		y + h/2,//
+        		R,//
+        		false,//
+        		CycleMethod.NO_CYCLE,//
+        		new Stop(0, lightColor),//
+        		new Stop(1, baseColor)
+        		));
+        g2.fillOval(x, y, w, h);
     }
+
     private void imageSizeHasChanged() {
-        final Configuration configuration = applicationEngine
-                .getConfiguration();
-        if (configuration != null) {
-            simulationHeight = (int) configuration.getHeight();
-            simulationWidth = (int) configuration.getWidth();
-        }
-        if (imagePanel != null) {
-        	double height = getHeight();
-        	double width = getWidth();
-            final int pseudoScale = (int) (Math.min(
-                    (height * 0.99 / simulationHeight),
-                    (width * 0.99 / simulationWidth)) * 100);
-            scale = pseudoScale >= 100 ? 100 : (byte) pseudoScale;
-        }
-        final float zoom = (float) scale / 100;
-        imagePanel
-                .setPreferredSize(new Dimension((int) (simulationWidth * zoom),
-                        (int) (simulationHeight * zoom)));
-        imageHasChanged();
+    	Platform.runLater(() -> {
+	        final Configuration configuration = applicationEngine
+	                .getConfiguration();
+	        if (configuration != null) {
+	            simulationHeight = (int) configuration.getHeight();
+	            simulationWidth = (int) configuration.getWidth();
+	        }
+	        if (imagePanel != null) {
+	        	double height = getHeight();
+	        	double width = getWidth();
+	            final int pseudoScale = (int) (Math.min(
+	                    (height * 0.99 / simulationHeight),
+	                    (width * 0.99 / simulationWidth)) * 100);
+	            scale = pseudoScale >= 100 ? 100 : (byte) pseudoScale;
+	        }
+	        final float zoom = (float) scale / 100;
+	        imagePanel
+	                .setPreferredSize(new Dimension((int) (simulationWidth * zoom),
+	                        (int) (simulationHeight * zoom)));
+	        imageHasChanged();
+    	});
     }
 
     private void imageHasChanged() {
@@ -158,18 +170,26 @@ public class AtomsPanel extends BorderPane {
             return;
         }
         imagePanel.repaint();
+        updateImage();
     }
     
-    public BufferedImage getBimg() {
-        final int w = simulationWidth;
-        final int h = simulationHeight;
-        if (bimg == null || bimg.getWidth() != w || bimg.getHeight() != h) {
-            bimg = (BufferedImage) imagePanel.createImage(w, h);
-        }
-        return bimg;
+    public void updateCanvas() {
+		Platform.runLater(() -> {
+			final int w = simulationWidth;
+			final int h = simulationHeight;
+			if (canvas == null || canvas.getWidth() != w || canvas.getHeight() != h) {
+				root.getChildren().remove(canvas);
+				canvas = new Canvas(w, h);
+				canvas.setTranslateX(100);
+				canvas.setTranslateY(100);
+				gc = canvas.getGraphicsContext2D();
+				root.getChildren().add(canvas);
+			}
+		});
     }
 
-    void updateImage() {
+    public void updateImage() {
+    	Platform.runLater(() -> {
         if (!needRepaint) {
             return;
         }
@@ -182,53 +202,50 @@ public class AtomsPanel extends BorderPane {
         final int w = simulationWidth;
         final int h = simulationHeight;
 
-        getBimg();
-        if (bimg == null) {
+        updateCanvas();
+        if (canvas == null) {
             return;// collisionsPanel is not displayable
         }
 
         // create graphics
-        final Graphics2D g2 = bimg.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setBackground(Color.WHITE);
-        g2.clearRect(0, 0, w, h);
+        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.clearRect(0, 0, w, h);
+        gc.fillRect(0, 0, w, h);
 
         // draw the atoms themselves
-        g2.setStroke(new BasicStroke(4));
-        g2.setFont(new Font("Arial", Font.BOLD, R));
-        g2.setPaint(Color.black);
+        gc.setLineWidth(4);
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, R));
+        gc.setFill(Color.BLACK);
         if (atoms != null) {
-            final int offset_x = R;
-            final int offset_y = R;
-            final int text_offset_y = (int) (R * 8.0 / 22.0);
+            final double offset_x = R;
+            final double offset_y = R;
+            final double text_offset_x = 2 * (R * 8.0 / 22.0);
+            final double text_offset_y = (R * 8.0 / 22.0);
             for (int i = 0; i < atoms.length; i++) {
                 if (!atoms[i].isKiller()) {
                     // draw the normal colour atom image and label it
-                    g2.drawImage(atomsImages.get(atoms[i].getType()),
-                            (int) atoms[i].getPhysicalPoint().getPositionX()
-                                    - offset_x, (int) atoms[i]
-                                    .getPhysicalPoint().getPositionY()
-                                    - offset_y, R * 2, R * 2, imagePanel);
+                	drawAtomsImage((BasicType)atoms[i].getType(), gc, //
+                			atoms[i].getPhysicalPoint().getPositionX() - offset_x, //
+                			atoms[i].getPhysicalPoint().getPositionY() - offset_y);
                     final String label = atoms[i].toString();
-                    final int width = g2.getFontMetrics().stringWidth(label);
-                    g2.drawString(label, (int) atoms[i].getPhysicalPoint()
-                            .getPositionX() - width / 2, (int) atoms[i]
-                            .getPhysicalPoint().getPositionY() + text_offset_y);
+                    gc.setFill(Color.BLACK);
+					gc.fillText(label, //
+							atoms[i].getPhysicalPoint().getPositionX() - text_offset_x, //
+							atoms[i].getPhysicalPoint().getPositionY() + text_offset_y);
                 } else {
                     // draw a special spiky image and no label
-                    g2.drawImage(spikyImage, (int) atoms[i].getPhysicalPoint()
-                            .getPositionX() - offset_x, (int) atoms[i]
-                            .getPhysicalPoint().getPositionY() - offset_y,
-                            R * 2, R * 2, imagePanel);
+                	// XXX later
+                	gc.drawImage(null /*spikyImage*/, //
+                    		atoms[i].getPhysicalPoint().getPositionX() - offset_x, //
+                            atoms[i].getPhysicalPoint().getPositionY() - offset_y, //
+                            R * 2,//
+                            R * 2);
                 }
             }
         }
 
         // draw the bonds
-        g2.setPaint(new Color(0, 0, 0, 50));
+        gc.setFill(Color.rgb(0, 0, 0, 0.1));
         if (atoms != null) {
             for (final Atom atom : atoms) {
                 final Iterator<Atom> it = atom.getBonds().iterator();
@@ -243,22 +260,25 @@ public class AtomsPanel extends BorderPane {
                     final float d = (float) Math.sqrt(dx * dx + dy * dy);
                     final float x_cut = dx * R * 0.8f / d;
                     final float y_cut = dy * R * 0.8f / d;
-                    g2.drawLine((int) (x1 + x_cut), (int) (y1 + y_cut),
-                            (int) (x1 + dx - x_cut), (int) (y1 + dy - y_cut));
+                    gc.strokeLine(//
+                    		x1 + x_cut,//
+                    		y1 + y_cut,//
+                            x1 + dx - x_cut,//
+                            y1 + dy - y_cut);
                 }
             }
         }
 
         // draw the dragging line if currently dragging
         if (draggingPoint != null) {
-            g2.setStroke(new BasicStroke(5));
-            g2.setPaint(new Color(0, 0, 0, 100));
-            g2.drawLine((int) draggingPoint.getX(), (int) draggingPoint.getY(),
-                    (int) atoms[draggingPoint.getWhichBeingDragging()]
-                            .getPhysicalPoint().getPositionX(),
-                    (int) atoms[draggingPoint.getWhichBeingDragging()]
-                            .getPhysicalPoint().getPositionY());
-            g2.setStroke(new BasicStroke(4)); // else the stroke would have been
+        	gc.setLineWidth(5);
+        	gc.setFill(Color.rgb(0, 0, 0, 0.3));
+            gc.strokeLine(//
+            		draggingPoint.getX(),//
+            		draggingPoint.getY(),//
+                    atoms[draggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionX(),//
+                    atoms[draggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionY());
+            gc.setLineWidth(4); // else the stroke would have been
                                               // changed
             // when outlining the collider area
         }
@@ -267,23 +287,28 @@ public class AtomsPanel extends BorderPane {
         if (applicationEngine.getLastUsedDraggingPoint() != null) {
             final DraggingPoint lastUsedDraggingPoint = applicationEngine
                     .getLastUsedDraggingPoint();
-            g2.setStroke(new BasicStroke(1));
-            g2.setPaint(new Color(200, 0, 0, 100));
-            g2.drawLine((int) lastUsedDraggingPoint.getX(),
-                    (int) lastUsedDraggingPoint.getY(),
-                    (int) atoms[lastUsedDraggingPoint.getWhichBeingDragging()]
-                            .getPhysicalPoint().getPositionX(),
-                    (int) atoms[lastUsedDraggingPoint.getWhichBeingDragging()]
-                            .getPhysicalPoint().getPositionY());
-            g2.setStroke(new BasicStroke(4)); // else the stroke would have been
+        	gc.setLineWidth(1);
+        	gc.setFill(Color.rgb(200, 0, 0, 0.3));
+            gc.strokeLine(//
+            		lastUsedDraggingPoint.getX(),//
+                    lastUsedDraggingPoint.getY(),//
+                    atoms[lastUsedDraggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionX(),//
+                    atoms[lastUsedDraggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionY());
+            gc.setLineWidth(4); // else the stroke would have been
                                               // changed
             // when outlining the collider area
         }
 
         // outline the collider area
-        g2.setPaint(new Color(100, 100, 200));
-        g2.drawRoundRect(2, 1, simulationWidth - 4, simulationHeight - 4, 9, 9);
-        g2.dispose();
+        gc.setFill(Color.BLUE);
+        gc.strokeRoundRect( //
+        		0, //
+        		0, //
+        		simulationWidth, //
+        		simulationHeight, //
+        		9, //
+        		9);
+    	});
     }
 
     private final class SizeListener implements Listener {
