@@ -1,10 +1,8 @@
 package uk.org.squirm3.config;
 
-import java.awt.Image;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +11,7 @@ import org.springframework.core.env.Environment;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import uk.org.squirm3.engine.ApplicationEngine;
@@ -119,7 +118,8 @@ public class GuiConfig {
     }
 
     @Bean
-    public AtomsPanel getAtomsPanel(@Value("/graphics/spiky.png") Image spikyImage) {
+    public AtomsPanel getAtomsPanel() {
+    	Image spikyImage = loadImage("/graphics/spiky.png");
         return new AtomsPanel(this.applicationEngine, spikyImage);
     }
 
@@ -134,10 +134,16 @@ public class GuiConfig {
 		button.setTooltip(new Tooltip(text));
 
 		String path = getMessage(identifier + ".button.icon");
-		javafx.scene.image.Image image = new javafx.scene.image.Image(getClass().getResourceAsStream(path));
-		button.setGraphic(new ImageView(image));
+		button.setGraphic(new ImageView(loadImage(path)));
 
 		return button;
+    }
+    
+    /**
+     * Load java fx image from path.
+     */
+    private Image loadImage(String path) {
+    	return new Image(getClass().getResourceAsStream(path));
     }
 
     /**

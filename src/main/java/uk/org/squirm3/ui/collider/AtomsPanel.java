@@ -1,7 +1,6 @@
 package uk.org.squirm3.ui.collider;
 
 import java.awt.Dimension;
-import java.awt.Image;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,6 +14,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -234,8 +234,7 @@ public class AtomsPanel extends BorderPane {
 							atoms[i].getPhysicalPoint().getPositionY() + text_offset_y);
                 } else {
                     // draw a special spiky image and no label
-                	// XXX later
-                	gc.drawImage(null /*spikyImage*/, //
+                	gc.drawImage(spikyImage, //
                     		atoms[i].getPhysicalPoint().getPositionX() - offset_x, //
                             atoms[i].getPhysicalPoint().getPositionY() - offset_y, //
                             R * 2,//
