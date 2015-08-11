@@ -31,9 +31,9 @@ class ImagePanel extends JPanel {
     @Override
     public void paint(final Graphics g) {
         super.paint(g);
-        atomsPanel.updateImage();
+        //atomsPanel.updateImage();
         final float zoom = (float) atomsPanel.scale / 100;
-        // XXX
+        // XXX zoom ?
         /*
         BufferedImage bimg = atomsPanel.getBimg();
         g.drawImage(bimg, 0, 0,
