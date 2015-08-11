@@ -28,6 +28,7 @@ import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
+import uk.org.squirm3.model.IPhysicalPoint;
 import uk.org.squirm3.model.type.def.BasicType;
 import uk.org.squirm3.ui.Utils;
 
@@ -59,7 +60,11 @@ public class AtomsPanel extends BorderPane {
 
     final ApplicationEngine applicationEngine;
     
-    private Canvas canvas;
+    private Canvas backgroundCanvas;
+    private Canvas atomsCanvas;
+    private Canvas draggingPointCanvas;
+    private Canvas latestDraggingPointCanvas;
+    private Canvas outlineCanvas;
     private Group root;
 
     public AtomsPanel(final ApplicationEngine applicationEngine,
@@ -75,11 +80,6 @@ public class AtomsPanel extends BorderPane {
 		swingNode.setContent(imagePanel);
 		
 		root = new Group();
-		canvas = new Canvas(200, 200);
-		canvas.setTranslateX(100);
-		canvas.setTranslateY(100);
-		root.getChildren().add(canvas);
-
 		setCenter(root);
 
         this.applicationEngine = applicationEngine;
@@ -91,6 +91,25 @@ public class AtomsPanel extends BorderPane {
         bindToApplicationEngine(applicationEngine);
 
     }
+
+	private void setupCanvasses(double width, double height) {
+		backgroundCanvas = createCanvas(width, height);
+		atomsCanvas = createCanvas(width, height);
+		draggingPointCanvas = createCanvas(width, height);
+		latestDraggingPointCanvas = createCanvas(width, height);
+		outlineCanvas = createCanvas(width, height);
+		
+		root.getChildren().clear();
+		root.getChildren().addAll(//
+				backgroundCanvas, atomsCanvas, draggingPointCanvas, latestDraggingPointCanvas, outlineCanvas);
+	}
+
+	private Canvas createCanvas(double width, double height) {
+		Canvas canvas = new Canvas(width, height);
+		canvas.setTranslateX(100);
+		canvas.setTranslateY(100);
+		return canvas;
+	}
     
     @Override
     public void resize(double width, double height) {
@@ -109,34 +128,33 @@ public class AtomsPanel extends BorderPane {
     }
     
     private static void drawAtomsImage(BasicType type, GraphicsContext g2, double x, double y) {
-        // size
-        final float R = Atom.getAtomSize() - 2;
-        final int w = (int) (2 * R);
-        final int h = (int) (2 * R);
-        Color baseColor = atomColors.get(type);
-        final int colorOffset = 220;
-        final double red = baseColor.getRed() * 255 < 255 - colorOffset ? baseColor
-                .getRed() * 255 + colorOffset : 255;
-        final double green = baseColor.getGreen() * 255 < 255 - colorOffset
-                ? baseColor.getGreen() * 255 + colorOffset
-                : 255;
-        final double blue = baseColor.getBlue() * 255 < 255 - colorOffset
-                ? baseColor.getBlue() * 255 + colorOffset
-                : 255;
-        final Color lightColor = Color.rgb((int)red, (int)green, (int)blue);
-        g2.setFill(new RadialGradient(
-        		0,//
-        		0,//
-        		x + w/2,//
-        		y + h/2,//
-        		R,//
-        		false,//
-        		CycleMethod.NO_CYCLE,//
-        		new Stop(0, lightColor),//
-        		new Stop(1, baseColor)
-        		));
-        g2.fillOval(x, y, w, h);
+		double R = Atom.getAtomSize() - 2;
+		double w = 2 * R;
+		double h = 2 * R;
+		Color baseColor = atomColors.get(type);
+		final int colorOffset = 220;
+		int red = addOffset(baseColor.getRed(), colorOffset);
+		int green = addOffset(baseColor.getGreen(), colorOffset);
+		int blue = addOffset(baseColor.getBlue(), colorOffset);
+		final Color lightColor = Color.rgb(red, green, blue);
+		g2.setFill(new RadialGradient(//
+				0, //
+				0, //
+				x + w / 2, //
+				y + h / 2, //
+				R, //
+				false, //
+				CycleMethod.NO_CYCLE, //
+				new Stop(0, lightColor), //
+				new Stop(1, baseColor)));
+		g2.fillOval(x, y, w, h);
     }
+
+	private static int addOffset(double component, final int colorOffset) {
+		int max = 255;
+		int scaledComponent = (int) component * max;
+		return Math.min(scaledComponent + colorOffset, max);
+	}
 
     private void imageSizeHasChanged() {
     	Platform.runLater(() -> {
@@ -170,94 +188,91 @@ public class AtomsPanel extends BorderPane {
         imagePanel.repaint();
         updateImage();
     }
-    
-    public void updateCanvas() {
+
+    public void updateImage() {
 		Platform.runLater(() -> {
-			final int w = simulationWidth;
-			final int h = simulationHeight;
-			if (canvas == null || canvas.getWidth() != w || canvas.getHeight() != h) {
-				root.getChildren().remove(canvas);
-				canvas = new Canvas(w, h);
-				canvas.setTranslateX(100);
-				canvas.setTranslateY(100);
-				root.getChildren().add(canvas);
+			if (!needRepaint) {
+				return;
 			}
+			needRepaint = false;
+			double R = Atom.getAtomSize();
+			final Atom[] atoms = latestAtomsCopy;
+
+			// get the dimensions
+			double w = simulationWidth;
+			double h = simulationHeight;
+
+			{
+				Canvas localBackgroundCanvas = backgroundCanvas;
+				if (localBackgroundCanvas == null || localBackgroundCanvas.getWidth() != w
+						|| localBackgroundCanvas.getHeight() != h) {
+					setupCanvasses(w, h);
+				}
+			}
+
+			Canvas localBackgroundCanvas = backgroundCanvas;
+			Canvas localAtomsCanvas = atomsCanvas;
+			Canvas localDraggingPointCanvas = latestDraggingPointCanvas;
+			Canvas localLatestDraggingPointCanvas = latestDraggingPointCanvas;
+			Canvas localOutlineCanvas = outlineCanvas;
+
+			drawBackground(w, h, localBackgroundCanvas.getGraphicsContext2D());
+			
+			localAtomsCanvas.getGraphicsContext2D().clearRect(0, 0, w, h);
+			drawAtoms(R, atoms, localAtomsCanvas.getGraphicsContext2D());
+			drawBonds(R, atoms, localAtomsCanvas.getGraphicsContext2D());
+			
+			localDraggingPointCanvas.getGraphicsContext2D().clearRect(0, 0, w, h);
+			drawDraggingPoint(atoms, draggingPoint, localDraggingPointCanvas.getGraphicsContext2D(), //
+					5, Color.rgb(0, 0, 0, 0.3));
+			
+			localLatestDraggingPointCanvas.getGraphicsContext2D().clearRect(0, 0, w, h);
+			drawDraggingPoint(atoms, applicationEngine.getLastUsedDraggingPoint(),
+					localLatestDraggingPointCanvas.getGraphicsContext2D(), //
+					1, Color.rgb(200, 0, 0, 0.3));
+			
+			drawColliderOutline(localOutlineCanvas.getGraphicsContext2D());
 		});
     }
 
-    public void updateImage() {
-    	Platform.runLater(() -> {
-        if (!needRepaint) {
-            return;
+	private void drawColliderOutline(GraphicsContext gc) {
+		gc.setFill(Color.BLUE);
+        gc.strokeRoundRect( //
+        		0, //
+        		0, //
+        		simulationWidth, //
+        		simulationHeight, //
+        		9, //
+        		9);
+	}
+
+	private void drawDraggingPoint(Atom[] atoms, DraggingPoint draggingPoint, GraphicsContext gc, double lineWidth, Color color) {
+		if (draggingPoint != null) {
+        	gc.setLineWidth(5);
+        	gc.setFill(Color.rgb(0, 0, 0, 0.3));
+            Atom draggedAtomPoint = atoms[draggingPoint.getWhichBeingDragging()];
+			gc.strokeLine(//
+            		draggingPoint.getX(),//
+            		draggingPoint.getY(),//
+                    draggedAtomPoint.getPhysicalPoint().getPositionX(),//
+                    draggedAtomPoint.getPhysicalPoint().getPositionY());
         }
-        needRepaint = false;
-        final int R = (int) Atom.getAtomSize();
-        // to avoid the array to be changed (multithreading issue maybe later)
-        final Atom[] atoms = latestAtomsCopy;
+	}
 
-        // get the dimensions
-        final int w = simulationWidth;
-        final int h = simulationHeight;
-
-        updateCanvas();
-        Canvas localCanvas = canvas;
-        if (localCanvas == null) {
-            return;// collisionsPanel is not displayable
-        }
-        GraphicsContext gc = localCanvas.getGraphicsContext2D();
-
-        // create graphics
-        gc.setFill(javafx.scene.paint.Color.WHITE);
-        gc.clearRect(0, 0, w, h);
-        gc.fillRect(0, 0, w, h);
-
-        // draw the atoms themselves
-        gc.setLineWidth(4);
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, R));
-        gc.setFill(Color.BLACK);
-        if (atoms != null) {
-            final double offset_x = R;
-            final double offset_y = R;
-            final double text_offset_x = 2 * (R * 8.0 / 22.0);
-            final double text_offset_y = (R * 8.0 / 22.0);
-            for (int i = 0; i < atoms.length; i++) {
-                if (!atoms[i].isKiller()) {
-                    // draw the normal colour atom image and label it
-                	drawAtomsImage((BasicType)atoms[i].getType(), gc, //
-                			atoms[i].getPhysicalPoint().getPositionX() - offset_x, //
-                			atoms[i].getPhysicalPoint().getPositionY() - offset_y);
-                    final String label = atoms[i].toString();
-                    gc.setFill(Color.BLACK);
-					gc.fillText(label, //
-							atoms[i].getPhysicalPoint().getPositionX() - text_offset_x, //
-							atoms[i].getPhysicalPoint().getPositionY() + text_offset_y);
-                } else {
-                    // draw a special spiky image and no label
-                	gc.drawImage(spikyImage, //
-                    		atoms[i].getPhysicalPoint().getPositionX() - offset_x, //
-                            atoms[i].getPhysicalPoint().getPositionY() - offset_y, //
-                            R * 2,//
-                            R * 2);
-                }
-            }
-        }
-
-        // draw the bonds
-        gc.setFill(Color.rgb(0, 0, 0, 0.1));
+	private void drawBonds(double r, Atom[] atoms, GraphicsContext gc) {
+		gc.setFill(Color.rgb(0, 0, 0, 0.1));
         if (atoms != null) {
             for (final Atom atom : atoms) {
-                final Iterator<Atom> it = atom.getBonds().iterator();
-                while (it.hasNext()) {
-                    final Atom other = it.next();
-                    final float x1 = atom.getPhysicalPoint().getPositionX();
-                    final float y1 = atom.getPhysicalPoint().getPositionY();
-                    final float dx = other.getPhysicalPoint().getPositionX()
-                            - x1;
-                    final float dy = other.getPhysicalPoint().getPositionY()
-                            - y1;
-                    final float d = (float) Math.sqrt(dx * dx + dy * dy);
-                    final float x_cut = dx * R * 0.8f / d;
-                    final float y_cut = dy * R * 0.8f / d;
+            	for (Atom other : atom.getBonds()) {
+                    IPhysicalPoint atomPoint = atom.getPhysicalPoint();
+                    IPhysicalPoint otherPoint = other.getPhysicalPoint();
+					double x1 = atomPoint.getPositionX();
+					double y1 = atomPoint.getPositionY();
+					double dx = otherPoint.getPositionX() - x1;
+					double dy = otherPoint.getPositionY() - y1;
+					double d = Math.sqrt(dx * dx + dy * dy);
+					double x_cut = dx * r * 0.8 / d;
+					double y_cut = dy * r * 0.8 / d;
                     gc.strokeLine(//
                     		x1 + x_cut,//
                     		y1 + y_cut,//
@@ -266,48 +281,45 @@ public class AtomsPanel extends BorderPane {
                 }
             }
         }
+	}
 
-        // draw the dragging line if currently dragging
-        if (draggingPoint != null) {
-        	gc.setLineWidth(5);
-        	gc.setFill(Color.rgb(0, 0, 0, 0.3));
-            gc.strokeLine(//
-            		draggingPoint.getX(),//
-            		draggingPoint.getY(),//
-                    atoms[draggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionX(),//
-                    atoms[draggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionY());
-            gc.setLineWidth(4); // else the stroke would have been
-                                              // changed
-            // when outlining the collider area
+	private void drawAtoms(double r, Atom[] atoms, GraphicsContext gc) {
+		gc.setLineWidth(4);
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, r));
+        gc.setFill(Color.BLACK);
+        if (atoms != null) {
+            double offset_x = r;
+            double offset_y = r;
+            double text_offset_x = 2 * (r * 8.0 / 22.0);
+            double text_offset_y = (r * 8.0 / 22.0);
+            for (Atom atom : atoms) {
+                IPhysicalPoint atomPoint = atom.getPhysicalPoint();
+				if (!atom.isKiller()) {
+                    // draw the normal colour atom image and label it
+                	drawAtomsImage((BasicType)atom.getType(), gc, //
+                			atomPoint.getPositionX() - offset_x, //
+                			atomPoint.getPositionY() - offset_y);
+                    final String label = atom.toString();
+                    gc.setFill(Color.BLACK);
+					gc.fillText(label, //
+							atomPoint.getPositionX() - text_offset_x, //
+							atomPoint.getPositionY() + text_offset_y);
+                } else {
+                    // draw a special spiky image and no label
+                	gc.drawImage(spikyImage, //
+                			atomPoint.getPositionX() - offset_x, //
+                			atomPoint.getPositionY() - offset_y, //
+                            r * 2,//
+                            r * 2);
+                }
+            }
         }
+	}
 
-        // draw the dragging point used
-        if (applicationEngine.getLastUsedDraggingPoint() != null) {
-            final DraggingPoint lastUsedDraggingPoint = applicationEngine
-                    .getLastUsedDraggingPoint();
-        	gc.setLineWidth(1);
-        	gc.setFill(Color.rgb(200, 0, 0, 0.3));
-            gc.strokeLine(//
-            		lastUsedDraggingPoint.getX(),//
-                    lastUsedDraggingPoint.getY(),//
-                    atoms[lastUsedDraggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionX(),//
-                    atoms[lastUsedDraggingPoint.getWhichBeingDragging()].getPhysicalPoint().getPositionY());
-            gc.setLineWidth(4); // else the stroke would have been
-                                              // changed
-            // when outlining the collider area
-        }
-
-        // outline the collider area
-        gc.setFill(Color.BLUE);
-        gc.strokeRoundRect( //
-        		0, //
-        		0, //
-        		simulationWidth, //
-        		simulationHeight, //
-        		9, //
-        		9);
-    	});
-    }
+	private void drawBackground(double w, double h, GraphicsContext gc) {
+		gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.fillRect(0, 0, w, h);
+	}
 
     private final class SizeListener implements Listener {
         @Override
