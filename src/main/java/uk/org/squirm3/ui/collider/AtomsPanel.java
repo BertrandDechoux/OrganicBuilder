@@ -119,10 +119,7 @@ public class AtomsPanel extends BorderPane {
 	            simulationHeight =  configuration.getHeight();
 	            simulationWidth = configuration.getWidth();
 	            if (previousHeight != simulationHeight && previousWidth != simulationWidth) {
-					Platform.runLater(() -> {
-						System.out.println(new Date() + " Redrawing for " + this.getClass().getSimpleName());
-						setupCanvasses(simulationWidth, simulationHeight);
-					});
+					setupCanvasses(simulationWidth, simulationHeight);
 	            }
 	        }
 	        /* XXX handle zoom
