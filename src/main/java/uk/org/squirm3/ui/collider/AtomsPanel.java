@@ -59,7 +59,6 @@ public class AtomsPanel extends BorderPane {
 
     final ApplicationEngine applicationEngine;
     
-    private GraphicsContext gc;
     private Canvas canvas;
     private Group root;
 
@@ -79,7 +78,6 @@ public class AtomsPanel extends BorderPane {
 		canvas = new Canvas(200, 200);
 		canvas.setTranslateX(100);
 		canvas.setTranslateY(100);
-		gc = canvas.getGraphicsContext2D();
 		root.getChildren().add(canvas);
 
 		setCenter(root);
@@ -182,7 +180,6 @@ public class AtomsPanel extends BorderPane {
 				canvas = new Canvas(w, h);
 				canvas.setTranslateX(100);
 				canvas.setTranslateY(100);
-				gc = canvas.getGraphicsContext2D();
 				root.getChildren().add(canvas);
 			}
 		});
@@ -203,9 +200,11 @@ public class AtomsPanel extends BorderPane {
         final int h = simulationHeight;
 
         updateCanvas();
-        if (canvas == null) {
+        Canvas localCanvas = canvas;
+        if (localCanvas == null) {
             return;// collisionsPanel is not displayable
         }
+        GraphicsContext gc = localCanvas.getGraphicsContext2D();
 
         // create graphics
         gc.setFill(javafx.scene.paint.Color.WHITE);
