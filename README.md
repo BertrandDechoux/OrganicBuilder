@@ -32,4 +32,10 @@ java -Duser.language=fr -Duser.country=FR -jar target/*-jar-with-dependencies.ja
 ```
 mvn clean site
 ```
-With dependencies, javadocs, test coverage and code/style checks (checkstyle,pmd,findbugs)
+* artifact site : target/site/index.html
+* [coverage](http://cobertura.github.io/cobertura/) : target/site/cobertura/index.html
+* [checkstyle](http://checkstyle.sourceforge.net/) : target/site/checkstyle.html
+* [CPD](http://pmd.sourceforge.net/pmd-4.3.0/cpd.html) : target/site/cpd.html
+* [PMD](https://pmd.github.io/) : target/site/pmd.htm
+* [findbugs](http://findbugs.sourceforge.net/) : target/site/findbugs.html
+
