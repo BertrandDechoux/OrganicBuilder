@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -31,7 +32,8 @@ public class AtomsRedrawTask extends CanvasRedrawTask<List<Atom>> {
 
 	private final Image spikyImage;
 
-	public AtomsRedrawTask(Image spikyImage) {
+	public AtomsRedrawTask(Canvas canvas, Image spikyImage) {
+		super(canvas);
 		this.spikyImage = spikyImage;
 	}
 

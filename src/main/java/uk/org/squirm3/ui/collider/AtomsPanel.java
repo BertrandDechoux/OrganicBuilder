@@ -26,16 +26,14 @@ import uk.org.squirm3.model.IPhysicalPoint;
 import uk.org.squirm3.ui.Utils;
 
 public class AtomsPanel extends BorderPane {
-    DraggingPoint draggingPoint;
-    Atom[] latestAtomsCopy;
+    private DraggingPoint draggingPoint;
+    private Atom[] latestAtomsCopy;
 
     private double simulationWidth;
     private double simulationHeight;
+    private double scale;
 
-    //private BufferedImage bimg;
-    byte scale;
-
-    final ApplicationEngine applicationEngine;
+    private final ApplicationEngine applicationEngine;
     
     private final BackgroundRedrawTask backgroundRedrawTask;
     private final AtomsRedrawTask atomsRedrawTask;
@@ -54,38 +52,29 @@ public class AtomsPanel extends BorderPane {
 		root = new Group();
 		setCenter(root);
 		
-		backgroundRedrawTask = new BackgroundRedrawTask();
-		atomsRedrawTask = new AtomsRedrawTask(spikyImage);
-		draggingPointRedrawTask = new DraggingPointRedrawTask(5, Color.rgb(0, 0, 0, 0.3));
-		outlineRedrawTask = new OutlineRedrawTask();
+		Canvas backgroundCanvas = createCanvas();
+		backgroundRedrawTask = new BackgroundRedrawTask(backgroundCanvas);
+		Canvas atomsCanvas = createCanvas();
+		atomsRedrawTask = new AtomsRedrawTask(atomsCanvas, spikyImage);
+		Canvas draggingPointCanvas = createCanvas();
+		draggingPointRedrawTask = new DraggingPointRedrawTask(draggingPointCanvas, 5, Color.rgb(0, 0, 0, 0.3));
+		Canvas outlineCanvas = createCanvas();
+		outlineRedrawTask = new OutlineRedrawTask(outlineCanvas);
 
-        this.applicationEngine = applicationEngine;
-        scale = 100;
-        imageSizeHasChanged();
-
-        bindToApplicationEngine(applicationEngine);
-
-    }
-
-	private void setupCanvasses(double width, double height) {
-		Canvas backgroundCanvas = backgroundRedrawTask.updateCanvas(createCanvas(width, height));
-		backgroundRedrawTask.requestRedraw(backgroundCanvas);
-
-		Canvas atomsCanvas = atomsRedrawTask.updateCanvas(createCanvas(width, height));
-		
-		Canvas draggingPointCanvas = draggingPointRedrawTask.updateCanvas(createCanvas(width, height));
-		
-		Canvas outlineCanvas = outlineRedrawTask.updateCanvas(createCanvas(width, height));
-		outlineRedrawTask.requestRedraw(outlineCanvas);
 		outlineCanvas.setOnMousePressed((e) -> setDraggingPoint(e));
 		outlineCanvas.setOnMouseDragged((e) -> updateDraggingPoint(e));
 		outlineCanvas.setOnMouseMoved((e) -> updateDraggingPoint(e));
 		outlineCanvas.setOnMouseReleased((e) -> resetDraggingPoint());
 		
-		root.getChildren().clear();
 		root.getChildren().addAll(//
 				backgroundCanvas, atomsCanvas, draggingPointCanvas, outlineCanvas);
-	}
+		
+        this.applicationEngine = applicationEngine;
+        scale = -1;
+        imageSizeHasChanged();
+
+        bindToApplicationEngine(applicationEngine);
+    }
 
 	private void resetDraggingPoint() {
 		applicationEngine.setDraggingPoint(null);
@@ -100,8 +89,8 @@ public class AtomsPanel extends BorderPane {
 		}
 	}
 
-	private Canvas createCanvas(double width, double height) {
-		Canvas canvas = new Canvas(width, height);
+	private Canvas createCanvas() {
+		Canvas canvas = new Canvas();
 		canvas.setTranslateX(100);
 		canvas.setTranslateY(100);
 		return canvas;
@@ -159,26 +148,22 @@ public class AtomsPanel extends BorderPane {
 	        	double previousWidth = simulationWidth;
 	            simulationHeight =  configuration.getHeight();
 	            simulationWidth = configuration.getWidth();
-	            if (previousHeight != simulationHeight && previousWidth != simulationWidth) {
-					setupCanvasses(simulationWidth, simulationHeight);
+	            double height = getHeight();
+	            double width = getWidth();
+	            double hScale = height / simulationHeight;
+	            double wScale = width / simulationWidth;
+	            double scale = Math.min(hScale, wScale);
+	            if (previousHeight != simulationHeight || previousWidth != simulationWidth || this.scale != scale) {
+	            	this.scale = scale;
+	            	backgroundRedrawTask.setSize(simulationHeight, simulationWidth, scale);
+	            	atomsRedrawTask.setSize(simulationHeight, simulationWidth, scale);
+	            	draggingPointRedrawTask.setSize(simulationHeight, simulationWidth, scale);
+	            	outlineRedrawTask.setSize(simulationHeight, simulationWidth, scale);
+	            	
+	            	backgroundRedrawTask.requestRedraw(true);
+	            	outlineRedrawTask.requestRedraw(true);
 	            }
 	        }
-	        /* XXX handle zoom
-	         
-	        if (imagePanel != null) {
-	        	double height = getHeight();
-	        	double width = getWidth();
-	            final int pseudoScale = (int) (Math.min(
-	                    (height * 0.99 / simulationHeight),
-	                    (width * 0.99 / simulationWidth)) * 100);
-	            scale = pseudoScale >= 100 ? 100 : (byte) pseudoScale;
-	        }
-	        final float zoom = (float) scale / 100;
-	        imagePanel
-	                .setPreferredSize(new Dimension((int) (simulationWidth * zoom),
-	                        (int) (simulationHeight * zoom)));
-	        */
-
     	});
     }
 

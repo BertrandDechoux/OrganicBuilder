@@ -3,6 +3,7 @@ package uk.org.squirm3.ui.collider;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import uk.org.squirm3.model.Atom;
@@ -13,7 +14,8 @@ public class DraggingPointRedrawTask extends CanvasRedrawTask<Optional<DraggingP
 	private final Color lineColor;
 	private List<Atom> atoms;
 
-	public DraggingPointRedrawTask(double lineWidth, Color lineColor) {
+	public DraggingPointRedrawTask(Canvas canvas, double lineWidth, Color lineColor) {
+		super(canvas);
 		this.lineWidth = lineWidth;
 		this.lineColor = lineColor;
 	}

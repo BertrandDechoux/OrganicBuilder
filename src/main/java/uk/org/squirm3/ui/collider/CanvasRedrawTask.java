@@ -9,11 +9,16 @@ import javafx.scene.canvas.GraphicsContext;
 public abstract class CanvasRedrawTask<T> extends AnimationTimer {
 	private final AtomicReference<T> data = new AtomicReference<T>(null);
 	private Canvas canvas;
-
-	public Canvas updateCanvas(Canvas canvas) {
-		data.set(null);
+	
+	public CanvasRedrawTask(Canvas canvas) {
 		this.canvas = canvas;
-		return canvas;
+	}
+	
+	public void setSize(double width, double height, double scale) {
+		canvas.setWidth(width);
+		canvas.setHeight(height);
+		canvas.setScaleX(scale);
+		canvas.setScaleY(scale);
 	}
 
 	public void requestRedraw(T dataToDraw) {
@@ -22,16 +27,12 @@ public abstract class CanvasRedrawTask<T> extends AnimationTimer {
 	}
 
 	public void handle(long now) {
-		Canvas localCanvas = canvas;
-		if (localCanvas == null) {
-			return;
-		}
 		T dataToDraw = data.getAndSet(null);
 		if (dataToDraw != null) {
 			redraw(//
-					localCanvas.getGraphicsContext2D(), //
-					localCanvas.getWidth(), //
-					localCanvas.getHeight(), //
+					canvas.getGraphicsContext2D(), //
+					canvas.getWidth(), //
+					canvas.getHeight(), //
 					dataToDraw);
 		}
 	}
