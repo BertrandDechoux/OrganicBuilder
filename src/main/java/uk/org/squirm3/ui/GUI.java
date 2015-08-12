@@ -1,18 +1,14 @@
 package uk.org.squirm3.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
-
 import org.springframework.context.MessageSource;
 
+import javafx.application.Platform;
+import javafx.geometry.Orientation;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import uk.org.squirm3.springframework.Messages;
 import uk.org.squirm3.ui.collider.AtomsPanel;
 import uk.org.squirm3.ui.level.CurrentLevelPanel;
@@ -25,83 +21,60 @@ import uk.org.squirm3.ui.toolbar.ToolBarPanel;
  * within a layout.
  */
 public class GUI {
+	public GUI(Stage primaryStage, final MessageSource messageSource, final CurrentLevelPanel currentLevelPanel,
+			final ReactionListPanel reactionListPanel, final ReactionConstructorPanel reactionConstructorPanel,
+			final AtomsPanel atomsPanel, final ToolBarPanel toolBarPanel) {
 
-    public GUI(final MessageSource messageSource,
-            final CurrentLevelPanel currentLevelPanel,
-            final ReactionListPanel reactionListPanel,
-            final ReactionConstructorPanel reactionConstructorPanel,
-            final AtomsPanel collisionsPanel, final ToolBarPanel toolBarPanel) {
+		SplitPane toollessApp = buildToollessApp(currentLevelPanel, reactionConstructorPanel, reactionListPanel,
+				atomsPanel);
+		Parent app = addTools(toolBarPanel, toollessApp);
+		showApplication(primaryStage, app, Messages.localize("application.title", messageSource));
 
-        final JSplitPane reactionsPane = createReactionsPane(reactionListPanel,
-                reactionConstructorPanel);
-        final JSplitPane rootComponent = buildRootComponent(collisionsPanel,
-                currentLevelPanel, reactionsPane);
-        final JPanel contentPane = buildContentPane(toolBarPanel, rootComponent);
-        buildMainFrame(messageSource, contentPane);
-    }
+	}
 
-    /**
-     * Bottom-left component.
-     */
-    private JSplitPane createReactionsPane(
-            final ReactionListPanel reactionListPanel,
-            final ReactionConstructorPanel reactionConstructorPanel) {
-        final JSplitPane reactionsPane = new JSplitPane(
-                JSplitPane.VERTICAL_SPLIT, true, reactionConstructorPanel,
-                reactionListPanel);
-        reactionsPane.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent arg0) {
-                if (arg0.getPropertyName().equals("dividerLocation")
-                        && !arg0.getNewValue().toString().equals("1")) {
-                    reactionsPane.setDividerLocation(-1);
-                }
-            }
-        });
-        reactionsPane.setOneTouchExpandable(true);
-        return reactionsPane;
-    }
+	/**
+	 * The main component (without the toolbar)
+	 */
+	private SplitPane buildToollessApp(final CurrentLevelPanel currentLevelPanel,
+			final ReactionConstructorPanel reactionConstructorPanel, final ReactionListPanel reactionListPanel,
+			final AtomsPanel collisionsPanel) {
+		BorderPane reactionsPane = new BorderPane();
+		reactionsPane.setTop(reactionConstructorPanel);
+		reactionsPane.setCenter(reactionListPanel);
 
-    /**
-     * The main component (without the toolbar)
-     */
-    private JSplitPane buildRootComponent(final JComponent collisionsPanel,
-            final JPanel currentLevelPanel, final JSplitPane reactionsPane) {
-        final JSplitPane leftComponent = new JSplitPane(
-                JSplitPane.VERTICAL_SPLIT, true, currentLevelPanel,
-                reactionsPane);
-        leftComponent.setOneTouchExpandable(true);
-        final JSplitPane rootComponent = new JSplitPane(
-                JSplitPane.HORIZONTAL_SPLIT, true, leftComponent,
-                collisionsPanel);
-        rootComponent.setOneTouchExpandable(true);
-        return rootComponent;
-    }
+		final SplitPane leftComponent = new SplitPane();
+		leftComponent.setOrientation(Orientation.VERTICAL);
+		leftComponent.getItems().addAll(currentLevelPanel, reactionsPane);
 
-    /**
-     * The whole graphical user interface.
-     */
-    private JPanel buildContentPane(final ToolBarPanel toolBarPanel,
-            final JSplitPane rootComponent) {
-        final JPanel contentPane = new JPanel();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add(toolBarPanel, BorderLayout.NORTH);
-        contentPane.add(rootComponent, BorderLayout.CENTER);
-        return contentPane;
-    }
+		final SplitPane toollessApp = new SplitPane();
+		toollessApp.setOrientation(Orientation.HORIZONTAL);
+		toollessApp.getItems().addAll(leftComponent, collisionsPanel);
+		return toollessApp;
+	}
 
-    /**
-     * Setup the whole GUI, title, size and exit behavior.
-     */
-    private void buildMainFrame(final MessageSource messageSource,
-            final JPanel contentPane) {
-        final JFrame frame = new JFrame(Messages.localize("application.title",
-                messageSource));
-        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setContentPane(contentPane);
-        SwingUtilities.updateComponentTreeUI(frame);
-        frame.setVisible(true);
-    }
+	/**
+	 * The whole graphical user interface.
+	 */
+	private Parent addTools(final ToolBarPanel toolBarPanel, final SplitPane rootComponent) {
+		final BorderPane app = new BorderPane();
+		app.setTop(toolBarPanel);
+		app.setCenter(rootComponent);
+		return app;
+	}
+
+	private void showApplication(Stage primaryStage, Parent app, String title) {
+		primaryStage.setMaximized(true);
+		primaryStage.setFullScreen(true);
+
+		primaryStage.setOnCloseRequest(e -> {
+			Platform.exit();
+			System.exit(0);
+		});
+
+		Scene scene = new Scene(app);
+		primaryStage.setTitle(title);
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
 
 }

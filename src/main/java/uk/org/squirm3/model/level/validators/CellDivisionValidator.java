@@ -1,12 +1,12 @@
 package uk.org.squirm3.model.level.validators;
 
-import java.awt.Polygon;
-import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javafx.geometry.Point2D;
+import javafx.scene.shape.Polygon;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.AtomValidator;
 import uk.org.squirm3.model.level.LevelMessages;
@@ -64,13 +64,13 @@ public class CellDivisionValidator implements AtomValidator {
             // at places)
             for (int iComp = 0; iComp < 2; iComp++) {
                 final int NP = components.get(iComp).size();
-                final int px[] = new int[NP], py[] = new int[NP];
+                double p[] = new double[NP*2];
                 for (int i = 0; i < NP; i++) {
                     final Atom a = components.get(iComp).get(i);
-                    px[i] = (int) a.getPhysicalPoint().getPositionX();
-                    py[i] = (int) a.getPhysicalPoint().getPositionY();
+                    p[i] = a.getPhysicalPoint().getPositionX();
+                    p[i + 1] = a.getPhysicalPoint().getPositionY();
                 }
-                poly[iComp] = new Polygon(px, py, NP);
+                poly[iComp] = new Polygon(p);
             }
             // check for either polygon having a point inside the other
             // (given that bond-crossing is forbidden, we expect this to be a
@@ -81,7 +81,7 @@ public class CellDivisionValidator implements AtomValidator {
                 for (int i = 0; i < NP; i++) {
                     final Atom a = c.get(i);
                     // is this point inside the other polygon?
-                    if (poly[1 - iComp].contains(new Point2D.Float(a
+                    if (poly[1 - iComp].contains(new Point2D(a
                             .getPhysicalPoint().getPositionX(), a
                             .getPhysicalPoint().getPositionY()))) {
                         return messages.getError(2);

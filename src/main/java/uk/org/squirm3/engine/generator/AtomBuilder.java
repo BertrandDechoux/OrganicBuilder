@@ -41,7 +41,7 @@ public class AtomBuilder {
         this.conversionService = conversionService;
     }
 
-    private float getSize(final String string) {
+    private double getSize(final String string) {
         return Atom.getAtomSize() * 2 * Integer.parseInt(string);
     }
 
@@ -80,12 +80,12 @@ public class AtomBuilder {
                     final char[] atomDescription = getAtomDescription(
                             descriptionLine, index);
                     if (isAtomStart(atomDescription)) {
-                        final char atomStart = atomDescription[0];
-                        final char atomType = atomDescription[2];
-                        final char atomState = atomDescription[3];
+                        char atomStart = atomDescription[0];
+                        char atomType = atomDescription[2];
+                        char atomState = atomDescription[3];
 
-                        final float xCoordinate = 2 * x * Atom.getAtomSize();
-                        final float yCoordinate = 2 * y * Atom.getAtomSize();
+                        double xCoordinate = 2 * x * Atom.getAtomSize();
+                        double yCoordinate = 2 * y * Atom.getAtomSize();
 
                         final Atom atom = Atoms.createAtom(
                                 getAtomType(atomType, atomTypeConverter),

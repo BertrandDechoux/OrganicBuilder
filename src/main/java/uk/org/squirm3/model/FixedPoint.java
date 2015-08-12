@@ -3,9 +3,9 @@ package uk.org.squirm3.model;
 public final class FixedPoint implements IPhysicalPoint {
     public static final IPhysicalPoint ORIGIN = new FixedPoint(0, 0);
 
-    private final float x, y;
+    private double x, y;
 
-    public FixedPoint(final float x, final float y) {
+    public FixedPoint(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -16,62 +16,62 @@ public final class FixedPoint implements IPhysicalPoint {
     }
 
     @Override
-    public float getPositionX() {
+    public double getPositionX() {
         return x;
     }
 
     @Override
-    public float getPositionY() {
+    public double getPositionY() {
         return y;
     }
 
     @Override
-    public float getSpeedX() {
+    public double getSpeedX() {
         return 0;
     }
 
     @Override
-    public float getSpeedY() {
+    public double getSpeedY() {
         return 0;
     }
 
     @Override
-    public float getAccelerationX() {
+    public double getAccelerationX() {
         return 0;
     }
 
     @Override
-    public float getAccelerationY() {
+    public double getAccelerationY() {
         return 0;
     }
 
     @Override
-    public boolean setPositionX(final float x) {
+    public boolean setPositionX(double x) {
         return false;
     }
 
     @Override
-    public boolean setPositionY(final float y) {
+    public boolean setPositionY(double y) {
         return false;
     }
 
     @Override
-    public boolean setSpeedX(final float dx) {
+    public boolean setSpeedX(double dx) {
         return false;
     }
 
     @Override
-    public boolean setSpeedY(final float dy) {
+    public boolean setSpeedY(double dy) {
         return false;
     }
 
     @Override
-    public boolean setAccelerationX(final float ddx) {
+    public boolean setAccelerationX(double ddx) {
         return false;
     }
 
     @Override
-    public boolean setAccelerationY(final float ddy) {
+    public boolean setAccelerationY(double ddy) {
         return false;
     }
 
