@@ -8,12 +8,9 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import uk.org.squirm3.engine.ApplicationEngine;
@@ -22,13 +19,9 @@ import uk.org.squirm3.listener.Listener;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
-import uk.org.squirm3.model.IPhysicalPoint;
 import uk.org.squirm3.ui.Utils;
 
 public class AtomsPanel extends BorderPane {
-    private DraggingPoint draggingPoint;
-    private Atom[] latestAtomsCopy;
-
     private double simulationWidth;
     private double simulationHeight;
     private double scale;
@@ -40,8 +33,6 @@ public class AtomsPanel extends BorderPane {
     private final DraggingPointRedrawTask draggingPointRedrawTask;
     private final OutlineRedrawTask outlineRedrawTask;
     
-    private Group root;
-
     public AtomsPanel(final ApplicationEngine applicationEngine,
             final Image spikyImage) {
     	setMinSize(300, 300);
@@ -49,7 +40,7 @@ public class AtomsPanel extends BorderPane {
     	Utils.defaultBorder(this);
     	setPadding(new Insets(12));
 
-		root = new Group();
+		Group root = new Group();
 		setCenter(root);
 		
 		Canvas backgroundCanvas = new Canvas();
@@ -61,10 +52,7 @@ public class AtomsPanel extends BorderPane {
 		Canvas outlineCanvas = new Canvas();
 		outlineRedrawTask = new OutlineRedrawTask(outlineCanvas);
 
-		outlineCanvas.setOnMousePressed((e) -> setDraggingPoint(e));
-		outlineCanvas.setOnMouseDragged((e) -> updateDraggingPoint(e));
-		outlineCanvas.setOnMouseMoved((e) -> updateDraggingPoint(e));
-		outlineCanvas.setOnMouseReleased((e) -> resetDraggingPoint());
+		new DragInput(outlineCanvas, applicationEngine);
 		
 		root.getChildren().addAll(//
 				backgroundCanvas, atomsCanvas, draggingPointCanvas, outlineCanvas);
@@ -74,46 +62,6 @@ public class AtomsPanel extends BorderPane {
         imageSizeHasChanged();
 
         bindToApplicationEngine(applicationEngine);
-    }
-
-	private void resetDraggingPoint() {
-		applicationEngine.setDraggingPoint(null);
-	}
-
-	private void updateDraggingPoint(MouseEvent e) {
-		if (draggingPoint != null) {
-			double zoom = (double) scale / 100;
-			DraggingPoint newDraggingPoint = new DraggingPoint((long) (e.getX() / zoom), (long) (e.getY() / zoom),
-					draggingPoint.getWhichBeingDragging());
-			applicationEngine.setDraggingPoint(newDraggingPoint);
-		}
-	}
-
-	private void setDraggingPoint(MouseEvent event) {
-    	if (!isLeftClick(event)) {
-    		return;
-    	}
-    	double x = event.getX();
-    	double y = event.getY();
-        double R = Atom.getAtomSize();
-        double zoom = (double) scale / 100;
-        
-        final Point2D p2 = new Point2D(x / zoom, y / zoom);
-        for (int i = 0; i < latestAtomsCopy.length; i++) {
-            IPhysicalPoint atomPoint = latestAtomsCopy[i].getPhysicalPoint();
-            final Point2D p1 = new Point2D(//
-            		atomPoint.getPositionX(),//
-            		atomPoint.getPositionY());
-            if (p2.distance(p1) < Math.sqrt(R * R)) {
-                DraggingPoint newDraggingPoint = new DraggingPoint((long) p2.getX(),
-				        (long) p2.getY(), i);
-				applicationEngine.setDraggingPoint(newDraggingPoint);
-                break;
-            }
-        }
-    }
-    private boolean isLeftClick(MouseEvent event) {
-        return event.getButton()  == MouseButton.PRIMARY;
     }
     
     @Override
@@ -174,7 +122,7 @@ public class AtomsPanel extends BorderPane {
         }
         @Override
         public void propertyHasChanged() {
-            draggingPoint = applicationEngine.getCurrentDraggingPoint();
+            DraggingPoint draggingPoint = applicationEngine.getCurrentDraggingPoint();
             draggingPointRedrawTask.requestRedraw(Optional.ofNullable(draggingPoint));
         }
     }
@@ -188,7 +136,7 @@ public class AtomsPanel extends BorderPane {
         public void propertyHasChanged() {
             final Collection<? extends Atom> c = applicationEngine.getAtoms();
             final Iterator<? extends Atom> it = c.iterator();
-            latestAtomsCopy = new Atom[c.size()];
+            Atom[] latestAtomsCopy = new Atom[c.size()];
             int i = 0;
             while (it.hasNext()) {
                 latestAtomsCopy[i] = it.next();
@@ -197,7 +145,7 @@ public class AtomsPanel extends BorderPane {
             List<Atom> atoms = Arrays.asList(latestAtomsCopy);
 			atomsRedrawTask.requestRedraw(atoms);
             draggingPointRedrawTask.setAtoms(atoms);
-            draggingPoint = applicationEngine.getCurrentDraggingPoint();
+            DraggingPoint draggingPoint = applicationEngine.getCurrentDraggingPoint();
             draggingPointRedrawTask.requestRedraw(Optional.ofNullable(draggingPoint));
         }
     }
