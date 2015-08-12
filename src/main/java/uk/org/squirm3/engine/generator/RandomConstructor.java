@@ -22,10 +22,10 @@ public class RandomConstructor implements LevelConstructor {
     @Override
     public Configuration construct() throws GeneratorException {
         final Collection<Atom> atoms = new ArrayList<Atom>();
-        float currentWidth = 5 * Atom.getAtomSize();
-        float currentHeight = 5 * Atom.getAtomSize();
-        final float maximumWidth = partialConfiguration.getWidth() - currentWidth;
-        final float maximumHeigth = partialConfiguration.getHeight() - currentHeight;
+        double currentWidth = 5 * Atom.getAtomSize();
+        double currentHeight = 5 * Atom.getAtomSize();
+        final double maximumWidth = partialConfiguration.getWidth() - currentWidth;
+        final double maximumHeigth = partialConfiguration.getHeight() - currentHeight;
         while (currentHeight < maximumHeigth) {
             if (currentWidth >= maximumWidth) {
                 currentWidth = Atom.getAtomSize();

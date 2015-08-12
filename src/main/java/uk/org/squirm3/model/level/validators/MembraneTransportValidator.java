@@ -53,19 +53,19 @@ public class MembraneTransportValidator implements AtomValidator {
         // nothing else
         final Atom b1 = prisoner; // see the setup code for this level
         final Polygon poly = new Polygon(x_points, y_points, joined.size());
-        if (!poly.contains(new Point2D.Float(b1.getPhysicalPoint()
+        if (!poly.contains(new Point2D.Double(b1.getPhysicalPoint()
                 .getPositionX(), b1.getPhysicalPoint().getPositionY()))) {
             return messages.getError(2);
         }
         // check the other atoms (want: f's inside, other's outside)
         for (final Atom a : atoms) {
             if (a.getType() == BasicType.F
-                    && !poly.contains(new Point2D.Float(a.getPhysicalPoint()
+                    && !poly.contains(new Point2D.Double(a.getPhysicalPoint()
                             .getPositionX(), a.getPhysicalPoint()
                             .getPositionY()))) {
                 return messages.getError(3);
             } else if (a.getType() != BasicType.F
-                    && poly.contains(new Point2D.Float(a.getPhysicalPoint()
+                    && poly.contains(new Point2D.Double(a.getPhysicalPoint()
                             .getPositionX(), a.getPhysicalPoint()
                             .getPositionY()))) {
                 return messages.getError(4);

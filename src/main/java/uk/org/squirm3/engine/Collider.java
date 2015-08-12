@@ -28,26 +28,26 @@ final class Collider {
     private final int n_buckets_x, n_buckets_y; // the horizontal and vertical
                                                 // dimensions are divided into
                                                 // this many buckets
-    private final int width, height;
+    private final double width, height;
     // we store the size to ensure we access the right bucket (dimensions might
     // change)
-    protected float bucket_width, bucket_height;
+    protected double bucket_width, bucket_height;
 
-    private float MAX_SPEED = 5.0f; // recomputed when R changes (thanks Ralph)
+    private double MAX_SPEED = 5.0f; // recomputed when R changes (thanks Ralph)
     private final Set<Atom> reactedAtoms = new HashSet<Atom>();
 
     // ------- methods ---------
     public Collider(final Configuration configuration) {
         atoms = new ArrayList<Atom>(configuration.getAtoms());
-        final int w = (int) configuration.getWidth();
-        final int h = (int) configuration.getHeight();
+        double w = configuration.getWidth();
+        double h = configuration.getHeight();
         // size the buckets structure so each bucket is approximately R in size
         // (approx 1 atom per bucket)
-        final float R = Atom.getAtomSize();
+        double R = Atom.getAtomSize();
         // recompute MAX_SPEED to allow for the new R
-        MAX_SPEED = 5.0f * R / 22.0f; // (thanks Ralph)
-        n_buckets_x = Math.round(w / (1.0f * R));
-        n_buckets_y = Math.round(h / (1.0f * R));
+        MAX_SPEED = 5.0 * R / 22.0; // (thanks Ralph)
+        n_buckets_x = (int)Math.round(w / (1.0f * R));
+        n_buckets_y = (int)Math.round(h / (1.0f * R));
         // (else div0 error)
         buckets = new ArrayList<List<List<Integer>>>(); // (garbage
                                                         // collection takes
@@ -80,7 +80,7 @@ final class Collider {
         return atoms;
     }
 
-    private int whichBucketX(final float x) {
+    private int whichBucketX(double x) {
         int w = (int) Math.floor(x / bucket_width);
         if (w < 0) {
             w = 0;
@@ -90,7 +90,7 @@ final class Collider {
         return w;
     }
 
-    private int whichBucketY(final float y) {
+    private int whichBucketY(double y) {
         int w = (int) Math.floor(y / bucket_height);
         if (w < 0) {
             w = 0;
@@ -136,9 +136,9 @@ final class Collider {
         // TODO the collider should not be responsible for the mangement of
         // reactions
 
-        final float R = Atom.getAtomSize();
-        final float diam = 2.0f * R;
-        final float diam2 = diam * diam;
+        final double R = Atom.getAtomSize();
+        final double diam = 2.0 * R;
+        final double diam2 = diam * diam;
 
         for (int i = 0; i < atoms.size(); i++) {
             Atom a = atoms.get(i);
@@ -190,9 +190,9 @@ final class Collider {
                         }
                         // shortcut
                         Atom b = atoms.get(iOther);
-                        if (new Point2D.Float(a.getPhysicalPoint()
+                        if (new Point2D.Double(a.getPhysicalPoint()
                                 .getPositionX(), a.getPhysicalPoint()
-                                .getPositionY()).distanceSq(new Point2D.Float(b
+                                .getPositionY()).distanceSq(new Point2D.Double(b
                                 .getPhysicalPoint().getPositionX(), b
                                 .getPhysicalPoint().getPositionY())) < diam2) {
                             // this is a collision - can any reactions apply to
@@ -231,19 +231,19 @@ final class Collider {
                                 }
                             }
                             // atoms bounce off other atoms
-                            final float sep = (float) new Point2D.Float(a
+                            final float sep = (float) new Point2D.Double(a
                                     .getPhysicalPoint().getPositionX(), a
                                     .getPhysicalPoint().getPositionY())
-                                    .distance(new Point2D.Float(b
+                                    .distance(new Point2D.Double(b
                                             .getPhysicalPoint().getPositionX(),
                                             b.getPhysicalPoint().getPositionY()));
-                            final float force = getForce(diam - sep);
+                            final double force = getForce(diam - sep);
                             // push from the other atom
-                            final float dx = force
+                            final double dx = force
                                     * (a.getPhysicalPoint().getPositionX() - b
                                             .getPhysicalPoint().getPositionX())
                                     / sep;
-                            final float dy = force
+                            final double dy = force
                                     * (a.getPhysicalPoint().getPositionY() - b
                                             .getPhysicalPoint().getPositionY())
                                     / sep;
@@ -268,21 +268,21 @@ final class Collider {
             final Iterator<Atom> it = a.getBonds().iterator();
             while (it.hasNext()) {
                 final Atom other = it.next();
-                final float sep = (float) new Point2D.Float(a
+                final float sep = (float) new Point2D.Double(a
                         .getPhysicalPoint().getPositionX(), a
                         .getPhysicalPoint().getPositionY())
-                        .distance(new Point2D.Float(other.getPhysicalPoint()
+                        .distance(new Point2D.Double(other.getPhysicalPoint()
                                 .getPositionX(), other.getPhysicalPoint()
                                 .getPositionY()));
-                final float force = getForce(sep - diam) / 4.0f; // this
+                final double force = getForce(sep - diam) / 4.0f; // this
                                                                  // determines
                 // the bond spring
                 // stiffness
                 // pull towards the other atom
-                final float dx = force
+                final double dx = force
                         * (other.getPhysicalPoint().getPositionX() - a
                                 .getPhysicalPoint().getPositionX()) / sep;
-                final float dy = force
+                final double dy = force
                         * (other.getPhysicalPoint().getPositionY() - a
                                 .getPhysicalPoint().getPositionY()) / sep;
                 a.getPhysicalPoint().setSpeedX(
@@ -294,11 +294,11 @@ final class Collider {
             if (draggingPoint != null
                     && draggingPoint.getWhichBeingDragging() == i) {
                 // normalise the pull vector
-                float pullX = draggingPoint.getX()
+            	double pullX = draggingPoint.getX()
                         - a.getPhysicalPoint().getPositionX();
-                float pullY = draggingPoint.getY()
+            	double pullY = draggingPoint.getY()
                         - a.getPhysicalPoint().getPositionY();
-                final float dist = (float) Math.sqrt(pullX * pullX + pullY
+                final double dist = (float) Math.sqrt(pullX * pullX + pullY
                         * pullY);
                 pullX /= dist;
                 pullY /= dist;
@@ -362,9 +362,9 @@ final class Collider {
 
     }
 
-    private float getForce(final float d) {
-        final float R = Atom.getAtomSize();
-        return 1.0f * d * 22.0f / R; // what is the overlap/overstretch force
+    private double getForce(double d) {
+        double R = Atom.getAtomSize();
+        return 1.0 * d * 22.0 / R; // what is the overlap/overstretch force
                                      // for distance d?
         // (now inversely proportional to R, thanks Ralph)
     }

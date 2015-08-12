@@ -81,7 +81,7 @@ public class CellDivisionValidator implements AtomValidator {
                 for (int i = 0; i < NP; i++) {
                     final Atom a = c.get(i);
                     // is this point inside the other polygon?
-                    if (poly[1 - iComp].contains(new Point2D.Float(a
+                    if (poly[1 - iComp].contains(new Point2D.Double(a
                             .getPhysicalPoint().getPositionX(), a
                             .getPhysicalPoint().getPositionY()))) {
                         return messages.getError(2);

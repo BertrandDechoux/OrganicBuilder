@@ -53,7 +53,7 @@ public class GrowMembraneValidator implements AtomValidator {
         // atom - the original f1 (although its state may have changed)
         final Atom f1 = prisoner; // see the setup code for this level
         final Polygon poly = new Polygon(x_points, y_points, joined.size());
-        if (!poly.contains(new Point2D.Float(f1.getPhysicalPoint()
+        if (!poly.contains(new Point2D.Double(f1.getPhysicalPoint()
                 .getPositionX(), f1.getPhysicalPoint().getPositionY()))) {
             return messages.getError(2);
         }
