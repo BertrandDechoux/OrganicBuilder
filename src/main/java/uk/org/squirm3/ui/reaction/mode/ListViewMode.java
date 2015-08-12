@@ -18,19 +18,11 @@ import uk.org.squirm3.model.Reaction;
 import uk.org.squirm3.ui.reaction.ReactionListPanel;
 
 public class ListViewMode implements ReactionsListMode {
-
-	private ReactionListPanel reactionListPanel;
-
-	private ReactionsListMode textMode;
-
 	private Button editButton, deleteButton, clearButton;
 	private ListView<Reaction> reactionsList;
 	private Pane buttonsPane;
 
 	public ListViewMode(final ReactionListPanel reactionListPanel, final ReactionsListMode textMode) {
-		this.reactionListPanel = reactionListPanel;
-		this.textMode = textMode;
-
 		buttonsPane = reactionListPanel.createButtonsPane();
 		reactionsList = new ListView<>();
 

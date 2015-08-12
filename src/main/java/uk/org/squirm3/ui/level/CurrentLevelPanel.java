@@ -68,11 +68,9 @@ public class CurrentLevelPanel extends BorderPane {
 	}
 
 	private final class EvaluateHandler implements EventHandler<ActionEvent> {
-		private final Object[] options;
 		private final ApplicationEngine applicationEngine;
 
 		private EvaluateHandler(final ApplicationEngine applicationEngine) {
-			options = new Object[] { localize("level.yes"), localize("level.no") };
 			this.applicationEngine = applicationEngine;
 		}
 
