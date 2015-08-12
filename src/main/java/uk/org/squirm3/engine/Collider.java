@@ -1,6 +1,5 @@
 package uk.org.squirm3.engine;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -9,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javafx.geometry.Point2D;
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.Configuration;
 import uk.org.squirm3.model.DraggingPoint;
@@ -190,11 +190,11 @@ final class Collider {
                         }
                         // shortcut
                         Atom b = atoms.get(iOther);
-                        if (new Point2D.Double(a.getPhysicalPoint()
+                        if (new Point2D(a.getPhysicalPoint()
                                 .getPositionX(), a.getPhysicalPoint()
-                                .getPositionY()).distanceSq(new Point2D.Double(b
+                                .getPositionY()).distance(new Point2D(b
                                 .getPhysicalPoint().getPositionX(), b
-                                .getPhysicalPoint().getPositionY())) < diam2) {
+                                .getPhysicalPoint().getPositionY())) < Math.sqrt(diam2)) {
                             // this is a collision - can any reactions apply to
                             // these two atoms?
                             if (!a.isKiller() && !b.isKiller()) {
@@ -231,10 +231,10 @@ final class Collider {
                                 }
                             }
                             // atoms bounce off other atoms
-                            final float sep = (float) new Point2D.Double(a
+                            final float sep = (float) new Point2D(a
                                     .getPhysicalPoint().getPositionX(), a
                                     .getPhysicalPoint().getPositionY())
-                                    .distance(new Point2D.Double(b
+                                    .distance(new Point2D(b
                                             .getPhysicalPoint().getPositionX(),
                                             b.getPhysicalPoint().getPositionY()));
                             final double force = getForce(diam - sep);
@@ -268,10 +268,10 @@ final class Collider {
             final Iterator<Atom> it = a.getBonds().iterator();
             while (it.hasNext()) {
                 final Atom other = it.next();
-                final float sep = (float) new Point2D.Double(a
+                final float sep = (float) new Point2D(a
                         .getPhysicalPoint().getPositionX(), a
                         .getPhysicalPoint().getPositionY())
-                        .distance(new Point2D.Double(other.getPhysicalPoint()
+                        .distance(new Point2D(other.getPhysicalPoint()
                                 .getPositionX(), other.getPhysicalPoint()
                                 .getPositionY()));
                 final double force = getForce(sep - diam) / 4.0f; // this
