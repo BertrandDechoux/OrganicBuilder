@@ -41,7 +41,7 @@ public class DragInput extends BorderPane {
 
 	private void updateDraggingPoint(MouseEvent e) {
 		if (draggingPoint != null) {
-			draggingPoint = new DraggingPoint((long) e.getX(), (long) e.getY(),
+			draggingPoint = new DraggingPoint(e.getX(), e.getY(),
 					draggingPoint.getWhichBeingDragging());
 			applicationEngine.setDraggingPoint(draggingPoint);
 		}
@@ -62,7 +62,7 @@ public class DragInput extends BorderPane {
 					atomPoint.getPositionX(), //
 					atomPoint.getPositionY());
 			if (p2.distance(p1) < Math.sqrt(R * R)) {
-				draggingPoint = new DraggingPoint((long) p2.getX(), (long) p2.getY(), i);
+				draggingPoint = new DraggingPoint(p2.getX(), p2.getY(), i);
 				applicationEngine.setDraggingPoint(draggingPoint);
 				break;
 			}
