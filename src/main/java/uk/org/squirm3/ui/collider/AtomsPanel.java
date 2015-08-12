@@ -52,13 +52,13 @@ public class AtomsPanel extends BorderPane {
 		root = new Group();
 		setCenter(root);
 		
-		Canvas backgroundCanvas = createCanvas();
+		Canvas backgroundCanvas = new Canvas();
 		backgroundRedrawTask = new BackgroundRedrawTask(backgroundCanvas);
-		Canvas atomsCanvas = createCanvas();
+		Canvas atomsCanvas = new Canvas();
 		atomsRedrawTask = new AtomsRedrawTask(atomsCanvas, spikyImage);
-		Canvas draggingPointCanvas = createCanvas();
+		Canvas draggingPointCanvas = new Canvas();
 		draggingPointRedrawTask = new DraggingPointRedrawTask(draggingPointCanvas, 5, Color.rgb(0, 0, 0, 0.3));
-		Canvas outlineCanvas = createCanvas();
+		Canvas outlineCanvas = new Canvas();
 		outlineRedrawTask = new OutlineRedrawTask(outlineCanvas);
 
 		outlineCanvas.setOnMousePressed((e) -> setDraggingPoint(e));
@@ -89,14 +89,7 @@ public class AtomsPanel extends BorderPane {
 		}
 	}
 
-	private Canvas createCanvas() {
-		Canvas canvas = new Canvas();
-		canvas.setTranslateX(100);
-		canvas.setTranslateY(100);
-		return canvas;
-	}
-	
-    private void setDraggingPoint(MouseEvent event) {
+	private void setDraggingPoint(MouseEvent event) {
     	if (!isLeftClick(event)) {
     		return;
     	}
