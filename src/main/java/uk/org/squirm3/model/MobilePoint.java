@@ -2,14 +2,15 @@ package uk.org.squirm3.model;
 
 public class MobilePoint implements IPhysicalPoint {
 
-    private float x, y, dx, dy, ddx, ddy;
+    private double x, y, dx, dy, ddx, ddy;
 
     public MobilePoint() {
         this(0, 0, 0, 0, 0, 0);
     }
 
-    public MobilePoint(final float x, final float y, final float dx,
-            final float dy, final float ddx, final float ddy) {
+    public MobilePoint(double x, double y,//
+    		double dx, double dy, //
+    		double ddx, double ddy) {
         setPositionX(x);
         setPositionY(y);
         setSpeedX(dx);
@@ -28,67 +29,67 @@ public class MobilePoint implements IPhysicalPoint {
     }
 
     @Override
-    public float getPositionX() {
+    public double getPositionX() {
         return x;
     }
 
     @Override
-    public float getPositionY() {
+    public double getPositionY() {
         return y;
     }
 
     @Override
-    public float getSpeedX() {
+    public double getSpeedX() {
         return dx;
     }
 
     @Override
-    public float getSpeedY() {
+    public double getSpeedY() {
         return dy;
     }
 
     @Override
-    public float getAccelerationX() {
+    public double getAccelerationX() {
         return ddx;
     }
 
     @Override
-    public float getAccelerationY() {
+    public double getAccelerationY() {
         return ddy;
     }
 
     @Override
-    public boolean setPositionX(final float x) {
+    public boolean setPositionX(double x) {
         this.x = x;
         return true;
     }
 
     @Override
-    public boolean setPositionY(final float y) {
+    public boolean setPositionY(double y) {
         this.y = y;
         return true;
     }
 
     @Override
-    public boolean setSpeedX(final float dx) {
+    public boolean setSpeedX(double dx) {
         this.dx = dx;
         return true;
     }
 
     @Override
-    public boolean setSpeedY(final float dy) {
+    public boolean setSpeedY(double dy) {
         this.dy = dy;
         return true;
     }
 
     @Override
-    public boolean setAccelerationX(final float ddx) {
+    public boolean setAccelerationX(double ddx) {
         this.ddx = ddx;
         return true;
     }
 
     @Override
-    public boolean setAccelerationY(final float ddy) {
+    public boolean setAccelerationY(double ddy) {
         this.ddy = ddy;
         return true;
     }

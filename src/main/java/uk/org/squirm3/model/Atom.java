@@ -8,7 +8,7 @@ import uk.org.squirm3.model.type.def.SpecialType;
 
 public class Atom {
     // TODO should not be hardcoded, properties file ?
-    static private final float R = 22.0f;
+    static private final double R = 22.0;
 
     private final IPhysicalPoint iPhysicalPoint;
     private int state;
@@ -103,7 +103,7 @@ public class Atom {
         return iPhysicalPoint;
     }
 
-    public static float getAtomSize() {
+    public static double getAtomSize() {
         return R;
     }
 

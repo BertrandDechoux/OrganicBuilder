@@ -12,10 +12,10 @@ public class DraggingPointTest {
      */
     @Test
     public void testDraggingPoint() {
-        final long x = 1;
-        final long y = 2;
-        final int index = 3;
-        final DraggingPoint p = new DraggingPoint(x, y, index);
+        double x = 1;
+        double y = 2;
+        int index = 3;
+        DraggingPoint p = new DraggingPoint(x, y, index);
         assertTrue(p.getX() == x);
         assertTrue(p.getY() == y);
         assertTrue(p.getWhichBeingDragging() == index);
@@ -26,9 +26,9 @@ public class DraggingPointTest {
      */
     @Test
     public void testEqualsObject() {
-        final DraggingPoint p1 = new DraggingPoint(1, 2, 3);
-        final DraggingPoint p2 = new DraggingPoint(1, 2, 3);
-        final DraggingPoint p3 = new DraggingPoint(2, 2, 3);
+        DraggingPoint p1 = new DraggingPoint(0.1, 0.2, 3);
+        DraggingPoint p2 = new DraggingPoint(0.1, 0.2, 3);
+        DraggingPoint p3 = new DraggingPoint(0.2, 0.2, 3);
 
         assertTrue(p1.equals(p1));
         assertTrue(p1.equals(p2));

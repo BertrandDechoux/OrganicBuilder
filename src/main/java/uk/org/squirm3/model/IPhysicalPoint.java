@@ -1,30 +1,23 @@
 package uk.org.squirm3.model;
 
 public interface IPhysicalPoint {
-    public float getPositionX();
+    double getPositionX();
+    double getPositionY();
 
-    public float getPositionY();
+    double getSpeedX();
+    double getSpeedY();
 
-    public float getSpeedX();
+    double getAccelerationX();
+    double getAccelerationY();
 
-    public float getSpeedY();
+    boolean setPositionX(double x);
+    boolean setPositionY(double y);
 
-    // acceleration only used in new correct physics code
-    public float getAccelerationX();
+    boolean setSpeedX(double dx);
+    boolean setSpeedY(double dy);
 
-    public float getAccelerationY();
-
-    public boolean setPositionX(float x);
-
-    public boolean setPositionY(float y);
-
-    public boolean setSpeedX(float dx);
-
-    public boolean setSpeedY(float dy);
-
-    public boolean setAccelerationX(float ddx);
-
-    public boolean setAccelerationY(float ddy);
+    boolean setAccelerationX(double ddx);
+    boolean setAccelerationY(double ddy);
 
     public IPhysicalPoint copy(); // TODO use clone, with generic ?
 }

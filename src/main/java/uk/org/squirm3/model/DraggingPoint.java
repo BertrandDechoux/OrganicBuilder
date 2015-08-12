@@ -1,12 +1,11 @@
 package uk.org.squirm3.model;
 
 public class DraggingPoint {
-    private final long x;
-    private final long y;
+    private final double x;
+    private final double y;
     private final int whichBeingDragging;
 
-    public DraggingPoint(final long x, final long y,
-            final int whichBeingDragging) {
+    public DraggingPoint(double x, double y, int whichBeingDragging) {
         this.x = x;
         this.y = y;
         this.whichBeingDragging = whichBeingDragging;
@@ -16,11 +15,11 @@ public class DraggingPoint {
         return whichBeingDragging;
     }
 
-    public long getX() {
+    public double getX() {
         return x;
     }
 
-    public long getY() {
+    public double getY() {
         return y;
     }
 

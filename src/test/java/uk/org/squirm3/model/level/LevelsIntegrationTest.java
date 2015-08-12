@@ -8,13 +8,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.google.common.collect.Lists;
 
 import uk.org.squirm3.config.EngineConfig;
 import uk.org.squirm3.engine.LevelManager;
-
-import com.google.common.collect.Lists;
 
 @RunWith(Parameterized.class)
 public class LevelsIntegrationTest {
@@ -26,7 +25,7 @@ public class LevelsIntegrationTest {
 
     @Parameters
     public static Collection<Object[]> parameters() {
-        final ApplicationContext applicationContext = new AnnotationConfigApplicationContext(EngineConfig.class);
+        final AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(EngineConfig.class);
 
         final List<? extends Level> levels = applicationContext.getBean(LevelManager.class).getLevels();
         final Collection<Object[]> parameters = Lists.newArrayList();
@@ -34,6 +33,7 @@ public class LevelsIntegrationTest {
             parameters.add(new Object[] { level });
         }
         Assert.assertEquals(levels.size(), 21);
+        applicationContext.close();
         return parameters;
     }
 

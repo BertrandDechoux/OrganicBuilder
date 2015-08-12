@@ -20,7 +20,7 @@ public class LineCsValidator implements AtomValidator {
     @Override
     public String evaluate(final Collection<? extends Atom> atoms,
             final LevelMessages messages) {
-        int single_bonded_atoms_found = 0, double_bonded_atoms_found = 0;
+        int single_bonded_atoms_found = 0;
         // get the set of atoms joined to atom[0]
         final LinkedList<Atom> joined = new LinkedList<Atom>();
         seed.getAllConnectedAtoms(joined);
@@ -36,7 +36,7 @@ public class LineCsValidator implements AtomValidator {
             if (atom.getBonds().size() == 1) {
                 single_bonded_atoms_found++;
             } else if (atom.getBonds().size() == 2) {
-                double_bonded_atoms_found++;
+            	// do nothing
             } else if (atom.getBonds().size() == 0) {
                 return messages.getError(2);
             } else {
