@@ -7,6 +7,7 @@ For more information, please visit [Organic Buidler website](https://bertranddec
 
 You are welcome to watch, fork the project and create pull requests. Contact me if you have any questions.
 
+![Travis build status](https://travis-ci.org/BertrandDechoux/OrganicBuilder.svg?branch=develop)
 
 **Compile and run the tests**
 ```
