@@ -9,22 +9,17 @@ import java.util.List;
 import org.junit.Test;
 
 import uk.org.squirm3.model.Atom;
-import uk.org.squirm3.model.level.validators.MakeECsValidator;
+import uk.org.squirm3.model.level.validators.PairValidator;
 import uk.org.squirm3.model.type.def.BasicType;
 
-/**
- * test vocabulary : carbon = atom of type c
- * 
- * test vocabulary : europium = atom of type e
- */
-public class MakeECsValidatorTest extends ValidatorTest {
+public class PairValidatorTest extends ValidatorTest {
 
 	@Test
 	public void successWhenNoAtom() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
 		// when
-		String errorMessage = new MakeECsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isNull();
 	}
@@ -35,7 +30,7 @@ public class MakeECsValidatorTest extends ValidatorTest {
 		List<Atom> atoms = new ArrayList<>();
 		atoms.add(atom(BasicType.C));
 		// when
-		String errorMessage = new MakeECsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isNull();
 	}
@@ -46,7 +41,7 @@ public class MakeECsValidatorTest extends ValidatorTest {
 		List<Atom> atoms = new ArrayList<>();
 		atoms.add(atom(BasicType.E));
 		// when
-		String errorMessage = new MakeECsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isNull();
 	}
@@ -62,7 +57,7 @@ public class MakeECsValidatorTest extends ValidatorTest {
 		e.bondWith(c);
 		atoms.addAll(Arrays.asList(e, b, a, c));
 		// when
-		String errorMessage = new MakeECsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isNull();
 	}
@@ -78,7 +73,7 @@ public class MakeECsValidatorTest extends ValidatorTest {
 		e2.bondWith(c);
 		atoms.addAll(Arrays.asList(e1, c, e2));
 		// when
-		String errorMessage = new MakeECsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isEqualTo(ERROR_2);
 	}
@@ -91,7 +86,7 @@ public class MakeECsValidatorTest extends ValidatorTest {
 		Atom c = atom(BasicType.C);
 		atoms.addAll(Arrays.asList(e, c));
 		// when
-		String errorMessage = new MakeECsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isEqualTo(ERROR_3);
 	}
@@ -106,8 +101,12 @@ public class MakeECsValidatorTest extends ValidatorTest {
 		b.bondWith(d);
 		atoms.addAll(Arrays.asList(b, d));
 		// when
-		String errorMessage = new MakeECsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isEqualTo(ERROR_1);
+	}
+
+	private String evaluate(List<Atom> atoms) {
+		return new PairValidator(BasicType.E, BasicType.C).evaluate(atoms, messages);
 	}
 }

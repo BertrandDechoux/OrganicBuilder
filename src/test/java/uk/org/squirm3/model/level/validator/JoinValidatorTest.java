@@ -9,19 +9,16 @@ import java.util.List;
 import org.junit.Test;
 
 import uk.org.squirm3.model.Atom;
-import uk.org.squirm3.model.level.validators.JoinAsValidator;
+import uk.org.squirm3.model.level.validators.JoinValidator;
 import uk.org.squirm3.model.type.def.BasicType;
 
-/**
- * test vocabulary : aluminium = atom of type a
- */
-public class JoinAsValidatorTest extends ValidatorTest {
+public class JoinValidatorTest extends ValidatorTest {
 	@Test
 	public void successWhenNoAtom() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
 		// when
-		String errorMessage = new JoinAsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isNull();
 	}
@@ -32,7 +29,7 @@ public class JoinAsValidatorTest extends ValidatorTest {
 		List<Atom> atoms = new ArrayList<>();
 		atoms.add(atom(BasicType.A));
 		// when
-		String errorMessage = new JoinAsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isNull();
 	}
@@ -50,7 +47,7 @@ public class JoinAsValidatorTest extends ValidatorTest {
 		a2.bondWith(a3);
 		atoms.addAll(Arrays.asList(a1, b, a2, c, a3));
 		// when
-		String errorMessage = new JoinAsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isNull();
 	}
@@ -66,7 +63,7 @@ public class JoinAsValidatorTest extends ValidatorTest {
 		atoms.add(b);
 		atoms.add(c);
 		// when
-		String errorMessage = new JoinAsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isEqualTo(ERROR_1);
 	}
@@ -78,7 +75,7 @@ public class JoinAsValidatorTest extends ValidatorTest {
 		atoms.add(atom(BasicType.A));
 		atoms.add(atom(BasicType.A));
 		// when
-		String errorMessage = new JoinAsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isEqualTo(ERROR_2);
 	}
@@ -95,8 +92,12 @@ public class JoinAsValidatorTest extends ValidatorTest {
 		a3.bondWith(a4);
 		atoms.addAll(Arrays.asList(a1, a2, a3, a4));
 		// when
-		String errorMessage = new JoinAsValidator().evaluate(atoms, messages);
+		String errorMessage = evaluate(atoms);
 		// then
 		assertThat(errorMessage).isEqualTo(ERROR_2);
+	}
+
+	private String evaluate(List<Atom> atoms) {
+		return new JoinValidator(BasicType.A).evaluate(atoms, messages);
 	}
 }

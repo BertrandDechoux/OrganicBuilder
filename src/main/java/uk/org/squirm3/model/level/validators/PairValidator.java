@@ -9,9 +9,14 @@ import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.LevelMessages;
 import uk.org.squirm3.model.type.def.BasicType;
 
-public class MakeECsValidator extends SetuplessAtomValidator {
-    private static final BasicType EUROPIUM = BasicType.E;
-	private static final BasicType CARBON = BasicType.C;
+public class PairValidator extends SetuplessAtomValidator {
+    private final BasicType europium;
+	private final BasicType carbon;
+	
+	public PairValidator(BasicType europium, BasicType carbon) {
+		this.europium = europium;
+		this.carbon = carbon;
+	}
 
 	@Override
 	public String evaluate(Collection<? extends Atom> atoms, LevelMessages messages) {
@@ -20,8 +25,8 @@ public class MakeECsValidator extends SetuplessAtomValidator {
 	}
 
 	private Optional<String> looseCandidatePair(Collection<? extends Atom> atoms, LevelMessages messages) {
-        long looseEuropium = countLoose(atoms, EUROPIUM);
-		long looseCarbon = countLoose(atoms, CARBON);
+        long looseEuropium = countLoose(atoms, europium);
+		long looseCarbon = countLoose(atoms, carbon);
         if (Math.min(looseEuropium, looseCarbon) > 0) {
             return Optional.of(messages.getError(3));
         }
@@ -34,12 +39,12 @@ public class MakeECsValidator extends SetuplessAtomValidator {
 
 	private Optional<String> bondedOtherAtom(Collection<? extends Atom> atoms, LevelMessages messages) {
 		return error(messages, 1, atoms.stream()//
-    			.filter(types(EUROPIUM, CARBON).negate().and(Atom::isBonded)));
+    			.filter(types(europium, carbon).negate().and(Atom::isBonded)));
 	}
 	
 	private Optional<String> europiumCarbonStructure(Collection<? extends Atom> atoms, LevelMessages messages) {
 		return error(messages, 2, atoms.stream()//
-    			.filter(types(EUROPIUM, CARBON).and(a -> a.getBonds().size() > 1)));
+    			.filter(types(europium, carbon).and(a -> a.getBonds().size() > 1)));
 	}
 
 }

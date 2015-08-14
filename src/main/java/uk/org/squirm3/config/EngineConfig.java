@@ -23,16 +23,17 @@ import uk.org.squirm3.model.level.validators.GrowMembraneValidator;
 import uk.org.squirm3.model.level.validators.InsertAtomValidator;
 import uk.org.squirm3.model.level.validators.IntroValidator;
 import uk.org.squirm3.model.level.validators.JoinAllValidator;
-import uk.org.squirm3.model.level.validators.JoinAsValidator;
+import uk.org.squirm3.model.level.validators.JoinValidator;
 import uk.org.squirm3.model.level.validators.JoinSameValidator;
 import uk.org.squirm3.model.level.validators.LineCsValidator;
-import uk.org.squirm3.model.level.validators.MakeECsValidator;
+import uk.org.squirm3.model.level.validators.PairValidator;
 import uk.org.squirm3.model.level.validators.MakeLadderValidator;
 import uk.org.squirm3.model.level.validators.MatchTemplateValidator;
 import uk.org.squirm3.model.level.validators.MembraneTransportValidator;
 import uk.org.squirm3.model.level.validators.PassMessageValidator;
 import uk.org.squirm3.model.level.validators.SelfrepValidator;
 import uk.org.squirm3.model.level.validators.SplitLadderValidator;
+import uk.org.squirm3.model.type.def.BasicType;
 
 import com.google.common.collect.Lists;
 
@@ -57,8 +58,8 @@ public class EngineConfig {
     private List<Level> getLevels(ComposedLevelFactory levelFactory) {
         List<Level> levels = Lists.newArrayList();
         levels.add(levelFactory.createRandom("intro", new IntroValidator()));
-        levels.add(levelFactory.createRandom("joinas", new JoinAsValidator()));
-        levels.add(levelFactory.createRandom("makeecs", new MakeECsValidator()));
+        levels.add(levelFactory.createRandom("join", new JoinValidator(BasicType.A)));
+        levels.add(levelFactory.createRandom("pair", new PairValidator(BasicType.E, BasicType.C)));
         levels.add(levelFactory.create("linecs", new LineCsValidator()));
         levels.add(levelFactory.createRandom("joinall", new JoinAllValidator()));
         levels.add(levelFactory.create("connectcorners", new ConnectCornersValidator()));
