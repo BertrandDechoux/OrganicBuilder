@@ -1,5 +1,6 @@
 package uk.org.squirm3.model;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -34,17 +35,17 @@ public class Atom {
         return bonds.contains(other);
     }
 
-    public void getAllConnectedAtoms(final LinkedList<Atom> list) {
+    public void getAllConnectedAtoms(final Collection<Atom> atoms) {
         // is this a new atom for this list?
-        if (list.contains(this)) {
+        if (atoms.contains(this)) {
             return;
         }
         // if no, add this one, and all connected atoms
-        list.add(this);
+        atoms.add(this);
         // recurse
         final Iterator<Atom> it = bonds.iterator();
         while (it.hasNext()) {
-            it.next().getAllConnectedAtoms(list);
+            it.next().getAllConnectedAtoms(atoms);
         }
     }
 
@@ -106,5 +107,13 @@ public class Atom {
     public static double getAtomSize() {
         return R;
     }
+    
+	public boolean isLoose() {
+		return bonds.isEmpty();
+	}
+
+	public boolean isBonded() {
+		return !bonds.isEmpty();
+	}
 
 }
