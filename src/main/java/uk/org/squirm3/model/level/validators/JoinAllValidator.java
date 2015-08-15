@@ -1,22 +1,18 @@
 package uk.org.squirm3.model.level.validators;
 
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Set;
 
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.LevelMessages;
 
 public class JoinAllValidator extends SetuplessAtomValidator {
 
-    @Override
-    public String evaluate(final Collection<? extends Atom> atoms,
-            final LevelMessages messages) {
-        // all joined?
-        final LinkedList<Atom> joined = new LinkedList<Atom>();
-        atoms.iterator().next().getAllConnectedAtoms(joined);
-        if (joined.size() != atoms.size()) {
-            return messages.getError(1);
-        }
-        return null;
-    }
+	@Override
+	public String evaluate(Collection<? extends Atom> atoms, LevelMessages messages) {
+		final Set<Atom> connectedAtoms = new HashSet<Atom>();
+		atoms.stream().findAny().ifPresent(a -> a.getAllConnectedAtoms(connectedAtoms));
+		return error(messages, 1, connectedAtoms.size() != atoms.size()).orElse(null);
+	}
 }
