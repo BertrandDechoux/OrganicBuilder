@@ -25,7 +25,7 @@ import uk.org.squirm3.model.level.validators.IntroValidator;
 import uk.org.squirm3.model.level.validators.JoinAllValidator;
 import uk.org.squirm3.model.level.validators.JoinValidator;
 import uk.org.squirm3.model.level.validators.JoinSameValidator;
-import uk.org.squirm3.model.level.validators.LineCsValidator;
+import uk.org.squirm3.model.level.validators.LineValidator;
 import uk.org.squirm3.model.level.validators.PairValidator;
 import uk.org.squirm3.model.level.validators.MakeLadderValidator;
 import uk.org.squirm3.model.level.validators.MatchTemplateValidator;
@@ -60,7 +60,7 @@ public class EngineConfig {
         levels.add(levelFactory.createRandom("intro", new IntroValidator()));
         levels.add(levelFactory.createRandom("join", new JoinValidator(BasicType.A)));
         levels.add(levelFactory.createRandom("pair", new PairValidator(BasicType.E, BasicType.C)));
-        levels.add(levelFactory.create("linecs", new LineCsValidator()));
+        levels.add(levelFactory.create("line", new LineValidator(BasicType.C, 1)));
         levels.add(levelFactory.createRandom("joinall", new JoinAllValidator()));
         levels.add(levelFactory.create("connectcorners", new ConnectCornersValidator()));
         levels.add(levelFactory.createRandom("abcdefchains", new AbcdefChainsValidator()));

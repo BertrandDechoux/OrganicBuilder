@@ -18,6 +18,10 @@ public abstract class AtomTemplateValidator implements AtomValidator {
 		return errorCases.findAny().map(e -> messages.getError(errorNumber));
 	}
 	
+	protected Optional<String> error(LevelMessages messages, int errorNumber, boolean error) {
+		return error? Optional.of(messages.getError(errorNumber)) : Optional.empty();
+	}
+	
 	protected String validation(Collection<? extends Atom> atoms, LevelMessages messages, ValidationCheck... checks) {
 		return Arrays.stream(checks)//
 				.map(c -> c.check(atoms, messages)).filter(Optional::isPresent)//

@@ -21,6 +21,7 @@ public abstract class ValidatorTest {
 	protected static final String ERROR_2 = "error 2";
 	protected static final String ERROR_3 = "error 3";
 	protected static final String ERROR_4 = "error 4";
+	protected static final String ERROR_5 = "error 5";
 
 	@Mock
 	protected LevelMessages messages;
@@ -36,5 +37,11 @@ public abstract class ValidatorTest {
 	}
 
 	protected Atom atom(AtomType type) {
-		return new Atom(new FixedPoint(0, 0), type, 0);
-	}}
+		return atom(type, 0);
+	}
+	
+	protected Atom atom(AtomType type, int state) {
+		return new Atom(new FixedPoint(0, 0), type, state);
+	}
+
+}

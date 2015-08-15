@@ -13,6 +13,8 @@ import uk.org.squirm3.model.level.validators.JoinValidator;
 import uk.org.squirm3.model.type.def.BasicType;
 
 public class JoinValidatorTest extends ValidatorTest {
+	private static final BasicType ALUMINIUM = BasicType.A;
+
 	@Test
 	public void successWhenNoAtom() {
 		// given
@@ -27,7 +29,7 @@ public class JoinValidatorTest extends ValidatorTest {
 	public void successWhenSingleAluminium() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		atoms.add(atom(BasicType.A));
+		atoms.add(atom(ALUMINIUM));
 		// when
 		String errorMessage = evaluate(atoms);
 		// then
@@ -38,9 +40,9 @@ public class JoinValidatorTest extends ValidatorTest {
 	public void successWhenBondedAluminiums() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		Atom a1 = atom(BasicType.A);
-		Atom a2 = atom(BasicType.A);
-		Atom a3 = atom(BasicType.A);
+		Atom a1 = atom(ALUMINIUM);
+		Atom a2 = atom(ALUMINIUM);
+		Atom a3 = atom(ALUMINIUM);
 		Atom b = atom(BasicType.B);
 		Atom c = atom(BasicType.C);
 		a1.bondWith(a2);
@@ -56,7 +58,7 @@ public class JoinValidatorTest extends ValidatorTest {
 	public void failWhenOtherAtomHasBond() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		atoms.add(atom(BasicType.A));
+		atoms.add(atom(ALUMINIUM));
 		Atom b = atom(BasicType.B);
 		Atom c = atom(BasicType.C);
 		b.bondWith(c);
@@ -72,8 +74,8 @@ public class JoinValidatorTest extends ValidatorTest {
 	public void failWhenLooseAluminium() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		atoms.add(atom(BasicType.A));
-		atoms.add(atom(BasicType.A));
+		atoms.add(atom(ALUMINIUM));
+		atoms.add(atom(ALUMINIUM));
 		// when
 		String errorMessage = evaluate(atoms);
 		// then
@@ -84,10 +86,10 @@ public class JoinValidatorTest extends ValidatorTest {
 	public void failWhenIsolatedAluminiums() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		Atom a1 = atom(BasicType.A);
-		Atom a2 = atom(BasicType.A);
-		Atom a3 = atom(BasicType.A);
-		Atom a4 = atom(BasicType.A);
+		Atom a1 = atom(ALUMINIUM);
+		Atom a2 = atom(ALUMINIUM);
+		Atom a3 = atom(ALUMINIUM);
+		Atom a4 = atom(ALUMINIUM);
 		a1.bondWith(a2);
 		a3.bondWith(a4);
 		atoms.addAll(Arrays.asList(a1, a2, a3, a4));
@@ -98,6 +100,6 @@ public class JoinValidatorTest extends ValidatorTest {
 	}
 
 	private String evaluate(List<Atom> atoms) {
-		return new JoinValidator(BasicType.A).evaluate(atoms, messages);
+		return new JoinValidator(ALUMINIUM).evaluate(atoms, messages);
 	}
 }

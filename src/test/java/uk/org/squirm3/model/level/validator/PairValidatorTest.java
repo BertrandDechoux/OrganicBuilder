@@ -13,6 +13,8 @@ import uk.org.squirm3.model.level.validators.PairValidator;
 import uk.org.squirm3.model.type.def.BasicType;
 
 public class PairValidatorTest extends ValidatorTest {
+	private static final BasicType EUROPIUM = BasicType.E;
+	private static final BasicType CARBON = BasicType.C;
 
 	@Test
 	public void successWhenNoAtom() {
@@ -28,7 +30,7 @@ public class PairValidatorTest extends ValidatorTest {
 	public void successWhenSingleCarbon() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		atoms.add(atom(BasicType.C));
+		atoms.add(atom(CARBON));
 		// when
 		String errorMessage = evaluate(atoms);
 		// then
@@ -39,7 +41,7 @@ public class PairValidatorTest extends ValidatorTest {
 	public void successWhenSingleEuropium() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		atoms.add(atom(BasicType.E));
+		atoms.add(atom(EUROPIUM));
 		// when
 		String errorMessage = evaluate(atoms);
 		// then
@@ -50,8 +52,8 @@ public class PairValidatorTest extends ValidatorTest {
 	public void successWhenEuropiumCarbonPair() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		Atom e = atom(BasicType.E);
-		Atom c = atom(BasicType.C);
+		Atom e = atom(EUROPIUM);
+		Atom c = atom(CARBON);
 		Atom a = atom(BasicType.A);
 		Atom b = atom(BasicType.B);
 		e.bondWith(c);
@@ -66,9 +68,9 @@ public class PairValidatorTest extends ValidatorTest {
 	public void failWhenEuropiumCarbonStructure() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		Atom e1 = atom(BasicType.E);
-		Atom c = atom(BasicType.C);
-		Atom e2 = atom(BasicType.E);
+		Atom e1 = atom(EUROPIUM);
+		Atom c = atom(CARBON);
+		Atom e2 = atom(EUROPIUM);
 		e1.bondWith(c);
 		e2.bondWith(c);
 		atoms.addAll(Arrays.asList(e1, c, e2));
@@ -82,8 +84,8 @@ public class PairValidatorTest extends ValidatorTest {
 	public void failWhenUnbondedEuropiumCarbon() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		Atom e = atom(BasicType.E);
-		Atom c = atom(BasicType.C);
+		Atom e = atom(EUROPIUM);
+		Atom c = atom(CARBON);
 		atoms.addAll(Arrays.asList(e, c));
 		// when
 		String errorMessage = evaluate(atoms);
@@ -95,7 +97,6 @@ public class PairValidatorTest extends ValidatorTest {
 	public void failWhenOtherAtomHasBond() {
 		// given
 		List<Atom> atoms = new ArrayList<>();
-		atoms.add(atom(BasicType.A));
 		Atom b = atom(BasicType.B);
 		Atom d = atom(BasicType.D);
 		b.bondWith(d);
@@ -107,6 +108,6 @@ public class PairValidatorTest extends ValidatorTest {
 	}
 
 	private String evaluate(List<Atom> atoms) {
-		return new PairValidator(BasicType.E, BasicType.C).evaluate(atoms, messages);
+		return new PairValidator(EUROPIUM, CARBON).evaluate(atoms, messages);
 	}
 }
