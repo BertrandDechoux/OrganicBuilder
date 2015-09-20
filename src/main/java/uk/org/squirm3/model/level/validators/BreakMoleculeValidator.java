@@ -11,14 +11,27 @@ import uk.org.squirm3.model.type.def.BasicType;
 import com.google.common.collect.Lists;
 
 public class BreakMoleculeValidator implements AtomValidator {
-    private final Collection<Atom> extremities = Lists.newArrayList();
-    private final Collection<Atom> innerMolecule = Lists.newArrayList();
-    private final Collection<Atom> gate = Lists.newArrayList();
+	private final BasicType moleculeTopType;
+	private final BasicType moleculeBottomType;
+	private final int moleculeState;
+	
+	private final Collection<Atom> extremities;
+    private final Collection<Atom> innerMolecule;
+    private final Collection<Atom> gate;
+	
+	public BreakMoleculeValidator(BasicType moleculeTopType, BasicType moleculeBottomType, int moleculeState) {
+		this.moleculeTopType = moleculeTopType;
+		this.moleculeBottomType = moleculeBottomType;
+		this.moleculeState = moleculeState;
+		extremities = Lists.newArrayList();
+		innerMolecule = Lists.newArrayList();
+		gate = Lists.newArrayList();
+	}
 
     @Override
     public void setup(final Collection<? extends Atom> atoms) {
-        setupMemory(AtomSelector.findAll(BasicType.A, 1, atoms));
-        setupMemory(AtomSelector.findAll(BasicType.D, 1, atoms));
+        setupMemory(AtomSelector.findAll(moleculeTopType, moleculeState, atoms));
+        setupMemory(AtomSelector.findAll(moleculeBottomType, moleculeState, atoms));
     }
 
     private void setupMemory(final Collection<? extends Atom> atoms) {

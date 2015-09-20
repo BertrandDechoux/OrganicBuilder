@@ -7,9 +7,8 @@ import uk.org.squirm3.model.level.LevelMessages;
 
 public class IntroValidator extends SetuplessAtomValidator {
 
-    @Override
-    public String evaluate(final Collection<? extends Atom> atoms,
-            final LevelMessages messages) {
-        return null;
-    }
+	@Override
+	public String evaluate(Collection<? extends Atom> atoms, LevelMessages messages) {
+		return null;
+	}
 }

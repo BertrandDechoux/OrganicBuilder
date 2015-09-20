@@ -18,21 +18,22 @@ import uk.org.squirm3.model.level.validators.AbcdefChainsValidator;
 import uk.org.squirm3.model.level.validators.BondPrisonerValidator;
 import uk.org.squirm3.model.level.validators.BreakMoleculeValidator;
 import uk.org.squirm3.model.level.validators.CellDivisionValidator;
-import uk.org.squirm3.model.level.validators.ConnectCornersValidator;
+import uk.org.squirm3.model.level.validators.ConnectValidator;
 import uk.org.squirm3.model.level.validators.GrowMembraneValidator;
 import uk.org.squirm3.model.level.validators.InsertAtomValidator;
 import uk.org.squirm3.model.level.validators.IntroValidator;
 import uk.org.squirm3.model.level.validators.JoinAllValidator;
-import uk.org.squirm3.model.level.validators.JoinAsValidator;
+import uk.org.squirm3.model.level.validators.JoinValidator;
 import uk.org.squirm3.model.level.validators.JoinSameValidator;
-import uk.org.squirm3.model.level.validators.LineCsValidator;
-import uk.org.squirm3.model.level.validators.MakeECsValidator;
+import uk.org.squirm3.model.level.validators.LineValidator;
+import uk.org.squirm3.model.level.validators.PairValidator;
 import uk.org.squirm3.model.level.validators.MakeLadderValidator;
 import uk.org.squirm3.model.level.validators.MatchTemplateValidator;
 import uk.org.squirm3.model.level.validators.MembraneTransportValidator;
 import uk.org.squirm3.model.level.validators.PassMessageValidator;
 import uk.org.squirm3.model.level.validators.SelfrepValidator;
 import uk.org.squirm3.model.level.validators.SplitLadderValidator;
+import uk.org.squirm3.model.type.def.BasicType;
 
 import com.google.common.collect.Lists;
 
@@ -57,15 +58,15 @@ public class EngineConfig {
     private List<Level> getLevels(ComposedLevelFactory levelFactory) {
         List<Level> levels = Lists.newArrayList();
         levels.add(levelFactory.createRandom("intro", new IntroValidator()));
-        levels.add(levelFactory.createRandom("joinas", new JoinAsValidator()));
-        levels.add(levelFactory.createRandom("makeecs", new MakeECsValidator()));
-        levels.add(levelFactory.create("linecs", new LineCsValidator()));
+        levels.add(levelFactory.createRandom("join", new JoinValidator(BasicType.A)));
+        levels.add(levelFactory.createRandom("pair", new PairValidator(BasicType.E, BasicType.C)));
+        levels.add(levelFactory.create("line", new LineValidator(BasicType.C, 1)));
         levels.add(levelFactory.createRandom("joinall", new JoinAllValidator()));
-        levels.add(levelFactory.create("connectcorners", new ConnectCornersValidator()));
+        levels.add(levelFactory.create("connect", new ConnectValidator(BasicType.A, BasicType.F, 1)));
         levels.add(levelFactory.createRandom("abcdefchains", new AbcdefChainsValidator()));
         levels.add(levelFactory.createRandom("joinsame", new JoinSameValidator()));
-        levels.add(levelFactory.create("matchtemplate", new MatchTemplateValidator()));
-        levels.add(levelFactory.create("breakmolecule", new BreakMoleculeValidator()));
+        levels.add(levelFactory.create("matchtemplate", new MatchTemplateValidator(1)));
+        levels.add(levelFactory.create("breakmolecule", new BreakMoleculeValidator(BasicType.A, BasicType.D, 1)));
         levels.add(levelFactory.create("bondprisoner", new BondPrisonerValidator()));
         levels.add(levelFactory.create("passmessage", new PassMessageValidator()));
         levels.add(levelFactory.create("splitladder", new SplitLadderValidator()));

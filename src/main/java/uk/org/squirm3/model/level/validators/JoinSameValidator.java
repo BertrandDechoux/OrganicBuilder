@@ -1,38 +1,50 @@
 package uk.org.squirm3.model.level.validators;
 
+import static uk.org.squirm3.model.level.AtomSelector.type;
+
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import uk.org.squirm3.model.Atom;
 import uk.org.squirm3.model.level.LevelMessages;
+import uk.org.squirm3.model.type.def.BasicType;
 
 public class JoinSameValidator extends SetuplessAtomValidator {
 
     @Override
-    public String evaluate(final Collection<? extends Atom> atoms,
-            final LevelMessages messages) {
-        for (final Atom atom : atoms) {
-            // get everything that's joined to this atom
-            final LinkedList<Atom> joined = new LinkedList<Atom>();
-            atom.getAllConnectedAtoms(joined);
-            // is there any atom in this list of a different type?
-            final Iterator<Atom> it = joined.iterator();
-            while (it.hasNext()) {
-                final Atom other = it.next();
-                if (other.getType() != atom.getType()) {
-                    return messages.getError(1);
-                }
-            }
-            // are there any atoms of the same type not on this list?
-            for (final Atom otherAtom : atoms) {
-                if (otherAtom.getType() == atom.getType()
-                        && !joined.contains(otherAtom)) {
-                    return messages.getError(2);
-                }
-            }
-        }
-        return null;
+    public String evaluate(Collection<? extends Atom> atoms, LevelMessages messages) {
+		return validation(atoms, messages, this::bondedOtherType, this::isolated);
     }
+    
+	private Optional<String> bondedOtherType(Collection<? extends Atom> atoms, LevelMessages messages) {
+		return error(messages, 1, //
+				Arrays.stream(BasicType.values()).flatMap(t -> bondedOtherType(t, atoms)));
+	}
+	
+	private Stream<? extends Atom> bondedOtherType(BasicType type, Collection<? extends Atom> atoms) {
+		return atoms.stream().filter(type(type))//
+				.findAny().map(a -> {
+					Set<Atom> connectedAtoms = new HashSet<>();
+					a.getAllConnectedAtoms(connectedAtoms);
+					return connectedAtoms.stream().filter(type(type).negate());
+				}).orElse(Stream.empty());
+	}
+    
+	private Optional<String> isolated(Collection<? extends Atom> atoms, LevelMessages messages) {
+		return error(messages, 2, //
+				Arrays.stream(BasicType.values()).flatMap(t -> isolated(t, atoms)));
+	}
+	
+	private Stream<? extends Atom> isolated(BasicType type, Collection<? extends Atom> atoms) {
+		Collection<Atom> subset = new HashSet<>();
+		atoms.stream().filter(type(type))//
+				.findAny().ifPresent(a -> a.getAllConnectedAtoms(subset));
+		return atoms.stream()//
+				.filter(type(type).and(a -> !subset.contains(a)));
+	}
 
 }
