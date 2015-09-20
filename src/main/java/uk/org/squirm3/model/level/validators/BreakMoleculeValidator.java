@@ -32,6 +32,9 @@ public class BreakMoleculeValidator implements AtomValidator {
     public void setup(final Collection<? extends Atom> atoms) {
         setupMemory(AtomSelector.findAll(moleculeTopType, moleculeState, atoms));
         setupMemory(AtomSelector.findAll(moleculeBottomType, moleculeState, atoms));
+        if(gate.size() != 2 || extremities.size() != 2 || innerMolecule.size() < 2) {
+        	throw new IllegalStateException("No molecule found.");
+        }
     }
 
     private void setupMemory(final Collection<? extends Atom> atoms) {
@@ -40,13 +43,18 @@ public class BreakMoleculeValidator implements AtomValidator {
                 extremities.add(atom);
                 continue;
             }
+            boolean isGate = false;
             for (final Atom other : atom.getBonds()) {
                 if (other.getType() != atom.getType()) {
-                    gate.add(atom);
-                    continue;
+                	isGate = true; 
+                    break;
                 }
             }
-            innerMolecule.add(atom);
+            if(isGate) {
+            	gate.add(atom);
+            } else {
+            	innerMolecule.add(atom);
+            }
         }
 
     }
