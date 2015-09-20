@@ -65,8 +65,8 @@ public class EngineConfig {
         levels.add(levelFactory.create("connect", new ConnectValidator(BasicType.A, BasicType.F, 1)));
         levels.add(levelFactory.createRandom("abcdefchains", new AbcdefChainsValidator()));
         levels.add(levelFactory.createRandom("joinsame", new JoinSameValidator()));
-        levels.add(levelFactory.create("matchtemplate", new MatchTemplateValidator()));
-        levels.add(levelFactory.create("breakmolecule", new BreakMoleculeValidator()));
+        levels.add(levelFactory.create("matchtemplate", new MatchTemplateValidator(1)));
+        levels.add(levelFactory.create("breakmolecule", new BreakMoleculeValidator(BasicType.A, BasicType.D, 1)));
         levels.add(levelFactory.create("bondprisoner", new BondPrisonerValidator()));
         levels.add(levelFactory.create("passmessage", new PassMessageValidator()));
         levels.add(levelFactory.create("splitladder", new SplitLadderValidator()));
