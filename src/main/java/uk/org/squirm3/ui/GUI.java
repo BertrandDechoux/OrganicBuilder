@@ -2,9 +2,14 @@ package uk.org.squirm3.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -30,14 +35,15 @@ public class GUI {
             final CurrentLevelPanel currentLevelPanel,
             final ReactionListPanel reactionListPanel,
             final ReactionConstructorPanel reactionConstructorPanel,
-            final AtomsPanel collisionsPanel, final ToolBarPanel toolBarPanel) {
+            final AtomsPanel collisionsPanel, final ToolBarPanel toolBarPanel,
+            final Action aboutAction) {
 
         final JSplitPane reactionsPane = createReactionsPane(reactionListPanel,
                 reactionConstructorPanel);
         final JSplitPane rootComponent = buildRootComponent(collisionsPanel,
                 currentLevelPanel, reactionsPane);
         final JPanel contentPane = buildContentPane(toolBarPanel, rootComponent);
-        buildMainFrame(messageSource, contentPane);
+        buildMainFrame(messageSource, contentPane, aboutAction);
     }
 
     /**
@@ -94,13 +100,37 @@ public class GUI {
      * Setup the whole GUI, title, size and exit behavior.
      */
     private void buildMainFrame(final MessageSource messageSource,
-            final JPanel contentPane) {
+            final JPanel contentPane, final Action aboutAction) {
         final JFrame frame = new JFrame(Messages.localize("application.title",
                 messageSource));
-        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setJMenuBar(UiSettings.createMenuBar(messageSource,
+                aboutAction));
         frame.setContentPane(contentPane);
         SwingUtilities.updateComponentTreeUI(frame);
+        // The window manager restores these bounds when the maximized
+        // state is left (e.g. by dragging the title bar), so they must be
+        // a usable size instead of the near-empty AWT default.
+        final Rectangle workArea = GraphicsEnvironment
+                .getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        final int width = workArea.width * 3 / 4;
+        final int height = workArea.height * 3 / 4;
+        frame.setBounds(workArea.x + (workArea.width - width) / 2,
+                workArea.y + (workArea.height - height) / 2, width, height);
+        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+        // Some X11 window managers ignore the extended state while the frame
+        // is not yet mapped, so it is re-applied once the window is opened.
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(final WindowEvent event) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+                    }
+                });
+            }
+        });
         frame.setVisible(true);
     }
 
