@@ -251,4 +251,30 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<!-- On JDK 9+ the module system blocks the reflective access that
+		     the legacy mockito-all test dependency needs into JDK
+		     internals (java.util.Properties constructor). Open the
+		     required packages for the test JVM only. The profile is
+		     inactive on JDK 8, where these flags would be unknown. -->
+		<profile>
+			<id>jdk9-plus-opens</id>
+			<activation>
+				<jdk>[9,)</jdk>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-surefire-plugin</artifactId>
+							<configuration>
+								<argLine>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
+
 </project>
