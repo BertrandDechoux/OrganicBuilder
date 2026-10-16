@@ -1,5 +1,6 @@
 package uk.org.squirm3.ui.reaction;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Insets;
@@ -87,7 +88,15 @@ public class ReactionConstructorPanel extends JPanel {
                         .singleton(createReactionFromEditor()));
             }
         });
-        add(addReaction);
+        // The button shows the resulting reaction (e.g.
+        // "a0+c0=>a1c1") and stretches to the full row width next to
+        // the label so the whole text stays readable.
+        final JPanel row = new JPanel(new BorderLayout(5, 0));
+        row.add(addReaction, BorderLayout.CENTER);
+        row.add(new JLabel(
+                Messages.localize("reactions.add", messageSource)),
+                BorderLayout.EAST);
+        add(row);
     }
 
     private Reaction createReactionFromEditor() {

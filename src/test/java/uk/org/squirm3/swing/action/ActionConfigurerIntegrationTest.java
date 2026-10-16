@@ -91,13 +91,13 @@ public class ActionConfigurerIntegrationTest {
         map.put("myid.action.accelerator", "alt shift X");
         map.put("myid.action.command", "wecan");
         map.put("myid.action.mnemoindex", "42");
-        map.put("myid.action.largeicon", "/graphics/reset.png");
+        map.put("myid.action.largeicon", "/graphics/reset.svg");
         map.put("myid.action.longtext", "long description");
         map.put("myid.action.mnemonic", "51");
         map.put("myid.action.name", "name");
         map.put("myid.action.selected", "true");
         map.put("myid.action.shorttext", "short description");
-        map.put("myid.action.smallicon", "/graphics/about.png");
+        map.put("myid.action.smallicon", "/graphics/help.svg");
         return map;
     }
 

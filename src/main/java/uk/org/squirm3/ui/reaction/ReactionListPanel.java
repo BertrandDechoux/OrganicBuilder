@@ -82,7 +82,7 @@ public class ReactionListPanel extends JPanel {
     }
 
     public String localize(final String key) {
-        return Messages.localize("reactions.current", messageSource);
+        return Messages.localize(key, messageSource);
     }
 
     private final class ReactionsChangedListener implements Listener {

@@ -90,6 +90,13 @@ public class CurrentLevelPanel extends JPanel {
         }
         @Override
         public void actionPerformed(final ActionEvent arg0) {
+            // The introduction has nothing to evaluate; the button
+            // starts the first real challenge directly.
+            if (applicationEngine.getLevelManager()
+                    .isCurrentLevelFirstLevel()) {
+                applicationEngine.goToNextLevel();
+                return;
+            }
             final String result = currentLevel.evaluate(applicationEngine
                     .getAtoms());
             if (result == null) {
@@ -162,6 +169,10 @@ public class CurrentLevelPanel extends JPanel {
                         + currentLevel.getChallenge());
                 hintButton.setEnabled(StringUtils.hasText(currentLevel
                         .getHint()));
+                evaluateButton.setText(localize(applicationEngine
+                        .getLevelManager().isCurrentLevelFirstLevel()
+                                ? "level.start"
+                                : "level.evaluate"));
                 evaluateButton.setEnabled(true);
             }
         }
