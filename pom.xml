@@ -15,7 +15,7 @@
 
 	<name>Organic Builder</name>
 	<description>Artificial chemistry low-level simulation : make up our own rules of construction to simulate open-ended, creative evolution.</description>
-	<url>http://organicbuilder.sourceforge.net/</url>
+	<url>https://github.com/BertrandDechoux/OrganicBuilder</url>
 	<inceptionYear>2002</inceptionYear>
 
 	<licenses>
@@ -67,6 +67,16 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+			<version>3.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf-extras</artifactId>
+			<version>3.7.2</version>
 		</dependency>
 
 		<!-- test -->
@@ -233,6 +243,11 @@
 						<manifest>
 							<mainClass>uk.org.squirm3.springframework.StandaloneSpringLauncher</mainClass>
 						</manifest>
+						<!-- FlatLaf ships Java 9+ classes under META-INF/versions;
+						     without this flag the JVM ignores them in the fat jar. -->
+						<manifestEntries>
+							<Multi-Release>true</Multi-Release>
+						</manifestEntries>
 					</archive>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
@@ -250,5 +265,31 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<!-- On JDK 9+ the module system blocks the reflective access that
+		     the legacy mockito-all test dependency needs into JDK
+		     internals (java.util.Properties constructor). Open the
+		     required packages for the test JVM only. The profile is
+		     inactive on JDK 8, where these flags would be unknown. -->
+		<profile>
+			<id>jdk9-plus-opens</id>
+			<activation>
+				<jdk>[9,)</jdk>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-surefire-plugin</artifactId>
+							<configuration>
+								<argLine>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

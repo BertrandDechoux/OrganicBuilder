@@ -87,7 +87,11 @@ public class ReactionConstructorPanel extends JPanel {
                         .singleton(createReactionFromEditor()));
             }
         });
-        add(addReaction);
+        final JPanel row = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        row.add(addReaction);
+        row.add(new JLabel(
+                Messages.localize("reactions.add", messageSource)));
+        add(row);
     }
 
     private Reaction createReactionFromEditor() {
