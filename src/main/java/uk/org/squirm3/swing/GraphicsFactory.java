@@ -9,6 +9,9 @@ import java.net.URL;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 public class GraphicsFactory {
     private final Component component = new JFrame();
@@ -26,6 +29,25 @@ public class GraphicsFactory {
     }
 
     public Icon createIcon(final String imagePath) throws InterruptedException {
+        if (imagePath.endsWith(".svg")) {
+            return createSvgIcon(imagePath);
+        }
         return new ImageIcon(createImage(imagePath));
+    }
+
+    /**
+     * Vector icons scale with the UI scale factor and are recolored to the
+     * current label foreground, so they follow theme changes.
+     */
+    private Icon createSvgIcon(final String imagePath) {
+        // ClassLoader.getResource does not accept a leading slash
+        final String resource = imagePath.startsWith("/")
+                ? imagePath.substring(1)
+                : imagePath;
+        final FlatSVGIcon icon = new FlatSVGIcon(resource, 20, 20,
+                getClass().getClassLoader());
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter(
+                color -> UIManager.getColor("Label.foreground")));
+        return icon;
     }
 }

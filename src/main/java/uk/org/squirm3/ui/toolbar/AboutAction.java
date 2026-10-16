@@ -3,10 +3,16 @@ package uk.org.squirm3.ui.toolbar;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
-import java.net.URI;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
+import javax.swing.event.HyperlinkEvent;
 
 import org.springframework.context.MessageSource;
 
@@ -17,6 +23,8 @@ import uk.org.squirm3.springframework.Messages;
  */
 public class AboutAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = Logger
+            .getLogger(AboutAction.class.getName());
 
     private final MessageSource messageSource;
     private final String siteUrl;
@@ -34,40 +42,51 @@ public class AboutAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(final ActionEvent event) {
-        if (openUrlOnPage()) {
+        final Component component = (Component) (event
+                .getSource() instanceof Component ? event.getSource() : null);
+        JOptionPane.showMessageDialog(component, createInfoText(),
+                localize("about.title"), JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Message text with a clickable link to the project repository.
+     */
+    private JEditorPane createInfoText() {
+        final JEditorPane text = new JEditorPane("text/html",
+                "<html>" + localize("about.text") + " <a href=\"" + siteUrl
+                        + "\">" + siteUrl + "</a></html>");
+        text.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
+                Boolean.TRUE);
+        text.setEditable(false);
+        text.setOpaque(false);
+        text.addHyperlinkListener(e -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                openUrl(e.getURL());
+            }
+        });
+        return text;
+    }
+
+    /**
+     * Open the url with the system browser. Environments without browser
+     * support simply leave the link in the dialog.
+     */
+    private void openUrl(final URL url) {
+        if (!Desktop.isDesktopSupported()
+                || !Desktop.getDesktop()
+                        .isSupported(java.awt.Desktop.Action.BROWSE)) {
+            LOGGER.warning("No desktop browser support, the link stays in the dialog: "
+                    + url);
             return;
         }
-        showUrlWithMessage(event);
-    }
-
-    /**
-     * Show a message with the url inside.
-     */
-    private void showUrlWithMessage(final ActionEvent event) {
-        final Component component = (Component) (event.getSource() instanceof Component
-                ? event.getSource()
-                : null);
-        JOptionPane.showMessageDialog(component, localize("about.text"),
-                localize("about.title"), JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * Try to open the url with a browser. If not supported or in case of error,
-     * return false.
-     */
-    private final boolean openUrlOnPage() {
-        if (Desktop.isDesktopSupported()) {
-            final Desktop desktop = Desktop.getDesktop();
-            if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
-                try {
-                    desktop.browse(new URI(siteUrl));
-                    return true;
-                } catch (final Exception e) {
-                    // on error show the message
-                }
-            }
+        try {
+            Desktop.getDesktop().browse(url.toURI());
+        } catch (final IOException | URISyntaxException e) {
+            LOGGER.log(Level.WARNING,
+                    "Could not open the browser, the link stays in the dialog: "
+                            + url,
+                    e);
         }
-        return false;
     }
 
     private final String localize(final String key) {

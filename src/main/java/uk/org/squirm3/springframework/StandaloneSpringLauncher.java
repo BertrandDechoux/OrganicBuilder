@@ -1,6 +1,11 @@
 package uk.org.squirm3.springframework;
 
+import javax.swing.JFrame;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import uk.org.squirm3.ui.UiScaling;
+import uk.org.squirm3.ui.theme.UiThemes;
 
 /**
  * Startup for standalone application using a spring xml application context for
@@ -21,6 +26,9 @@ public class StandaloneSpringLauncher {
      * @param args unused arguments from cli
      */
     public static void main(final String... args) {
+        UiScaling.adaptToScreenResolution();
+        UiThemes.installSavedTheme();
+        JFrame.setDefaultLookAndFeelDecorated(true);
         new ClassPathXmlApplicationContext(DEFAULT_APPLICATION_CONTEXT);
     }
 
