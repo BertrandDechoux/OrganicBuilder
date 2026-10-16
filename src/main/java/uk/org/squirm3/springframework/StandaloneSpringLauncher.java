@@ -2,6 +2,8 @@ package uk.org.squirm3.springframework;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import uk.org.squirm3.ui.UiScaling;
+
 /**
  * Startup for standalone application using a spring xml application context for
  * configuration.
@@ -21,6 +23,7 @@ public class StandaloneSpringLauncher {
      * @param args unused arguments from cli
      */
     public static void main(final String... args) {
+        UiScaling.adaptToScreenResolution();
         new ClassPathXmlApplicationContext(DEFAULT_APPLICATION_CONTEXT);
     }
 
